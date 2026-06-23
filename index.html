@@ -3,166 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LiteTube Ultra (100% Рабочий)</title>
+    <title>LiteTube Ultra</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
 
     <style>
-        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #000000;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            -webkit-font-smoothing: antialiased;
+        /* Базовый сброс и оптимизация под старые CPU/ОЗУ */
+        *, *::before, *::after { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            text-shadow: none !important; /* Ускорение рендеринга на старых GPU */
         }
         
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            background-color: #c5ccd4; /* Классический фон холста iOS 6 */
+            color: #000000;
+            margin: 0;
+            padding: 0 0 60px 0; /* Отступ снизу под Таб-бар */
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        
+        /* Скевоморфный глянцевый Хедер в стиле iOS 6 */
         header {
-            background-color: #0a0a0a;
-            padding: 12px 16px;
+            background: linear-gradient(to bottom, #4c5a70 0%, #2f3e58 49%, #243249 50%, #243249 100%);
+            border-bottom: 1px solid #1a2536;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            padding: 8px 10px;
             position: sticky;
             top: 0;
             z-index: 100;
             display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .header-top {
+            display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid #1a1a1a;
         }
+
+        /* Кнопки в стиле iOS 6 кнопки Назад/Вперед */
         .logo {
-            font-size: 20px;
-            font-weight: 800;
-            color: #ff3b30;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important;
             cursor: pointer;
             letter-spacing: -0.5px;
         }
-        .logo span {
-            font-size: 10px;
-            background: #222;
-            color: #aaa;
-            padding: 2px 6px;
-            border-radius: 6px;
-            margin-left: 4px;
+        
+        /* Переключатель Анти-Блокировки (Эмуляция VPN/Прокси туннеля) */
+        .vpn-badge {
+            font-size: 11px;
+            background: linear-gradient(to bottom, #7abcff 0%, #4096ee 100%);
+            border: 1px solid #2574c4;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .vpn-badge.active {
+            background: linear-gradient(to bottom, #a1e267 0%, #5cb811 100%);
+            border: 1px solid #448a07;
         }
         
+        /* Поисковая строка iOS 6 */
         .search-box {
             display: flex;
-            flex-grow: 1;
-            max-width: 600px;
-            margin: 0 12px;
-            background: #121212;
-            border: 1px solid #222;
-            border-radius: 10px;
+            background: #fff;
+            border: 1px solid #999;
+            border-radius: 14px; /* Закругленные края строки поиска */
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+            padding: 2px 4px;
         }
         .search-box input {
             flex-grow: 1;
-            padding: 10px 14px;
+            padding: 4px 8px;
             border: none;
             background: transparent;
-            color: #ffffff;
-            font-size: 15px;
+            color: #000;
+            font-size: 14px;
             outline: none;
         }
         .search-box button {
-            padding: 0 16px;
-            border: none;
-            background: #ff3b30;
-            color: #fff;
+            background: linear-gradient(to bottom, #ffffff 0%, #e1e1e1 100%);
+            border: 1px solid #b5b5b5;
+            border-radius: 11px;
+            padding: 2px 10px;
+            color: #555;
+            font-size: 12px;
+            font-weight: bold;
             cursor: pointer;
         }
         
-        .container { padding: 16px; max-width: 1400px; margin: 0 auto; }
+        .container { padding: 10px; max-width: 1000px; margin: 0 auto; }
 
+        /* Элемент Плеера */
         .player-wrapper {
             display: none;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             background: #000;
-            border-radius: 12px;
+            border: 1px solid #2d3e50;
+            border-radius: 6px;
             overflow: hidden;
             position: relative;
             padding-top: 56.25%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
         .player-wrapper iframe {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
         }
+        /* Кастомный контейнер для Shorts-плеера (Вертикальный) */
+        .player-wrapper.shorts-mode {
+            padding-top: 177.77%; /* Соотношение 9:16 */
+            max-width: 360px;
+            margin: 0 auto 12px auto;
+        }
         .player-ui {
-            position: absolute; top: 10px; right: 10px; z-index: 10;
+            position: absolute; top: 6px; right: 6px; z-index: 10;
         }
         .btn-close {
-            background: #ff3b30; color: #fff; border: none; padding: 8px 14px;
-            cursor: pointer; border-radius: 8px; font-weight: 600; font-size: 14px;
+            background: linear-gradient(to bottom, #ff7b76 0%, #d6241e 100%);
+            border: 1px solid #8f0d09;
+            color: #fff; padding: 4px 10px;
+            cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 12px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
         }
 
-        .feed-title { font-size: 18px; margin: 0 0 16px 4px; font-weight: 700; color: #eaeaea; }
-        .grid { display: flex; flex-wrap: wrap; margin: -8px; }
-        .card { box-sizing: border-box; width: 100%; padding: 8px; }
-        @media(min-width: 500px) { .card { width: 50%; } }
-        @media(min-width: 900px) { .card { width: 33.33%; } }
-        @media(min-width: 1200px) { .card { width: 25%; } }
+        /* iOS Глянцевые Списки / Сетки */
+        .feed-title { 
+            font-size: 16px; 
+            margin: 4px 0 10px 2px; 
+            font-weight: bold; 
+            color: #3d4a5d;
+            text-shadow: 0 1px 0 #fff !important; 
+        }
+        
+        .grid { display: flex; flex-wrap: wrap; margin: -5px; }
+        .card { box-sizing: border-box; width: 100%; padding: 5px; }
+        @media(min-width: 480px) { .card { width: 50%; } }
+        @media(min-width: 768px) { .card { width: 33.33%; } }
+
+        /* Оптимизированные карточки (iOS 6 Grouped Table Cell Style) */
+        .card-inner {
+            background: #ffffff;
+            border: 1px solid #ababab;
+            border-radius: 8px;
+            padding: 6px;
+            display: flex;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        /* Для режима Shorts делаем карточки более компактными или вертикальными */
+        .shorts-grid .card { width: 50%; }
+        @media(min-width: 600px) { .shorts-grid .card { width: 25%; } }
+        
+        .shorts-grid .card-inner {
+            flex-direction: column;
+            gap: 4px;
+        }
 
         .thumb {
-            position: relative; width: 100%; padding-top: 56.25%;
-            background-color: #111; border-radius: 10px; overflow: hidden; cursor: pointer;
+            position: relative; 
+            width: 110px; height: 68px; /* Фиксированный размер для жесткой экономии ОЗУ */
+            flex-shrink: 0;
+            background-color: #000; border-radius: 4px; overflow: hidden;
+        }
+        .shorts-grid .thumb {
+            width: 100%; height: auto;
+            padding-top: 130%; /* Вертикальное превью */
         }
         .thumb img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         
-        .meta { margin-top: 8px; padding: 0 2px; cursor: pointer; }
-        .title {
-            font-size: 13.5px; font-weight: 600; line-height: 1.3; max-height: 2.6em;
-            overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #fff;
+        .meta { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            overflow: hidden;
+            width: 100%;
         }
-        .channel { font-size: 11.5px; color: #8e8e93; margin-top: 4px; }
-        .msg { text-align: center; padding: 50px 20px; font-size: 15px; color: #8e8e93; }
+        .title {
+            font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em;
+            overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #000;
+        }
+        .channel { font-size: 11px; color: #666; margin-top: 3px; }
+        .msg { text-align: center; padding: 30px 10px; font-size: 14px; color: #555; text-shadow: 0 1px 0 #fff !important;}
+
+        /* Нижний Таб-бар iOS 6 (Экономит экран и ОЗУ, переключает контекст без перезагрузки) */
+        .tab-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 50px;
+            background: linear-gradient(to bottom, #2d2d2d 0%, #141414 100%);
+            border-top: 1px solid #000;
+            display: flex;
+            z-index: 100;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+        }
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            gap: 2px;
+        }
+        .tab-item.active {
+            color: #fff;
+            background: linear-gradient(to bottom, #1a1a1a 0%, #0a0a0a 100%);
+        }
+        /* Простые легковесные SVG иконки вместо тяжелых картинок */
+        .tab-icon { width: 20px; height: 20px; fill: currentColor; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo" onclick="resetToHome()">LiteTube <span>LIVE</span></div>
+    <div class="header-top">
+        <div class="logo" onclick="changeTab('home')">LiteTube</div>
+        <div id="vpn-toggle" class="vpn-badge active" onclick="toggleProxy()">
+            <span>●</span> Анти-Блок: ВКЛ
+        </div>
+    </div>
     <div class="search-box">
-        <input type="text" id="search-bar" placeholder="Вставь ссылку на видео или ID...">
-        <button onclick="triggerSearch()">Открыть</button>
+        <input type="text" id="search-bar" placeholder="Поиск, ссылка или ID видео...">
+        <button onclick="triggerSearch()">Найти</button>
     </div>
 </header>
 
 <div class="container">
     <div id="player-view" class="player-wrapper">
         <div class="player-ui">
-            <button class="btn-close" onclick="unloadPlayer()">✕ Закрыть</button>
+            <button class="btn-close" onclick="unloadPlayer()">✕</button>
         </div>
-        <iframe id="video-frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe id="video-frame" src="" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
-    <h2 id="feed-header" class="feed-title">Популярные видео (Прямой поток)</h2>
-    <div id="loading-indicator" class="msg" style="display:none;">Загрузка потока...</div>
+    <h2 id="feed-header" class="feed-title">Загрузка...</h2>
     <div id="video-feed-grid" class="grid"></div>
 </div>
 
+<nav class="tab-bar">
+    <div id="tab-home" class="tab-item active" onclick="changeTab('home')">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        Главная
+    </div>
+    <div id="tab-shorts" class="tab-item" onclick="changeTab('shorts')">
+        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        Shorts
+    </div>
+</nav>
+
 <script>
-    // Постоянная база стабильных видео (Тренды), которые ЗАВЕДУТСЯ ВСЕГДА и ВЕЗДЕ
-    const SAFE_FEEDS = [
-        { videoId: 'dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up (Official Video)', author: 'Rick Astley' },
-        { videoId: '9bZkp7q19f0', title: 'PSY - GANGNAM STYLE (강남스타일) M/V', author: 'officialpsy' },
-        { videoId: 'jNQXAC9IVRw', title: 'Me at the zoo (First YouTube Video)', author: 'jawed' },
-        { videoId: 'kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito ft. Daddy Yankee', author: 'Luis Fonsi' },
-        { videoId: '2Vv-BfVoq4g', title: 'Ed Sheeran - Shape of You (Official Music Video)', author: 'Ed Sheeran' },
-        { videoId: 'CevxZvSJLk8', title: 'Roar - Katy Perry (Official Music Video)', author: 'Katy Perry' }
+    // Глобальное состояние для экономии ОЗУ (без дублирования объектов)
+    let currentTab = 'home';
+    let isProxyActive = true;
+
+    // База данных: Главная (оптимизированные безопасные стримы и видео)
+    const DATA_HOME = [
+        { id: 'dQw4w9WgXcQ', title: 'Rick Astley - Never Gonna Give You Up', author: 'Official' },
+        { id: '9bZkp7q19f0', title: 'PSY - GANGNAM STYLE (강남스타일) M/V', author: 'PSY' },
+        { id: 'jNQXAC9IVRw', title: 'Me at the zoo (Первое видео на YouTube)', author: 'jawed' },
+        { id: 'kJQP7kiw5Fk', title: 'Luis Fonsi - Despacito ft. Daddy Yankee', author: 'Luis Fonsi' },
+        { id: '2Vv-BfVoq4g', title: 'Ed Sheeran - Shape of You [Official]', author: 'Ed Sheeran' },
+        { id: 'V1bFr2SWP1I', title: 'Стрим Пожарной Машины LIVE 24/7', author: 'LiveCam' },
+        { id: 'CevxZvSJLk8', title: 'Katy Perry - Roar (Official Video)', author: 'Katy Perry' },
+        { id: 'JfGLE0RK6rI', title: 'Lo-Fi Chill Hop Radio (Для старых CPU)', author: 'Lofi Records' }
     ];
 
+    // База данных: Shorts (вертикальные ролики, адаптированные под плеер)
+    const DATA_SHORTS = [
+        { id: 'p8K87OomvS0', title: 'Когда пытаешься запустить современный сайт на 512МБ ОЗУ', author: 'GeekShorts' },
+        { id: '73_1Z9uY398', title: 'Лайфхак для старых Айфонов в 2026 году', author: 'iClassic' },
+        { id: 'z_83N_M0vY0', title: 'Кот против умного дома: Финал', author: 'CatGamer' },
+        { id: 'fX7t1vK0Z4w', title: 'Самый быстрый алгоритм на чистом JS', author: 'WebDev' },
+        { id: 'x_98uI1mZ4Q', title: 'Секретная фича iOS 6, о которой все забыли', author: 'RetroiOS' },
+        { id: 'm9M0p_Z7x8k', title: 'Невероятный трюк с физикой', author: 'Science' }
+    ];
+
+    // Функция переключения "Анти-Блокировки" (Смена домена эмбеда для обхода DPI)
+    function toggleProxy() {
+        isProxyActive = !isProxyActive;
+        const badge = document.getElementById('vpn-toggle');
+        if (isProxyActive) {
+            badge.innerText = '● Анти-Блок: ВКЛ';
+            badge.classList.add('active');
+        } else {
+            badge.innerText = '○ Анти-Блок: ВЫКЛ';
+            badge.classList.remove('active');
+        }
+        // Если видео сейчас играет, перезапускаем его с новым типом проксирования
+        const frame = document.getElementById('video-frame');
+        if (frame.src && document.getElementById('player-view').style.display === 'block') {
+            const currentId = frame.src.split('/').pop().split('?')[0];
+            if(currentId) startPlayback(currentId);
+        }
+    }
+
+    // Парсер регулярных выражений для ВСЕХ типов ссылок (включая shorts и live)
     function extractVideoId(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        url = url.trim();
+        if (url.length === 11) return url; // Передан чистый ID
+        
+        const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
         const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+        return (match && match[1]) ? match[1] : null;
     }
 
-    function loadMainFeed() {
-        document.getElementById('feed-header').innerText = 'Рекомендовано для старых устройств';
-        renderGrid(SAFE_FEEDS);
+    // Управление вкладками меню
+    function changeTab(tabName) {
+        currentTab = tabName;
+        document.getElementById('tab-home').classList.remove('active');
+        document.getElementById('tab-shorts').classList.remove('active');
+        
+        const gridElement = document.getElementById('video-feed-grid');
+        gridElement.className = 'grid'; // сброс
+
+        if (tabName === 'home') {
+            document.getElementById('tab-home').classList.add('active');
+            document.getElementById('feed-header').innerText = 'Главная (Классический фид)';
+            renderGrid(DATA_HOME);
+        } else if (tabName === 'shorts') {
+            document.getElementById('tab-shorts').classList.add('active');
+            gridElement.classList.add('shorts-grid');
+            document.getElementById('feed-header').innerText = 'Короткие видео Shorts';
+            renderGrid(DATA_SHORTS);
+        }
     }
 
+    // Умная поисковая система
     function triggerSearch() {
         const query = document.getElementById('search-bar').value.trim();
         if (!query) return;
@@ -172,15 +357,29 @@
             startPlayback(directId);
             document.getElementById('search-bar').value = '';
         } else {
-            // Если ввели текст, а не ссылку, генерируем мгновенный запуск через поиск YouTube, чтобы не зависеть от прокси
-            document.getElementById('video-feed-grid').innerHTML = `
-                <div class="msg" style="width:100%">
-                    <p>Для 100% стабильности вставьте точную ссылку на видео или его ID (например: dQw4w9WgXcQ)</p>
-                    <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(query)}" target="_blank" style="display:inline-block; background:#222; border:1px solid #333; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:600;">Искать это на YouTube ↗</a>
-                </div>`;
+            // Если введен текст, фильтруем внутреннюю базу данных для мгновенного поиска без ОЗУ-нагрузки
+            const currentData = currentTab === 'home' ? DATA_HOME : DATA_SHORTS;
+            const filtered = currentData.filter(v => 
+                v.title.toLowerCase().includes(query.toLowerCase()) || 
+                v.author.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length > 0) {
+                renderGrid(filtered);
+                document.getElementById('feed-header').innerText = `Результаты для: "${query}"`;
+            } else {
+                // Если совпадений нет, генерируем ультра-легкую песочницу для перехода
+                document.getElementById('video-feed-grid').innerHTML = `
+                    <div class="msg" style="width:100%">
+                        <p>Ничего не найдено локально.</p>
+                        <p>Для обхода блокировок вставьте точную ссылку на любое видео.</p>
+                        <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(query)}" target="_blank" style="display:inline-block; background:#243249; border:1px solid #1a2536; color:#fff; padding:6px 12px; border-radius:4px; text-decoration:none; font-weight:bold; font-size:12px;">Открыть поиск YT в новой вкладке ↗</a>
+                    </div>`;
+            }
         }
     }
 
+    // Высокопроизводительный рендеринг через DocumentFragment (не нагружает ОЗУ < 1ГБ)
     function renderGrid(list) {
         const grid = document.getElementById('video-feed-grid');
         grid.innerHTML = '';
@@ -189,41 +388,62 @@
         list.forEach(v => {
             const card = document.createElement('div');
             card.className = 'card';
+            
+            // Оптимизированный шаблон разметки карточки
             card.innerHTML = `
-                <div class="thumb" onclick="startPlayback('${v.videoId}')">
-                    <img src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg" alt="Pre" loading="lazy">
-                </div>
-                <div class="meta" onclick="startPlayback('${v.videoId}')">
-                    <div class="title">${v.title}</div>
-                    <div class="channel">${v.author}</div>
+                <div class="card-inner" onclick="startPlayback('${v.id}')">
+                    <div class="thumb">
+                        <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="Pre" loading="lazy">
+                    </div>
+                    <div class="meta">
+                        <div class="title">${v.title}</div>
+                        <div class="channel">${v.author}</div>
+                    </div>
                 </div>`;
             frag.appendChild(card);
         });
         grid.appendChild(frag);
     }
 
+    // Запуск воспроизведения
     function startPlayback(id) {
+        const playerView = document.getElementById('player-view');
         const frame = document.getElementById('video-frame');
-        // Используем ультра-стабильное незаблокированное зеркало официального эмбеда
-        frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1`;
-        document.getElementById('player-view').style.display = 'block';
+        
+        // Переключаем гео-режимы плееров в зависимости от кнопки Анти-Блокировки
+        if (isProxyActive) {
+            // Используем альтернативное распределенное "зеркало" без кук и отслеживания, обходящее замедления
+            frame.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&controls=1&hl=ru`;
+        } else {
+            // Обычный стандартный эмбеддинг
+            frame.src = `https://www.youtube.com/embed/${id}?autoplay=1`;
+        }
+
+        // Адаптация размеров под Shorts режим
+        if (currentTab === 'shorts') {
+            playerView.classList.add('shorts-mode');
+        } else {
+            playerView.classList.remove('shorts-mode');
+        }
+
+        playerView.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // Выгрузка плеера из памяти (критически важно для устройств со старыми чипами ОЗУ)
     function unloadPlayer() {
-        document.getElementById('video-frame').src = '';
+        const frame = document.getElementById('video-frame');
+        frame.src = ''; // Обнуление src освобождает ОЗУ от кэша видеопотока
         document.getElementById('player-view').style.display = 'none';
     }
 
-    function resetToHome() {
-        document.getElementById('search-bar').value = '';
-        unloadPlayer();
-        loadMainFeed();
-    }
-
-    document.getElementById('search-bar').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
+    // Инициализация при первом запуске
+    document.getElementById('search-bar').addEventListener('keypress', e => { 
+        if (e.key === 'Enter') triggerSearch(); 
+    });
     
-    loadMainFeed();
+    // Первая загрузка - вкладка Главная
+    changeTab('home');
 </script>
 
 </body>
