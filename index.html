@@ -2,12 +2,40 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#465c71">
     <title>LiteTube Ultra iOS6</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
 
     <style>
+        /* CSS-переменные для мгновенного переключения тем */
+        :root {
+            --bg-texture: #c5ccd4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%23c5ccd4"/><circle cx="2" cy="2" r="1" fill="%23b8bfc7"/></svg>');
+            --text-main: #000000;
+            --text-sub: #555555;
+            --header-grad: linear-gradient(to bottom, #768a9e 0%, #465c71 50%, #3a4f64 51%, #314355 100%);
+            --header-border: #2d3e4f;
+            --card-bg: #ffffff;
+            --card-border: #ababab;
+            --card-shadow: rgba(0,0,0,0.1);
+            --search-bg: #ffffff;
+            --search-text: #000000;
+        }
+
+        [data-theme="dark"] {
+            --bg-texture: #1e1e1e url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%231e1e1e"/><circle cx="2" cy="2" r="1" fill="%232a2a2a"/></svg>');
+            --text-main: #f0f0f0;
+            --text-sub: #aaaaaa;
+            --header-grad: linear-gradient(to bottom, #3a3a3a 0%, #1f1f1f 50%, #111111 51%, #000000 100%);
+            --header-border: #000000;
+            --card-bg: #2a2a2a;
+            --card-border: #111111;
+            --card-shadow: rgba(0,0,0,0.5);
+            --search-bg: #333333;
+            --search-text: #ffffff;
+        }
+
         /* Жесткая оптимизация рендеринга для слабых CPU */
         *, *::before, *::after { 
             box-sizing: border-box; 
@@ -18,238 +46,129 @@
         
         body {
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background: #c5ccd4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%23c5ccd4"/><circle cx="2" cy="2" r="1" fill="%23b8bfc7"/></svg>'); /* iOS 6 Linen-like Texture */
-            color: #000000;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
+            background: var(--bg-texture);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            overflow: hidden; height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* КЛАССИЧЕСКИЙ iOS 6 SLATE NAV BAR */
+        /* Хедер */
         header {
-            background: linear-gradient(to bottom, #768a9e 0%, #465c71 50%, #3a4f64 51%, #314355 100%);
-            border-bottom: 1px solid #2d3e4f;
+            background: var(--header-grad);
+            border-bottom: 1px solid var(--header-border);
             box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-            padding: 6px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            height: 80px;
-            position: relative;
-            z-index: 10;
+            padding: 8px 10px;
+            display: flex; flex-direction: column; gap: 8px;
+            height: 85px; position: relative; z-index: 10;
         }
 
-        .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 30px;
-        }
-
-        /* Глянцевый текст iOS */
-        .logo {
-            font-size: 19px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important;
-            cursor: pointer;
-        }
+        .header-top { display: flex; align-items: center; justify-content: space-between; height: 30px; }
+        .logo { font-size: 19px; font-weight: bold; color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important; cursor: pointer; }
         
-        /* Скевоморфная iOS 6 кнопка переключения прокси */
-        .vpn-badge {
+        .header-actions { display: flex; gap: 6px; align-items: center; }
+
+        /* Кнопки в стиле iOS 6 */
+        .ios-btn {
             font-size: 11px;
             background: linear-gradient(to bottom, #5a7491 0%, #34465d 100%);
-            border: 1px solid #283748;
-            border-radius: 4px;
-            color: white;
-            padding: 4px 10px;
-            font-weight: bold;
-            cursor: pointer;
+            border: 1px solid #283748; border-radius: 4px; color: white;
+            padding: 4px 10px; font-weight: bold; cursor: pointer;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 1px rgba(0,0,0,0.2);
+            display: flex; align-items: center; justify-content: center;
         }
-        .vpn-badge.active {
-            background: linear-gradient(to bottom, #74ca5d 0%, #3b9423 100%);
-            border: 1px solid #246112;
-        }
+        .ios-btn.active { background: linear-gradient(to bottom, #74ca5d 0%, #3b9423 100%); border-color: #246112; }
         
-        /* Поисковое поле iOS 6 SearchBar */
+        /* Поиск */
         .search-box {
-            display: flex;
-            background: #fff;
-            border: 1px solid #717171;
-            border-radius: 14px; 
-            overflow: hidden;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-            padding: 1px 3px;
-            height: 28px;
-            align-items: center;
+            display: flex; background: var(--search-bg); border: 1px solid #717171;
+            border-radius: 14px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            padding: 1px 3px; height: 30px; align-items: center;
         }
         .search-box input {
-            flex-grow: 1;
-            padding: 2px 8px;
-            border: none;
-            background: transparent;
-            color: #000;
-            font-size: 14px;
-            outline: none;
+            flex-grow: 1; padding: 2px 8px; border: none; background: transparent;
+            color: var(--search-text); font-size: 14px; outline: none; width: 100%;
         }
         .search-box button {
-            background: linear-gradient(to bottom, #fafafa 0%, #cecece 100%);
-            border: 1px solid #9c9c9c;
-            border-radius: 11px;
-            padding: 2px 12px;
-            color: #444;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 1px 0 #fff;
+            background: linear-gradient(to bottom, #fafafa 0%, #cecece 100%); border: 1px solid #9c9c9c;
+            border-radius: 11px; padding: 2px 12px; color: #444; font-size: 12px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 1px 0 #fff; flex-shrink: 0;
         }
 
-        /* Главный рабочий контейнер со скроллом */
+        /* Главный контейнер (GPU-ускорен) */
         .main-content {
-            height: calc(100vh - 130px); /* Минус Хедер и Таббар */
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 10px;
+            height: calc(100vh - 135px); /* Учитываем таббар и хедер */
+            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px;
+            transform: translateZ(0); /* Включает аппаратное ускорение скролла */
+            will-change: transform;
         }
         
-        /* ЛЕНТА SHORTS (Режим TikTok / Бесконечный вертикальный слайдер) */
-        .main-content.shorts-mode {
-            padding: 0;
-            scroll-snap-type: y mandatory;
-            overflow-y: scroll;
-            background: #000;
-        }
+        .main-content.shorts-mode { padding: 0; scroll-snap-type: y mandatory; background: #000; }
 
-        /* Сетка видео под любые экраны (Стиль списков iOS 6 Grouped) */
+        /* Оптимизированная адаптивная сетка: поддержка ультра-мелких экранов (min 100%) */
         .grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 12px; 
-            max-width: 1200px;
-            margin: 0 auto;
+            grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); 
+            gap: 12px; max-width: 1200px; margin: 0 auto;
         }
 
+        /* Карточка видео */
         .card-inner {
-            background: #ffffff;
-            border: 1px solid #ababab;
-            border-radius: 8px;
-            padding: 6px;
-            display: flex;
-            gap: 10px;
-            cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            border-radius: 8px; padding: 6px; display: flex; gap: 10px;
+            cursor: pointer; box-shadow: 0 1px 2px var(--card-shadow);
+            transition: background 0.3s;
         }
 
-        .thumb {
-            position: relative; 
-            width: 120px; height: 75px; 
-            background-color: #000; border-radius: 4px; overflow: hidden;
-            flex-shrink: 0;
-        }
+        /* Карточка канала */
+        .card-inner.channel-card { align-items: center; }
+        .channel-avatar { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--card-border); object-fit: cover; flex-shrink: 0; }
+        .channel-badge-text { font-size: 10px; background: var(--header-grad); color: #fff; padding: 2px 6px; border-radius: 3px; margin-top: 4px; font-weight: bold; display: inline-block; }
+
+        .thumb { position: relative; width: 120px; height: 75px; background-color: #000; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
         .thumb img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         
-        .meta { display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
-        .title {
-            font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em;
-            overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #000;
-        }
-        .channel { font-size: 11px; color: #555; margin-top: 4px; }
+        .meta { display: flex; flex-direction: column; justify-content: center; overflow: hidden; width: 100%; }
+        .title { font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: var(--text-main); }
+        .channel { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
 
-        /* ЭЛЕМЕНТ ВЕРТИКАЛЬНОЙ ЛЕНТЫ SHORTS (iOS 6 Skeuomorphic Overlay) */
-        .shorts-item {
-            width: 100%;
-            height: calc(100vh - 130px);
-            scroll-snap-align: start;
-            position: relative;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 2px solid #333;
-        }
+        /* Shorts */
+        .shorts-item { width: 100%; height: calc(100vh - 135px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #333; }
+        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: #111; }
+        .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
+        .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
         
-        .shorts-media-container {
-            width: 100%;
-            max-width: 420px;
-            height: 100%;
-            position: relative;
-            background: #111;
-        }
-
-        .shorts-item iframe, .shorts-item .shorts-placeholder {
-            width: 100%;
-            height: 100%;
-            border: none;
-            position: absolute;
-            top: 0; left: 0;
-        }
-
-        .shorts-placeholder {
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            cursor: pointer;
-        }
-
-        /* Градиентный скевоморфный шильдик поверх шортса */
-        .shorts-overlay-info {
-            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-            padding: 20px 12px;
-            color: #fff;
-        }
+        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%); padding: 20px 12px; color: #fff; }
         .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold;}
         .shorts-overlay-info p { margin: 0; font-size: 12px; color: #ccc;}
 
-        /* Плей-кнопка по центру */
         .play-btn-center {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.7) 100%);
             border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px;
             display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .play-btn-center::after {
-            content: ''; display: block; margin-left: 4px;
-            border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111;
-        }
+        .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
 
-        /* ВСПЛЫВАЮЩИЙ КЛАССИЧЕСКИЙ ПЛЕЕР ДЛЯ ГЛАВНОЙ СТРАНИЦЫ */
-        .ios-player-modal {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 200; padding: 10px;
-            flex-direction: column; justify-content: center; align-items: center;
-        }
-        .ios-player-box {
-            width: 100%; max-width: 700px; background: #222; border: 2px solid #555;
-            border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000;
-        }
-        .ios-player-bar {
-            background: linear-gradient(to bottom, #4c5a70 0%, #243249 100%);
-            padding: 6px; display: flex; justify-content: flex-end; border-bottom: 1px solid #111;
-        }
+        /* Всплывающий плеер */
+        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; }
+        .ios-player-box { width: 100%; max-width: 700px; background: #222; border: 2px solid #555; border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000; }
+        .ios-player-bar { background: linear-gradient(to bottom, #4c5a70 0%, #243249 100%); padding: 6px; display: flex; justify-content: flex-end; border-bottom: 1px solid #111; }
         .ios-video-container { position: relative; padding-top: 56.25%; background: #000; }
         .ios-video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
 
-        /* ИНФОРМАЦИОННЫЕ СООБЩЕНИЯ */
-        .loader, .msg { text-align: center; color: #465c71; padding: 30px 10px; font-weight: bold; text-shadow: 0 1px 0 #fff !important; }
+        /* Инфо сообщения */
+        .msg-box { text-align: center; color: var(--text-sub); padding: 40px 10px; font-weight: bold; }
 
-        /* ТАБ-БАР В СТИЛЕ iOS 6 (Глянцевый черный металл) */
+        /* Таб-бар */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
             background: linear-gradient(to bottom, #444444 0%, #111111 50%, #000000 51%, #000000 100%);
             border-top: 1px solid #222; display: flex; z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom); /* Фикс для современных iPhone с "челкой" */
         }
-        .tab-item {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px;
-        }
-        .tab-item.active {
-            color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%);
-            box-shadow: inset 0 1px 5px rgba(0,0,0,0.8);
-        }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px; }
+        .tab-item.active { color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%); box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); }
         .tab-icon { width: 22px; height: 22px; fill: currentColor; }
     </style>
 </head>
@@ -258,12 +177,13 @@
 <header>
     <div class="header-top">
         <div class="logo" onclick="changeTab('home')">LiteTube</div>
-        <div id="vpn-toggle" class="vpn-badge active" onclick="toggleProxy()">
-            ● Анти-Блок: СКВO
+        <div class="header-actions">
+            <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()" title="Сменить тему">🌙</div>
+            <div id="vpn-toggle" class="ios-btn active" onclick="toggleProxy()">● Анти-Блок</div>
         </div>
     </div>
     <div class="search-box">
-        <input type="text" id="search-bar" placeholder="Поиск свежих видео...">
+        <input type="text" id="search-bar" placeholder="Поиск видео или @автора...">
         <button onclick="triggerSearch()">Найти</button>
     </div>
 </header>
@@ -273,7 +193,7 @@
 <div id="ios-player" class="ios-player-modal">
     <div class="ios-player-box">
         <div class="ios-player-bar">
-            <button class="vpn-badge" onclick="closePlayer()">✕ Готово</button>
+            <button class="ios-btn" onclick="closePlayer()">✕ Готово</button>
         </div>
         <div class="ios-video-container" id="player-target"></div>
     </div>
@@ -294,12 +214,25 @@
     let currentTab = 'home';
     let isProxyActive = true;
     
-    // Продвинутый пул быстрых независимых нод-серверов для распределения нагрузки
+    // Инициализация темы при загрузке
+    function initTheme() {
+        const savedTheme = localStorage.getItem('litetube_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-toggle').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('litetube_theme', newTheme);
+        document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+    
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
-        "https://yewtu.be/api/v1/",
-        "https://invidious.flokinet.to/api/v1/"
+        "https://yewtu.be/api/v1/"
     ];
     let currentNodeIndex = 0;
 
@@ -307,18 +240,12 @@
         isProxyActive = !isProxyActive;
         const badge = document.getElementById('vpn-toggle');
         badge.classList.toggle('active', isProxyActive);
-        badge.innerText = isProxyActive ? '● Анти-Блок: СКВO' : '○ Анти-Блок: ВЫКЛ';
+        badge.innerText = isProxyActive ? '● Анти-Блок' : '○ Выкл';
     }
 
-    function getApiUrl(endpoint) {
-        return PROXY_NODES[currentNodeIndex] + endpoint;
-    }
+    function getApiUrl(endpoint) { return PROXY_NODES[currentNodeIndex] + endpoint; }
+    function switchNode() { currentNodeIndex = (currentNodeIndex + 1) % PROXY_NODES.length; }
 
-    function switchNode() {
-        currentNodeIndex = (currentNodeIndex + 1) % PROXY_NODES.length;
-    }
-
-    // Универсальный парсер ссылок/ID
     function extractVideoId(url) {
         if (!url) return null;
         url = url.trim();
@@ -328,162 +255,167 @@
         return (match && match[1]) ? match[1] : null;
     }
 
-    // Загрузка СВЕЖИХ видео (Живые тренды с серверов)
-    async function loadDynamicContent(query = '') {
+    async function loadDynamicContent(query = '', isChannelSearch = false) {
         const view = document.getElementById('main-view');
-        view.innerHTML = '<div class="loader">Синхронизация с узлом YouTube...</div>';
+        view.innerHTML = '<div class="msg-box">Синхронизация...</div>';
         
         let attempts = 0;
         while (attempts < PROXY_NODES.length) {
             try {
-                const url = query 
-                    ? getApiUrl(`search?q=${encodeURIComponent(query)}&type=video`)
-                    : getApiUrl(`trending?region=RU`);
+                let url;
+                if (currentTab === 'shorts') {
+                    url = getApiUrl(`search?q=${encodeURIComponent(query ? query + ' shorts' : 'shorts trending')}&type=video`);
+                } else if (isChannelSearch) {
+                    url = getApiUrl(`search?q=${encodeURIComponent(query)}&type=channel`);
+                } else if (query) {
+                    url = getApiUrl(`search?q=${encodeURIComponent(query)}&type=video`);
+                } else {
+                    url = getApiUrl(`trending?region=RU`);
+                }
                 
                 const res = await fetch(url, { cache: "no-store" });
                 if (!res.ok) throw new Error();
-                
                 const data = await res.json();
-                let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }));
                 
+                if (isChannelSearch) { renderChannelsList(data); return; }
+
                 if (currentTab === 'shorts') {
-                    // Имитация оригинальной ленты: берем только вертикальные короткие ролики
-                    parsed = parsed.filter(v => v.sec && v.sec < 65);
-                    renderShortsFeed(parsed.slice(0, 15));
+                    let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }));
+                    let filtered = parsed.filter(v => !v.sec || v.sec < 65);
+                    renderShortsFeed((filtered.length ? filtered : parsed).slice(0, 15));
                 } else {
-                    renderHomeGrid(parsed.slice(0, 24));
+                    renderHomeGrid(data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24));
                 }
-                return; // Успешно вышли
+                return;
             } catch (e) {
-                console.warn(`Узел ${PROXY_NODES[currentNodeIndex]} недоступен. Переключение...`);
-                switchNode();
-                attempts++;
+                switchNode(); attempts++;
             }
         }
-        view.innerHTML = '<div class="msg">Ошибка сети. Пожалуйста, попробуйте изменить статус Анти-Блока или повторить попытку позже.</div>';
+        view.innerHTML = '<div class="msg-box">Ошибка сети. Проверьте Анти-Блок.</div>';
+    }
+
+    async function loadChannelVideos(channelId, channelName) {
+        const view = document.getElementById('main-view');
+        view.innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
+        let attempts = 0;
+        while (attempts < PROXY_NODES.length) {
+            try {
+                const res = await fetch(getApiUrl(`channels/${channelId}/videos`), { cache: "no-store" });
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                renderHomeGrid((data.videos || data).map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30));
+                return;
+            } catch (e) { switchNode(); attempts++; }
+        }
+        view.innerHTML = '<div class="msg-box">Ошибка загрузки видео канала.</div>';
     }
 
     function changeTab(tabName) {
         currentTab = tabName;
         document.getElementById('tab-home').classList.remove('active');
         document.getElementById('tab-shorts').classList.remove('active');
-        
-        const view = document.getElementById('main-view');
-        closePlayer(); // Выгружаем плееры при переходе
+        closePlayer();
 
+        const view = document.getElementById('main-view');
         if (tabName === 'home') {
             document.getElementById('tab-home').classList.add('active');
             view.className = 'main-content';
-            loadDynamicContent();
-        } else if (tabName === 'shorts') {
+        } else {
             document.getElementById('tab-shorts').classList.add('active');
             view.className = 'main-content shorts-mode';
-            loadDynamicContent();
         }
+        loadDynamicContent();
     }
 
     function triggerSearch() {
-        const query = document.getElementById('search-bar').value.trim();
+        let query = document.getElementById('search-bar').value.trim();
         if (!query) return;
-
         const id = extractVideoId(query);
         if (id) {
             startInlinePlayer(id);
             document.getElementById('search-bar').value = '';
-        } else {
-            loadDynamicContent(query);
+            return;
         }
+        loadDynamicContent(query, query.startsWith('@'));
     }
 
-    // Отрендерить сетку главных видео
-    function renderHomeGrid(list) {
+    function renderChannelsList(channels) {
         const view = document.getElementById('main-view');
+        if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Канал не найден.</div>'; return; }
         view.innerHTML = '<div class="grid" id="home-grid"></div>';
         const grid = document.getElementById('home-grid');
         const frag = document.createDocumentFragment();
 
-        list.forEach(v => {
-            if (!v.id) return;
+        channels.forEach(c => {
+            if (c.type !== 'channel' && !c.authorId) return;
             const card = document.createElement('div');
-            card.className = 'card-inner';
-            card.onclick = () => startInlinePlayer(v.id);
+            card.className = 'card-inner channel-card';
+            card.onclick = () => loadChannelVideos(c.authorId || c.channelId, c.author);
             card.innerHTML = `
-                <div class="thumb">
-                    <img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" alt="Pre" loading="lazy">
-                </div>
+                <img class="channel-avatar" src="${c.authorThumbnails ? c.authorThumbnails[c.authorThumbnails.length - 1].url : 'https://img.youtube.com/vi/0/default.jpg'}" loading="lazy">
                 <div class="meta">
-                    <div class="title">${v.title}</div>
-                    <div class="channel">${v.author}</div>
+                    <div class="title">${c.author}</div>
+                    <div class="channel">${c.subCountText || ''}</div>
+                    <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
                 </div>`;
             frag.appendChild(card);
         });
         grid.appendChild(frag);
     }
 
-    // Отрендерить вертикальную ленту Shorts TikTok-style
+    function renderHomeGrid(list) {
+        const view = document.getElementById('main-view');
+        view.innerHTML = '<div class="grid" id="home-grid"></div>';
+        const frag = document.createDocumentFragment();
+        list.forEach(v => {
+            if (!v.id) return;
+            const card = document.createElement('div');
+            card.className = 'card-inner';
+            card.onclick = () => startInlinePlayer(v.id);
+            card.innerHTML = `
+                <div class="thumb"><img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" loading="lazy"></div>
+                <div class="meta"><div class="title">${v.title}</div><div class="channel">${v.author}</div></div>`;
+            frag.appendChild(card);
+        });
+        document.getElementById('home-grid').appendChild(frag);
+    }
+
     function renderShortsFeed(list) {
         const view = document.getElementById('main-view');
         view.innerHTML = '';
-        
-        if(list.length === 0) {
-            view.innerHTML = '<div class="msg">Нет доступных коротких видео в данном узле. Сделайте глобальный поиск.</div>';
-            return;
-        }
+        if(list.length === 0) { view.innerHTML = '<div class="msg-box">Нет видео.</div>'; return; }
 
         list.forEach(v => {
             if (!v.id) return;
             const item = document.createElement('div');
             item.className = 'shorts-item';
-            
-            // Вместо iframe рендерим легкую заглушку. Плеер создастся только при клике!
             item.innerHTML = `
                 <div class="shorts-media-container" id="container-${v.id}">
                     <div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${v.id}/hqdefault.jpg')" onclick="activateShortsPlayer('${v.id}')">
                         <div class="play-btn-center"></div>
-                        <div class="shorts-overlay-info">
-                            <h3>${v.title}</h3>
-                            <p>@${v.author}</p>
-                        </div>
+                        <div class="shorts-overlay-info"><h3>${v.title}</h3><p>@${v.author}</p></div>
                     </div>
                 </div>`;
             view.appendChild(item);
         });
     }
 
-    // Мгновенная инициализация Shorts плеера внутри выбранного контейнера
     function activateShortsPlayer(id) {
-        // Очищаем все остальные iframe в ленте перед запуском нового (Жесткая экономия ОЗУ)
-        const openIframes = document.querySelectorAll('.shorts-item iframe');
-        openIframes.forEach(el => {
+        document.querySelectorAll('.shorts-item iframe').forEach(el => {
             const parent = el.parentElement;
             const oldId = parent.id.replace('container-', '');
-            parent.innerHTML = `
-                <div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')">
-                    <div class="play-btn-center"></div>
-                </div>`;
+            parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
-
-        const targetContainer = document.getElementById(`container-${id}`);
         const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        
-        // Модифицированная быстрая загрузка без тяжелых библиотек
-        targetContainer.innerHTML = `
-            <iframe src="${domain}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" 
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen></iframe>`;
+        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${domain}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     }
 
-    // Запуск всплывающего плеера для вкладки "Главная"
     function startInlinePlayer(id) {
-        const modal = document.getElementById('ios-player');
-        const target = document.getElementById('player-target');
         const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        
-        target.innerHTML = `<iframe src="${domain}${id}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
-        modal.style.display = 'flex';
+        document.getElementById('player-target').innerHTML = `<iframe src="${domain}${id}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
+        document.getElementById('ios-player').style.display = 'flex';
     }
 
-    // Полная очистка памяти от фрейма плеера
     function closePlayer() {
         document.getElementById('ios-player').style.display = 'none';
         document.getElementById('player-target').innerHTML = '';
@@ -491,7 +423,8 @@
 
     document.getElementById('search-bar').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
     
-    // Первый старт
+    // Старт
+    initTheme();
     changeTab('home');
 </script>
 
