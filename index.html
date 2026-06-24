@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://img.youtube.com">
 
     <style>
-        /* CSS-переменные для мгновенного переключения тем */
         :root {
             --bg-texture: #c5ccd4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%23c5ccd4"/><circle cx="2" cy="2" r="1" fill="%23b8bfc7"/></svg>');
             --text-main: #000000;
@@ -36,7 +35,6 @@
             --search-text: #ffffff;
         }
 
-        /* Жесткая оптимизация рендеринга для слабых CPU */
         *, *::before, *::after { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
@@ -49,11 +47,11 @@
             background: var(--bg-texture);
             color: var(--text-main);
             margin: 0; padding: 0;
-            overflow: hidden; height: 100vh;
+            overflow: hidden; 
+            height: 100vh; height: 100dvh; 
             transition: background 0.3s ease, color 0.3s ease;
         }
         
-        /* Хедер */
         header {
             background: var(--header-grad);
             border-bottom: 1px solid var(--header-border);
@@ -65,10 +63,8 @@
 
         .header-top { display: flex; align-items: center; justify-content: space-between; height: 30px; }
         .logo { font-size: 19px; font-weight: bold; color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important; cursor: pointer; }
-        
         .header-actions { display: flex; gap: 6px; align-items: center; }
 
-        /* Кнопки в стиле iOS 6 */
         .ios-btn {
             font-size: 11px;
             background: linear-gradient(to bottom, #5a7491 0%, #34465d 100%);
@@ -79,7 +75,6 @@
         }
         .ios-btn.active { background: linear-gradient(to bottom, #74ca5d 0%, #3b9423 100%); border-color: #246112; }
         
-        /* Поиск */
         .search-box {
             display: flex; background: var(--search-bg); border: 1px solid #717171;
             border-radius: 14px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
@@ -95,24 +90,20 @@
             cursor: pointer; box-shadow: 0 1px 0 #fff; flex-shrink: 0;
         }
 
-        /* Главный контейнер (GPU-ускорен) */
         .main-content {
-            height: calc(100vh - 135px); /* Учитываем таббар и хедер */
+            height: calc(100vh - 135px); height: calc(100dvh - 135px);
             overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px;
-            transform: translateZ(0); /* Включает аппаратное ускорение скролла */
-            will-change: transform;
+            transform: translateZ(0); will-change: transform;
         }
         
         .main-content.shorts-mode { padding: 0; scroll-snap-type: y mandatory; background: #000; }
 
-        /* Оптимизированная адаптивная сетка: поддержка ультра-мелких экранов (min 100%) */
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); 
             gap: 12px; max-width: 1200px; margin: 0 auto;
         }
 
-        /* Карточка видео */
         .card-inner {
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: 8px; padding: 6px; display: flex; gap: 10px;
@@ -120,7 +111,6 @@
             transition: background 0.3s;
         }
 
-        /* Карточка канала */
         .card-inner.channel-card { align-items: center; }
         .channel-avatar { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--card-border); object-fit: cover; flex-shrink: 0; }
         .channel-badge-text { font-size: 10px; background: var(--header-grad); color: #fff; padding: 2px 6px; border-radius: 3px; margin-top: 4px; font-weight: bold; display: inline-block; }
@@ -132,8 +122,7 @@
         .title { font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: var(--text-main); }
         .channel { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
 
-        /* Shorts */
-        .shorts-item { width: 100%; height: calc(100vh - 135px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #333; }
+        .shorts-item { width: 100%; height: calc(100vh - 135px); height: calc(100dvh - 135px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #333; }
         .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: #111; }
         .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
@@ -150,22 +139,19 @@
         }
         .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
 
-        /* Всплывающий плеер */
         .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; }
         .ios-player-box { width: 100%; max-width: 700px; background: #222; border: 2px solid #555; border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000; }
         .ios-player-bar { background: linear-gradient(to bottom, #4c5a70 0%, #243249 100%); padding: 6px; display: flex; justify-content: flex-end; border-bottom: 1px solid #111; }
         .ios-video-container { position: relative; padding-top: 56.25%; background: #000; }
         .ios-video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
 
-        /* Инфо сообщения */
         .msg-box { text-align: center; color: var(--text-sub); padding: 40px 10px; font-weight: bold; }
 
-        /* Таб-бар */
         .tab-bar {
             position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
             background: linear-gradient(to bottom, #444444 0%, #111111 50%, #000000 51%, #000000 100%);
             border-top: 1px solid #222; display: flex; z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom); /* Фикс для современных iPhone с "челкой" */
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px; }
         .tab-item.active { color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%); box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); }
@@ -213,8 +199,8 @@
 <script>
     let currentTab = 'home';
     let isProxyActive = true;
+    let fetchAbortController = null; 
     
-    // Инициализация темы при загрузке
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -229,12 +215,15 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
+    // Расширенный пул ТОП-быстрых серверов
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
-        "https://yewtu.be/api/v1/"
+        "https://invidious.projectsegfau.lt/api/v1/",
+        "https://yewtu.be/api/v1/",
+        "https://invidious.flokinet.to/api/v1/",
+        "https://vid.puffyan.us/api/v1/"
     ];
-    let currentNodeIndex = 0;
 
     function toggleProxy() {
         isProxyActive = !isProxyActive;
@@ -242,9 +231,6 @@
         badge.classList.toggle('active', isProxyActive);
         badge.innerText = isProxyActive ? '● Анти-Блок' : '○ Выкл';
     }
-
-    function getApiUrl(endpoint) { return PROXY_NODES[currentNodeIndex] + endpoint; }
-    function switchNode() { currentNodeIndex = (currentNodeIndex + 1) % PROXY_NODES.length; }
 
     function extractVideoId(url) {
         if (!url) return null;
@@ -255,59 +241,99 @@
         return (match && match[1]) ? match[1] : null;
     }
 
-    async function loadDynamicContent(query = '', isChannelSearch = false) {
+    function clearViewMemory() {
         const view = document.getElementById('main-view');
-        view.innerHTML = '<div class="msg-box">Синхронизация...</div>';
-        
-        let attempts = 0;
-        while (attempts < PROXY_NODES.length) {
-            try {
-                let url;
-                if (currentTab === 'shorts') {
-                    url = getApiUrl(`search?q=${encodeURIComponent(query ? query + ' shorts' : 'shorts trending')}&type=video`);
-                } else if (isChannelSearch) {
-                    url = getApiUrl(`search?q=${encodeURIComponent(query)}&type=channel`);
-                } else if (query) {
-                    url = getApiUrl(`search?q=${encodeURIComponent(query)}&type=video`);
-                } else {
-                    url = getApiUrl(`trending?region=RU`);
-                }
-                
-                const res = await fetch(url, { cache: "no-store" });
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                
-                if (isChannelSearch) { renderChannelsList(data); return; }
+        view.querySelectorAll('iframe').forEach(iframe => iframe.src = 'about:blank');
+        view.innerHTML = '';
+    }
 
-                if (currentTab === 'shorts') {
-                    let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }));
-                    let filtered = parsed.filter(v => !v.sec || v.sec < 65);
-                    renderShortsFeed((filtered.length ? filtered : parsed).slice(0, 15));
-                } else {
-                    renderHomeGrid(data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24));
-                }
-                return;
-            } catch (e) {
-                switchNode(); attempts++;
+    // НОВЫЙ АЛГОРИТМ: Параллельный запуск (Racing)
+    async function fastApiFetch(endpoint, globalSignal) {
+        // Берем 3 случайных сервера из списка
+        const nodesToTry = [...PROXY_NODES].sort(() => 0.5 - Math.random()).slice(0, 3);
+        
+        // Запускаем гонку: кто первый ответит, тот и победил
+        const requests = nodesToTry.map(async (node) => {
+            const localController = new AbortController();
+            // Жесткий таймаут 4.5 секунды. Если сервер тупит, обрываем связь.
+            const timeoutId = setTimeout(() => localController.abort(), 4500); 
+            
+            // Если юзер переключил вкладку — отменяем всё
+            globalSignal.addEventListener('abort', () => { 
+                localController.abort(); 
+                clearTimeout(timeoutId); 
+            });
+            
+            try {
+                const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
+                clearTimeout(timeoutId);
+                if (!res.ok) throw new Error('Bad Status');
+                return await res.json();
+            } catch (err) {
+                clearTimeout(timeoutId);
+                throw err;
             }
+        });
+
+        // Возвращаем результат самого быстрого успешного сервера
+        return Promise.any(requests);
+    }
+
+    async function loadDynamicContent(query = '', isChannelSearch = false) {
+        if (fetchAbortController) fetchAbortController.abort();
+        fetchAbortController = new AbortController();
+
+        clearViewMemory();
+        document.getElementById('main-view').innerHTML = '<div class="msg-box">Поиск быстрых узлов...</div>';
+        
+        try {
+            let endpoint;
+            if (currentTab === 'shorts') {
+                endpoint = `search?q=${encodeURIComponent(query ? query + ' shorts' : 'shorts trending')}&type=video`;
+            } else if (isChannelSearch) {
+                endpoint = `search?q=${encodeURIComponent(query)}&type=channel`;
+            } else if (query) {
+                endpoint = `search?q=${encodeURIComponent(query)}&type=video`;
+            } else {
+                endpoint = `trending?region=RU`;
+            }
+            
+            // Запрашиваем 3 сервера одновременно
+            const data = await fastApiFetch(endpoint, fetchAbortController.signal);
+            
+            if (isChannelSearch) { 
+                renderChannelsList(data); 
+                return; 
+            }
+
+            if (currentTab === 'shorts') {
+                let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }));
+                let filtered = parsed.filter(v => !v.sec || v.sec < 65);
+                renderShortsFeed((filtered.length ? filtered : parsed).slice(0, 15));
+            } else {
+                renderHomeGrid(data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24));
+            }
+        } catch (error) {
+            if (error.name === 'AbortError' || error.name === 'AggregateError' && error.errors.some(e => e.name === 'AbortError')) return;
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Серверы перегружены. Попробуйте еще раз.</div>';
         }
-        view.innerHTML = '<div class="msg-box">Ошибка сети. Проверьте Анти-Блок.</div>';
     }
 
     async function loadChannelVideos(channelId, channelName) {
-        const view = document.getElementById('main-view');
-        view.innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
-        let attempts = 0;
-        while (attempts < PROXY_NODES.length) {
-            try {
-                const res = await fetch(getApiUrl(`channels/${channelId}/videos`), { cache: "no-store" });
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                renderHomeGrid((data.videos || data).map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30));
-                return;
-            } catch (e) { switchNode(); attempts++; }
+        if (fetchAbortController) fetchAbortController.abort();
+        fetchAbortController = new AbortController();
+        
+        clearViewMemory();
+        document.getElementById('main-view').innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
+        
+        try {
+            const endpoint = `channels/${channelId}/videos`;
+            const data = await fastApiFetch(endpoint, fetchAbortController.signal);
+            renderHomeGrid((data.videos || data).map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30));
+        } catch (error) {
+            if (error.name === 'AbortError' || error.name === 'AggregateError' && error.errors.some(e => e.name === 'AbortError')) return;
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка загрузки видео канала.</div>';
         }
-        view.innerHTML = '<div class="msg-box">Ошибка загрузки видео канала.</div>';
     }
 
     function changeTab(tabName) {
@@ -330,6 +356,7 @@
     function triggerSearch() {
         let query = document.getElementById('search-bar').value.trim();
         if (!query) return;
+        
         const id = extractVideoId(query);
         if (id) {
             startInlinePlayer(id);
@@ -340,77 +367,82 @@
     }
 
     function renderChannelsList(channels) {
+        clearViewMemory();
         const view = document.getElementById('main-view');
         if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Канал не найден.</div>'; return; }
+        
         view.innerHTML = '<div class="grid" id="home-grid"></div>';
         const grid = document.getElementById('home-grid');
-        const frag = document.createDocumentFragment();
+        let htmlStr = '';
 
         channels.forEach(c => {
             if (c.type !== 'channel' && !c.authorId) return;
-            const card = document.createElement('div');
-            card.className = 'card-inner channel-card';
-            card.onclick = () => loadChannelVideos(c.authorId || c.channelId, c.author);
-            card.innerHTML = `
-                <img class="channel-avatar" src="${c.authorThumbnails ? c.authorThumbnails[c.authorThumbnails.length - 1].url : 'https://img.youtube.com/vi/0/default.jpg'}" loading="lazy">
-                <div class="meta">
-                    <div class="title">${c.author}</div>
-                    <div class="channel">${c.subCountText || ''}</div>
-                    <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
+            const thumb = c.authorThumbnails ? c.authorThumbnails[c.authorThumbnails.length - 1].url : 'https://img.youtube.com/vi/0/default.jpg';
+            htmlStr += `
+                <div class="card-inner channel-card" onclick="loadChannelVideos('${c.authorId || c.channelId}', '${c.author.replace(/'/g, "\\'")}')">
+                    <img class="channel-avatar" src="${thumb}" loading="lazy">
+                    <div class="meta">
+                        <div class="title">${c.author}</div>
+                        <div class="channel">${c.subCountText || ''}</div>
+                        <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
+                    </div>
                 </div>`;
-            frag.appendChild(card);
         });
-        grid.appendChild(frag);
+        grid.innerHTML = htmlStr;
     }
 
     function renderHomeGrid(list) {
+        clearViewMemory();
         const view = document.getElementById('main-view');
         view.innerHTML = '<div class="grid" id="home-grid"></div>';
-        const frag = document.createDocumentFragment();
+        let htmlStr = '';
+        
         list.forEach(v => {
             if (!v.id) return;
-            const card = document.createElement('div');
-            card.className = 'card-inner';
-            card.onclick = () => startInlinePlayer(v.id);
-            card.innerHTML = `
-                <div class="thumb"><img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" loading="lazy"></div>
-                <div class="meta"><div class="title">${v.title}</div><div class="channel">${v.author}</div></div>`;
-            frag.appendChild(card);
+            htmlStr += `
+                <div class="card-inner" onclick="startInlinePlayer('${v.id}')">
+                    <div class="thumb"><img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" loading="lazy"></div>
+                    <div class="meta"><div class="title">${v.title}</div><div class="channel">${v.author}</div></div>
+                </div>`;
         });
-        document.getElementById('home-grid').appendChild(frag);
+        document.getElementById('home-grid').innerHTML = htmlStr;
     }
 
     function renderShortsFeed(list) {
+        clearViewMemory();
         const view = document.getElementById('main-view');
-        view.innerHTML = '';
         if(list.length === 0) { view.innerHTML = '<div class="msg-box">Нет видео.</div>'; return; }
 
+        let htmlStr = '';
         list.forEach(v => {
             if (!v.id) return;
-            const item = document.createElement('div');
-            item.className = 'shorts-item';
-            item.innerHTML = `
-                <div class="shorts-media-container" id="container-${v.id}">
-                    <div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${v.id}/hqdefault.jpg')" onclick="activateShortsPlayer('${v.id}')">
-                        <div class="play-btn-center"></div>
-                        <div class="shorts-overlay-info"><h3>${v.title}</h3><p>@${v.author}</p></div>
+            htmlStr += `
+                <div class="shorts-item">
+                    <div class="shorts-media-container" id="container-${v.id}">
+                        <div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${v.id}/hqdefault.jpg')" onclick="activateShortsPlayer('${v.id}')">
+                            <div class="play-btn-center"></div>
+                            <div class="shorts-overlay-info"><h3>${v.title}</h3><p>@${v.author}</p></div>
+                        </div>
                     </div>
                 </div>`;
-            view.appendChild(item);
         });
+        view.innerHTML = htmlStr;
     }
 
     function activateShortsPlayer(id) {
-        document.querySelectorAll('.shorts-item iframe').forEach(el => {
-            const parent = el.parentElement;
+        document.querySelectorAll('.shorts-item iframe').forEach(iframe => {
+            const parent = iframe.parentElement;
             const oldId = parent.id.replace('container-', '');
+            iframe.src = 'about:blank'; 
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
+        
         const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
         document.getElementById(`container-${id}`).innerHTML = `<iframe src="${domain}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     }
 
     function startInlinePlayer(id) {
+        closePlayer();
         const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
         document.getElementById('player-target').innerHTML = `<iframe src="${domain}${id}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
         document.getElementById('ios-player').style.display = 'flex';
@@ -418,12 +450,15 @@
 
     function closePlayer() {
         document.getElementById('ios-player').style.display = 'none';
-        document.getElementById('player-target').innerHTML = '';
+        const target = document.getElementById('player-target');
+        const iframe = target.querySelector('iframe');
+        
+        if (iframe) iframe.src = 'about:blank';
+        target.innerHTML = ''; 
     }
 
     document.getElementById('search-bar').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
     
-    // Старт
     initTheme();
     changeTab('home');
 </script>
