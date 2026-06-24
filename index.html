@@ -7,7 +7,6 @@
     <title>LiteTube Ultra iOS6</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
-    <link rel="preconnect" href="https://www.youtube-nocookie.com">
 
     <style>
         :root {
@@ -132,7 +131,7 @@
         .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
         
-        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%); padding: 15px 12px; color: #fff; text-shadow: 0 1px 2px #000; }
+        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%); padding: 15px 12px; color: #fff; text-shadow: 0 1px 2px #000; z-index: 5; }
         .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold;}
         .shorts-overlay-info p { margin: 0; font-size: 11px; color: #ccc;}
 
@@ -151,7 +150,7 @@
         .ios-video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
 
         .msg-box { text-align: center; color: var(--text-sub); padding: 30px 10px; font-weight: bold; font-size: 14px; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
-        .scroll-loader { text-align: center; padding: 15px; font-weight: bold; color: var(--text-sub); font-size: 12px; width: 100%; }
+        .scroll-loader { text-align: center; padding: 20px; font-weight: bold; color: var(--text-sub); font-size: 12px; width: 100%; }
 
         .tab-bar {
             position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
@@ -207,7 +206,6 @@
     let isProxyActive = true;
     let fetchAbortController = null; 
     
-    // Переменные бесконечного скроллинга и состояния
     let currentPage = 1;
     let isStreamLoading = false;
     let currentQuery = '';
@@ -215,17 +213,17 @@
     let activeChannelId = '';
     let activeChannelName = '';
 
+    // Обновленный высокоскоростной отказоустойчивый пул серверов на 2026 год
     const PROXY_NODES = [
-        "https://inv.tux.pizza/api/v1/",
-        "https://invidious.nerdvpn.de/api/v1/",
-        "https://invidious.projectsegfau.lt/api/v1/",
-        "https://yewtu.be/api/v1/",
-        "https://invidious.flokinet.to/api/v1/",
-        "https://vid.puffyan.us/api/v1/",
+        "https://invidious.perennialte.ch/api/v1/",
+        "https://iv.melmac.space/api/v1/",
+        "https://yt.artemislena.eu/api/v1/",
+        "https://invidious.asir.dev/api/v1/",
+        "https://inv.us.projectsegfau.lt/api/v1/",
+        "https://invidious.slipfox.xyz/api/v1/",
         "https://invidious.privacydev.net/api/v1/"
     ];
     
-    // Фиксированный «горячий» узел для моментальных подгрузок страниц
     let fastPinnedNode = localStorage.getItem('litetube_pinned_node') || null;
 
     function initTheme() {
@@ -266,26 +264,38 @@
         view.innerHTML = '';
     }
 
-    // Умная гонка с кэшированием самого быстрого сервера для моментальной пагинации
+    // Возвращает URL плеера в зависимости от состояния Анти-Блока
+    function getEmbedUrl(id) {
+        if (isProxyActive && fastPinnedNode) {
+            // Полное туннелирование: пускаем воспроизведение через рабочий Invidious-сервер в обход ограничений YT
+            return fastPinnedNode.replace('api/v1/', 'embed/') + id + "?autoplay=1&control_bar=true&dark_mode=true";
+        }
+        return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
+    }
+
+    // Ультра-быстрый Racing-запрос с автоматическим сбросом зависших узлов
     async function fastApiFetch(endpoint, globalSignal) {
         if (fastPinnedNode) {
             try {
                 const localController = new AbortController();
-                const tId = setTimeout(() => localController.abort(), 1800);
+                const tId = setTimeout(() => localController.abort(), 1500); // Жесткий лимит 1.5 сек на ответ
                 globalSignal.addEventListener('abort', () => localController.abort());
                 
                 const res = await fetch(fastPinnedNode + endpoint, { signal: localController.signal });
                 clearTimeout(tId);
                 if (res.ok) return await res.json();
+                throw new Error(); // Спровоцировать сброс если сервер прислал ошибку
             } catch(e) {
                 fastPinnedNode = null; 
+                localStorage.removeItem('litetube_pinned_node');
             }
         }
 
-        const nodesToTry = [...PROXY_NODES].sort(() => 0.5 - Math.random()).slice(0, 3);
+        // Параллельный запуск гонки по случайным узлам
+        const nodesToTry = [...PROXY_NODES].sort(() => 0.5 - Math.random()).slice(0, 4);
         const requests = nodesToTry.map(async (node) => {
             const localController = new AbortController();
-            const timeoutId = setTimeout(() => localController.abort(), 2500); 
+            const timeoutId = setTimeout(() => localController.abort(), 3000); 
             globalSignal.addEventListener('abort', () => localController.abort());
             
             try {
@@ -306,7 +316,6 @@
         return Promise.any(requests);
     }
 
-    // Первичная инициализация ленты
     async function loadDynamicContent(query = '', isChannelSearch = false) {
         if (fetchAbortController) fetchAbortController.abort();
         fetchAbortController = new AbortController();
@@ -316,7 +325,7 @@
         isChannelMode = false;
         
         clearViewMemory();
-        document.getElementById('main-view').innerHTML = '<div class="msg-box">Подключение к быстрому узлу...</div>';
+        document.getElementById('main-view').innerHTML = '<div class="msg-box">Поиск свободного канала связи...</div>';
         
         try {
             let endpoint = getEndpointUrl();
@@ -326,7 +335,7 @@
             clearViewMemory();
 
             if (isChannelSearch) { 
-                renderChannelsList(data, false); 
+                renderChannelsList(data); 
             } else if (currentTab === 'shorts') {
                 renderShortsFeed(parseShorts(data), false);
             } else {
@@ -335,11 +344,10 @@
             appendScrollLoader();
         } catch (error) {
             if (fetchAbortController.signal.aborted) return;
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка сети. Нажмите логотип для перезагрузки.</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Все узлы перегружены. Нажмите на логотип для смены прокси.</div>';
         }
     }
 
-    // Бесконечный стриминг данных (Срабатывает при скролле вниз)
     async function streamNextPage() {
         if (isStreamLoading) return;
         isStreamLoading = true;
@@ -383,7 +391,7 @@
     function parseShorts(data) {
         if (!Array.isArray(data)) return [];
         return data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }))
-                   .filter(v => v.id && (!v.sec || v.sec < 65)).slice(0, 15);
+                   .filter(v => v.id).slice(0, 18);
     }
 
     async function loadChannelVideos(channelId, channelName) {
@@ -396,7 +404,7 @@
         activeChannelName = channelName;
 
         clearViewMemory();
-        document.getElementById('main-view').innerHTML = `<div class="msg-box">Связь с каналом ${channelName}...</div>`;
+        document.getElementById('main-view').innerHTML = `<div class="msg-box">Открытие полного архива: ${channelName}...</div>`;
         
         try {
             const data = await fastApiFetch(`channels/${channelId}/videos`, fetchAbortController.signal);
@@ -404,7 +412,7 @@
             renderHomeGrid(parseVideos(data?.videos || data), false);
             appendScrollLoader();
         } catch (error) {
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось открыть архив канала.</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось открыть архив канала. Попробуйте еще раз.</div>';
         }
     }
 
@@ -429,7 +437,7 @@
 
     function renderShortsFeed(list, appendMode) {
         const view = document.getElementById('main-view');
-        if (!appendMode && list.length === 0) { view.innerHTML = '<div class="msg-box">Нет Shorts.</div>'; return; }
+        if (!appendMode && list.length === 0) { view.innerHTML = '<div class="msg-box">Нет доступных Shorts.</div>'; return; }
 
         let htmlStr = '';
         list.forEach(v => {
@@ -477,8 +485,8 @@
 
     function appendScrollLoader() {
         const view = document.getElementById('main-view');
-        if (!view.querySelector('.scroll-loader') && !isChannelMode) {
-            view.insertAdjacentHTML('beforeend', '<div class="scroll-loader">Загрузка новых видео...</div>');
+        if (!view.querySelector('.scroll-loader')) {
+            view.insertAdjacentHTML('beforeend', '<div class="scroll-loader">Стриминг новых видео...</div>');
         }
     }
 
@@ -505,6 +513,8 @@
     }
 
     function resetToHome() {
+        fastPinnedNode = null;
+        localStorage.removeItem('litetube_pinned_node');
         document.getElementById('search-bar').value = '';
         loadDynamicContent('');
     }
@@ -530,14 +540,12 @@
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
         
-        const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${domain}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${getEmbedUrl(id)}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
     }
 
     function startInlinePlayer(id) {
         closePlayer();
-        const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        document.getElementById('player-target').innerHTML = `<iframe src="${domain}${id}?autoplay=1&rel=0&modestbranding=1" allowfullscreen></iframe>`;
+        document.getElementById('player-target').innerHTML = `<iframe src="${getEmbedUrl(id)}" allowfullscreen></iframe>`;
         document.getElementById('ios-player').style.display = 'flex';
     }
 
@@ -549,9 +557,8 @@
         target.innerHTML = ''; 
     }
 
-    // Слушатель событий скролла для реализации бесконечного стриминга лент
     document.getElementById('main-view').addEventListener('scroll', function() {
-        if ((this.scrollTop + this.clientHeight) >= (this.scrollHeight - 400)) {
+        if ((this.scrollTop + this.clientHeight) >= (this.scrollHeight - 500)) {
             streamNextPage();
         }
     });
