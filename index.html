@@ -7,6 +7,7 @@
     <title>LiteTube Ultra iOS6</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
+    <link rel="preconnect" href="https://piped.video">
 
     <style>
         :root {
@@ -131,7 +132,7 @@
         .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
         
-        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%); padding: 15px 12px; color: #fff; text-shadow: 0 1px 2px #000; z-index: 5; }
+        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%); padding: 15px 12px; color: #fff; text-shadow: 0 1px 2px #000; z-index: 5; position: relative; }
         .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold;}
         .shorts-overlay-info p { margin: 0; font-size: 11px; color: #ccc;}
 
@@ -139,11 +140,11 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(210,210,210,0.8) 100%);
             border: 2px solid #fff; border-radius: 50%; width: 55px; height: 55px;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 8px rgba(0,0,0,0.6); z-index: 2;
         }
         .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent #111; }
 
-        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 200; padding: 8px; flex-direction: column; justify-content: center; align-items: center; }
+        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 200; padding: 8px; flex-direction: column; justify-content: center; align-items: center; }
         .ios-player-box { width: 100%; max-width: 640px; background: #1a1a1a; border: 1px solid #444; border-radius: 5px; overflow: hidden; box-shadow: 0 4px 20px #000; }
         .ios-player-bar { background: linear-gradient(to bottom, #3a4758 0%, #1c2635 100%); padding: 5px; display: flex; justify-content: flex-end; border-bottom: 1px solid #000; }
         .ios-video-container { position: relative; padding-top: 56.25%; background: #000; }
@@ -213,15 +214,23 @@
     let activeChannelId = '';
     let activeChannelName = '';
 
-    // Обновленный высокоскоростной отказоустойчивый пул серверов на 2026 год
+    // Сервера для получения текстовых данных (API)
     const PROXY_NODES = [
+        "https://invidious.nerdvpn.de/api/v1/",
+        "https://inv.tux.pizza/api/v1/",
+        "https://invidious.projectsegfau.lt/api/v1/",
         "https://invidious.perennialte.ch/api/v1/",
-        "https://iv.melmac.space/api/v1/",
         "https://yt.artemislena.eu/api/v1/",
-        "https://invidious.asir.dev/api/v1/",
         "https://inv.us.projectsegfau.lt/api/v1/",
-        "https://invidious.slipfox.xyz/api/v1/",
         "https://invidious.privacydev.net/api/v1/"
+    ];
+
+    // Сервера СПЕЦИАЛЬНО для плеера (обходят запрет на iframe)
+    const PLAYER_NODES = [
+        "https://piped.video/embed/",
+        "https://piped.mha.fi/embed/",
+        "https://piped.tokhmi.xyz/embed/",
+        "https://piped.lunar.icu/embed/"
     ];
     
     let fastPinnedNode = localStorage.getItem('litetube_pinned_node') || null;
@@ -264,38 +273,38 @@
         view.innerHTML = '';
     }
 
-    // Возвращает URL плеера в зависимости от состояния Анти-Блока
+    // НОВАЯ БЕЗОТКАЗНАЯ ЛОГИКА ПЛЕЕРА
     function getEmbedUrl(id) {
-        if (isProxyActive && fastPinnedNode) {
-            // Полное туннелирование: пускаем воспроизведение через рабочий Invidious-сервер в обход ограничений YT
-            return fastPinnedNode.replace('api/v1/', 'embed/') + id + "?autoplay=1&control_bar=true&dark_mode=true";
+        if (isProxyActive) {
+            // Берем случайный Piped-сервер для распределения нагрузки
+            const randomPlayer = PLAYER_NODES[Math.floor(Math.random() * PLAYER_NODES.length)];
+            return randomPlayer + id + "?autoplay=1";
         }
+        // Если анти-блок выключен, используем стандартный YT
         return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&modestbranding=1&rel=0`;
     }
 
-    // Ультра-быстрый Racing-запрос с автоматическим сбросом зависших узлов
     async function fastApiFetch(endpoint, globalSignal) {
         if (fastPinnedNode) {
             try {
                 const localController = new AbortController();
-                const tId = setTimeout(() => localController.abort(), 1500); // Жесткий лимит 1.5 сек на ответ
+                const tId = setTimeout(() => localController.abort(), 1800);
                 globalSignal.addEventListener('abort', () => localController.abort());
                 
                 const res = await fetch(fastPinnedNode + endpoint, { signal: localController.signal });
                 clearTimeout(tId);
                 if (res.ok) return await res.json();
-                throw new Error(); // Спровоцировать сброс если сервер прислал ошибку
+                throw new Error(); 
             } catch(e) {
                 fastPinnedNode = null; 
                 localStorage.removeItem('litetube_pinned_node');
             }
         }
 
-        // Параллельный запуск гонки по случайным узлам
         const nodesToTry = [...PROXY_NODES].sort(() => 0.5 - Math.random()).slice(0, 4);
         const requests = nodesToTry.map(async (node) => {
             const localController = new AbortController();
-            const timeoutId = setTimeout(() => localController.abort(), 3000); 
+            const timeoutId = setTimeout(() => localController.abort(), 3500); 
             globalSignal.addEventListener('abort', () => localController.abort());
             
             try {
@@ -344,7 +353,7 @@
             appendScrollLoader();
         } catch (error) {
             if (fetchAbortController.signal.aborted) return;
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Все узлы перегружены. Нажмите на логотип для смены прокси.</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Все серверы перегружены. Нажмите на логотип "LiteTube" для перезагрузки.</div>';
         }
     }
 
@@ -412,7 +421,7 @@
             renderHomeGrid(parseVideos(data?.videos || data), false);
             appendScrollLoader();
         } catch (error) {
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось открыть архив канала. Попробуйте еще раз.</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось загрузить архив. Нажмите логотип для сброса.</div>';
         }
     }
 
@@ -486,7 +495,7 @@
     function appendScrollLoader() {
         const view = document.getElementById('main-view');
         if (!view.querySelector('.scroll-loader')) {
-            view.insertAdjacentHTML('beforeend', '<div class="scroll-loader">Стриминг новых видео...</div>');
+            view.insertAdjacentHTML('beforeend', '<div class="scroll-loader">Загрузка новых видео...</div>');
         }
     }
 
