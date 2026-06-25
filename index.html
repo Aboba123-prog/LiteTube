@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#465c71">
-    <title>LiteTube</title>
+    <title>LiteTube Legacy</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
+    <link rel="preconnect" href="https://www.youtube-nocookie.com">
 
     <style>
         :root {
@@ -21,6 +22,7 @@
             --search-bg: #ffffff;
             --search-text: #000000;
             
+            /* Светлая тема для Shorts */
             --shorts-bg: #d1d8e0;
             --shorts-item-border: #b0b8c0;
             --shorts-card-bg: #ffffff;
@@ -41,6 +43,7 @@
             --search-bg: #333333;
             --search-text: #ffffff;
 
+            /* Темная тема для Shorts */
             --shorts-bg: #0f0f0f;
             --shorts-item-border: #222222;
             --shorts-card-bg: #111111;
@@ -77,17 +80,15 @@
 
         .header-top { display: flex; align-items: center; justify-content: space-between; height: 30px; }
         .logo { font-size: 19px; font-weight: bold; color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important; cursor: pointer; }
-        .header-actions { display: flex; gap: 6px; align-items: center; }
 
         .ios-btn {
-            font-size: 11px;
+            font-size: 12px;
             background: linear-gradient(to bottom, #5a7491 0%, #34465d 100%);
             border: 1px solid #283748; border-radius: 4px; color: white;
-            padding: 4px 10px; font-weight: bold; cursor: pointer;
+            padding: 4px 12px; font-weight: bold; cursor: pointer;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 1px rgba(0,0,0,0.2);
             display: flex; align-items: center; justify-content: center;
         }
-        .ios-btn.active { background: linear-gradient(to bottom, #74ca5d 0%, #3b9423 100%); border-color: #246112; }
         
         .search-box {
             display: flex; background: var(--search-bg); border: 1px solid #717171;
@@ -154,6 +155,7 @@
         }
         .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
 
+        /* Навигация для Больших Мониторов / ТВ */
         .tv-scroll-controls {
             display: none; position: fixed; right: 40px; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 16px; z-index: 150;
         }
@@ -192,10 +194,7 @@
 <header>
     <div class="header-top">
         <div class="logo" onclick="changeTab('home')">LiteTube</div>
-        <div class="header-actions">
-            <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()">🌙</div>
-            <div id="vpn-toggle" class="ios-btn active" onclick="toggleProxy()">● Анти-Блок</div>
-        </div>
+        <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()">🌙</div>
     </div>
     <div class="search-box">
         <input type="text" id="search-bar" placeholder="Поиск видео или @автора...">
@@ -232,7 +231,6 @@
 
 <script>
     let currentTab = 'home';
-    let isProxyActive = true;
     let fetchAbortController = null; 
     
     let currentPage = 1;
@@ -244,6 +242,9 @@
 
     const apiCache = new Map();
     const CACHE_TTL = 60000; 
+
+    // Базовый нативный адрес легкого плеера Google без лишнего трекинга кук
+    const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
 
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
@@ -259,7 +260,7 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
-    // Пул стабильных узлов API
+    // Пул серверов исключительно для быстрого сбора текстовых данных
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
@@ -274,13 +275,6 @@
     const UNIQUE_NODES = [...new Set(PROXY_NODES)];
     let lastSuccessfulNode = localStorage.getItem('litetube_fastest_node') || null;
 
-    function toggleProxy() {
-        isProxyActive = !isProxyActive;
-        const badge = document.getElementById('vpn-toggle');
-        badge.classList.toggle('active', isProxyActive);
-        badge.innerText = isProxyActive ? '● Анти-Блок' : '○ Выкл';
-    }
-
     function extractVideoId(url) {
         if (!url) return null;
         url = url.trim();
@@ -288,17 +282,6 @@
         const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
         const match = url.match(regExp);
         return (match && match[1]) ? match[1] : null;
-    }
-
-    // Функция генерации URL плеера в зависимости от текущего состояния сети
-    function getOptimizedEmbedUrl(id) {
-        if (isProxyActive && lastSuccessfulNode) {
-            // Трансформируем адрес API-узла в адрес веб-эмбеда этого же легкого сервера
-            // Пример: https://yewtu.be/api/v1/ -> https://yewtu.be/embed/
-            return lastSuccessfulNode.replace('/api/v1/', '/embed/') + id;
-        }
-        // Дефолтный плеер Google без кук, если прокси выключен
-        return "https://www.youtube-nocookie.com/embed/" + id;
     }
 
     function clearViewMemory() {
@@ -317,7 +300,7 @@
         apiCache.set(key, { data, timestamp: Date.now() });
     }
 
-    // Гонка серверов для моментального выбора самого легкого региона
+    // Поиск быстрейшего текстового узла
     async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
         if (lastSuccessfulNode && attempt === 1) {
             try {
@@ -375,12 +358,6 @@
         }
     }
 
-    // Фоновый пинг для определения лидера сразу при запуске приложения
-    function preWarmFastestNode() {
-        const controller = new AbortController();
-        fastApiFetch('trending?region=RU', controller.signal).catch(()=>{});
-    }
-
     async function loadDynamicContent(query = '', isChannelSearch = false, isAppend = false) {
         if (!isAppend) {
             currentPage = 1;
@@ -390,7 +367,7 @@
             if (fetchAbortController) fetchAbortController.abort();
             fetchAbortController = new AbortController();
             clearViewMemory();
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Подключаемся к быстрому региону...</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Загрузка списков...</div>';
         }
 
         const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}_p${currentPage}`;
@@ -407,7 +384,7 @@
         if (isAppend) {
             bottomIndicator = document.createElement('div');
             bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Подгружаем новые видео...';
+            bottomIndicator.innerText = 'Загрузка...';
             document.getElementById('main-view').appendChild(bottomIndicator);
         }
         
@@ -449,7 +426,7 @@
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                document.getElementById('main-view').innerHTML = '<div class="msg-box">Все узлы перегружены. Попробуйте нажать кнопку поиска еще раз.</div>';
+                document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка соединения. Нажмите кнопку поиска еще раз.</div>';
             }
         }
     }
@@ -477,7 +454,7 @@
         if (isAppend) {
             bottomIndicator = document.createElement('div');
             bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Загрузка контента канала...';
+            bottomIndicator.innerText = 'Загрузка...';
             document.getElementById('main-view').appendChild(bottomIndicator);
         }
         
@@ -494,7 +471,7 @@
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка сети при получении данных канала.</div>';
+                document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось загрузить видео канала.</div>';
             }
         }
     }
@@ -624,6 +601,7 @@
         view.insertAdjacentHTML('beforeend', htmlStr);
     }
 
+    // Мгновенная инициализация нативного легкого HTML5-плеера для Shorts
     function activateShortsPlayer(id) {
         document.querySelectorAll('.shorts-item iframe').forEach(iframe => {
             const parent = iframe.parentElement;
@@ -632,14 +610,14 @@
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
         
-        const calculatedUrl = getOptimizedEmbedUrl(id);
-        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${calculatedUrl}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
+        // Параметры для максимальной совместимости со старыми WebView/Safari (playsinline=1 и html5=1)
+        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}&playsinline=1&html5=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
     }
 
+    // Мгновенная инициализация нативного легкого HTML5-плеера для обычных видео
     function startInlinePlayer(id) {
         closePlayer();
-        const calculatedUrl = getOptimizedEmbedUrl(id);
-        document.getElementById('player-target').innerHTML = `<iframe src="${calculatedUrl}?autoplay=1&rel=0&modestbranding=1" allowfullscreen eager></iframe>`;
+        document.getElementById('player-target').innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&html5=1" allowfullscreen eager></iframe>`;
         document.getElementById('ios-player').style.display = 'flex';
     }
 
@@ -662,7 +640,6 @@
     });
     
     initTheme();
-    preWarmFastestNode(); // Прогрев балансировщика регионов при инициализации страницы
     changeTab('home');
 </script>
 
