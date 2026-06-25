@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#465c71">
-    <title>LiteTube Endless Edition</title>
+    <title>LiteTube Speed & Stable</title>
     
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
     <link rel="preconnect" href="https://img.youtube.com">
@@ -255,13 +255,13 @@
     let activeChannelSubTab = 'videos'; 
 
     const apiCache = new Map();
-    const CACHE_TTL = 45000; // Увеличили кэш до 45 секунд для экономии трафика
+    const CACHE_TTL = 30000; 
 
     const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
 
-    // Списки тем для постоянного обновления контента
-    const HOME_FEED_KEYWORDS = ['клипы', 'трейлеры', 'музыка 2026', 'юмор', 'технологии', 'гаджеты', 'игры обзор', 'авто', 'наука', 'travel', 'лекции', 'подкаст'];
-    const SHORTS_FEED_KEYWORDS = ['shorts trending', 'vine', 'мемы shorts', 'tik tok trends', 'shorts mix', 'лучшее shorts', 'лайфхаки shorts', 'funny shorts'];
+    // Свежая база тем (2026) для разнообразия рекомендаций
+    const HOME_FEED_KEYWORDS = ['музыка 2026', 'новые технологии', 'авто обзоры', 'наука и космос', ' travel тренды', 'лучшие блоги', 'игровые стримы', 'юмор клипы', 'подкасты'];
+    const SHORTS_FEED_KEYWORDS = ['shorts тренды', 'мемы shorts', 'vine mix', 'тик ток тренды', 'интересные факты shorts', 'юмор shorts', 'лайфхаки shorts'];
 
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
@@ -277,20 +277,17 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
-    // Расширенный отказоустойчивый пул серверов
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
         "https://invidious.projectsegfau.lt/api/v1/",
         "https://yewtu.be/api/v1/",
-        "https://invidious.privacydev.net/api/v1/",
-        "https://iv.melmac.space/api/v1/",
-        "https://invidious.perennialte.ch/api/v1/",
         "https://invidious.flokinet.to/api/v1/",
         "https://vid.puffyan.us/api/v1/",
+        "https://invidious.privacydev.net/api/v1/",
         "https://invidious.drgns.space/api/v1/",
         "https://invidious.protokolla.fi/api/v1/",
-        "https://invidious.slipfox.xyz/api/v1/"
+        "https://invidious.perennialte.ch/api/v1/"
     ];
     const UNIQUE_NODES = [...new Set(PROXY_NODES)];
     let lastSuccessfulNode = localStorage.getItem('litetube_fastest_node') || null;
@@ -320,58 +317,72 @@
         apiCache.set(key, { data, timestamp: Date.now() });
     }
 
-    // Движок многоступенчатого параллельного забега
-    async function fastApiFetch(endpoint, globalSignal) {
-        // Мы делаем до 3 автоматических скрытых попыток перед тем, как выдать ошибку
-        for (let attempt = 1; attempt <= 3; attempt++) {
+    // Тот самый стабильный сетевой движок из второй версии
+    async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
+        // Шаг 1: Одиночный быстрый запрос к последнему рабочему узлу (минимальная нагрузка)
+        if (lastSuccessfulNode && attempt === 1) {
             try {
-                let pool = [...UNIQUE_NODES];
-                // Случайное перемешивание пула для эффекта новизны результатов поиска
-                pool.sort(() => 0.5 - Math.random());
+                const localController = new AbortController();
+                const timeoutId = setTimeout(() => localController.abort(), 1200); 
+                globalSignal.addEventListener('abort', () => localController.abort());
                 
-                // На каждой попытке берем пачку из 6 серверов для одновременного параллельного запроса!
-                let nodesToTry = pool.slice(0, 6);
-                
-                if (lastSuccessfulNode && UNIQUE_NODES.includes(lastSuccessfulNode) && attempt === 1) {
-                    nodesToTry = [lastSuccessfulNode, ...nodesToTry.filter(n => n !== lastSuccessfulNode)].slice(0, 6);
+                const res = await fetch(lastSuccessfulNode + endpoint, { signal: localController.signal, cache: 'no-store' });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const json = await res.json();
+                    if (Array.isArray(json) && json.length > 0) return json;
+                    if (json && !Array.isArray(json)) return json; 
                 }
+            } catch (err) {}
+        }
 
-                // С каждой попыткой плавно увеличиваем лимит времени (1.5с -> 3с -> 5с)
-                const timeoutDuration = attempt === 1 ? 1500 : (attempt === 2 ? 3000 : 5000);
+        // Шаг 2: Если узел молчит, запускаем параллельный забег по 4 случайным базам
+        let pool = [...UNIQUE_NODES];
+        let nodesToTry = [];
 
-                const requests = nodesToTry.map(async (node) => {
-                    const localController = new AbortController();
-                    const timeoutId = setTimeout(() => localController.abort(), timeoutDuration);
-                    if (globalSignal) globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
+        if (lastSuccessfulNode && pool.includes(lastSuccessfulNode)) {
+            nodesToTry.push(lastSuccessfulNode);
+            pool = pool.filter(n => n !== lastSuccessfulNode);
+        }
 
-                    try {
-                        const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
-                        clearTimeout(timeoutId);
-                        if (!res.ok) throw new Error('Fail Status');
-                        const json = await res.json();
-                        
-                        if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
-                            throw new Error('Empty Payload');
-                        }
-                        
-                        lastSuccessfulNode = node;
-                        localStorage.setItem('litetube_fastest_node', node);
-                        return json;
-                    } catch (err) {
-                        clearTimeout(timeoutId);
-                        throw err;
-                    }
-                });
-
-                // Кто первый из 6 серверов прислал данные - тот выиграл гонку
-                return await Promise.any(requests);
-            } catch (error) {
-                if (globalSignal && globalSignal.aborted) throw error;
-                // Если это была последняя 3-я попытка и всё упало, прокидываем ошибку дальше
-                if (attempt === 3) throw error;
-                // Иначе ждем 200мс и переходим на следующий каскад серверов
-                await new Promise(r => setTimeout(r, 200));
+        pool.sort(() => 0.5 - Math.random());
+        nodesToTry = nodesToTry.concat(pool.slice(0, 4 - nodesToTry.length));
+        const timeoutDuration = attempt === 1 ? 1800 : 4000; 
+        
+        const requests = nodesToTry.map(async (node) => {
+            const localController = new AbortController();
+            const timeoutId = setTimeout(() => localController.abort(), timeoutDuration); 
+            globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
+            
+            try {
+                const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
+                clearTimeout(timeoutId);
+                if (!res.ok) throw new Error('Bad Node');
+                const json = await res.json();
+                
+                if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
+                    throw new Error('Empty Data Node'); 
+                }
+                
+                lastSuccessfulNode = node;
+                localStorage.setItem('litetube_fastest_node', node);
+                return json;
+            } catch (err) {
+                clearTimeout(timeoutId);
+                throw err;
             }
+        });
+
+        try {
+            return await Promise.any(requests);
+        } catch (error) {
+            // Тихое автоматическое переподключение вместо вывода ошибки
+            if (attempt === 1 && !globalSignal.aborted) {
+                lastSuccessfulNode = null;
+                localStorage.removeItem('litetube_fastest_node');
+                return fastApiFetch(endpoint, globalSignal, 2);
+            }
+            throw error;
         }
     }
 
@@ -384,7 +395,7 @@
             if (fetchAbortController) fetchAbortController.abort();
             fetchAbortController = new AbortController();
             clearViewMemory();
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Подключение к сети серверов...</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Загрузка ленты новостей...</div>';
         }
 
         const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}_p${currentPage}`;
@@ -401,21 +412,22 @@
         if (isAppend) {
             bottomIndicator = document.createElement('div');
             bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Синхронизация контента...';
+            bottomIndicator.innerText = 'Синхронизация данных...';
             document.getElementById('main-view').appendChild(bottomIndicator);
         }
         
         try {
             let endpoint;
-            // Перемешиваем категории на лету, чтобы рекомендации никогда не повторялись
-            const randHomeKeywords = [...HOME_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
-            const randShortsKeywords = [...SHORTS_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
             
+            // Запускаем алгоритм перемешивания ключевых слов на лету для эффекта новизны контента
+            const mixedHome = [...HOME_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
+            const mixedShorts = [...SHORTS_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
+
             if (currentTab === 'shorts') {
                 if (query) {
                     endpoint = `search?q=${encodeURIComponent(query + ' shorts')}&type=video&page=${currentPage}`;
                 } else {
-                    const keyword = randShortsKeywords[currentPage % randShortsKeywords.length];
+                    const keyword = mixedShorts[currentPage % mixedShorts.length];
                     endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
                 }
             } else if (isChannelSearch) {
@@ -424,12 +436,11 @@
                 endpoint = `search?q=${encodeURIComponent(query)}&type=video&page=${currentPage}`;
             } else {
                 if (currentPage === 1) {
-                    // Случайный выбор региона для разнообразия рекомендаций на главной
                     const regions = ['RU', 'BY', 'KZ'];
                     const randomRegion = regions[Math.floor(Math.random() * regions.length)];
                     endpoint = `trending?region=${randomRegion}`;
                 } else {
-                    const keyword = randHomeKeywords[currentPage % randHomeKeywords.length];
+                    const keyword = mixedHome[currentPage % mixedHome.length];
                     endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
                 }
             }
@@ -446,8 +457,6 @@
 
             if (currentTab === 'shorts') {
                 let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 20);
-                // Перемешаем внутри страницы для дополнительного хаоса новизны
-                parsed.sort(() => 0.5 - Math.random());
                 setCache(cacheKey, parsed);
                 renderShortsFeed(parsed, isAppend);
             } else {
@@ -460,11 +469,10 @@
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                // Если произошло чудо и упало всё, даем красивую кнопку переподключения вместо глухого текста
                 document.getElementById('main-view').innerHTML = `
                     <div class="msg-box">
-                        Сеть перегружена. Пробуем переподключиться?<br>
-                        <button class="retry-btn" onclick="loadDynamicContent('${query}', ${isChannelSearch})">Обновить поток</button>
+                        Все узлы заняты. Попробуем обновить поток?<br>
+                        <button class="retry-btn" onclick="loadDynamicContent('${query}', ${isChannelSearch})">Обновить</button>
                     </div>`;
             }
         }
@@ -496,6 +504,7 @@
             fetchAbortController = new AbortController();
             
             clearViewMemory();
+            
             const view = document.getElementById('main-view');
             
             let tabsHtml = `
@@ -515,14 +524,17 @@
         const cacheKey = `channel_${channelId}_${activeChannelSubTab}_p${currentPage}`;
         const cachedData = getCache(cacheKey);
         if (cachedData) {
-            if (activeChannelSubTab === 'shorts') renderShortsFeed(cachedData, true);
-            else renderHomeGrid(cachedData, true);
+            if (activeChannelSubTab === 'shorts') {
+                renderShortsFeed(cachedData, true);
+            } else {
+                renderHomeGrid(cachedData, true);
+            }
             return;
         }
 
         let bottomIndicator = document.createElement('div');
         bottomIndicator.className = 'scroll-loader';
-        bottomIndicator.innerText = 'Чтение архива канала...';
+        bottomIndicator.innerText = 'Загрузка контента...';
         document.getElementById('main-view').appendChild(bottomIndicator);
         
         try {
@@ -552,7 +564,7 @@
             if (!isAppend) {
                 const errBox = document.createElement('div');
                 errBox.className = 'msg-box';
-                errBox.innerHTML = `Не удалось открыть архив. <button class="retry-btn" onclick="loadChannelVideos('${channelId}', '${channelName}')">Повторить</button>`;
+                errBox.innerText = 'Ошибка чтения данных канала. Попробуйте еще раз.';
                 document.getElementById('main-view').appendChild(errBox);
             }
         }
@@ -623,7 +635,7 @@
         if (!isAppend) {
             clearViewMemory();
             const view = document.getElementById('main-view');
-            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Автор или канал не найден.</div>'; return; }
+            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Автор не найден.</div>'; return; }
             view.innerHTML = '<div class="grid" id="home-grid"></div>';
         }
         
@@ -640,7 +652,7 @@
                     <div class="meta">
                         <div class="title">${c.author}</div>
                         <div class="channel">${c.subCountText || ''}</div>
-                        <div class="channel-badge-text">ОТКРЫТЬ В КЛАДКИ</div>
+                        <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
                     </div>
                 </div>`;
         });
