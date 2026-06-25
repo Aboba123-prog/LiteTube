@@ -103,6 +103,19 @@
             cursor: pointer; box-shadow: 0 1px 0 #fff; flex-shrink: 0;
         }
 
+        /* Навигация внутри каналов */
+        .channel-header-tabs {
+            display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 600px;
+        }
+        .channel-tab-btn {
+            flex: 1; padding: 8px; font-size: 13px; font-weight: bold; text-align: center;
+            background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border);
+            border-radius: 6px; cursor: pointer; box-shadow: 0 1px 2px var(--card-shadow);
+        }
+        .channel-tab-btn.active {
+            background: linear-gradient(to bottom, #768a9e 0%, #465c71 100%); color: white; border-color: #2d3e4f;
+        }
+
         .main-content {
             height: calc(100vh - 135px); height: calc(100dvh - 135px);
             overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px;
@@ -234,15 +247,17 @@
     let isNextPageLoading = false;
     let activeQuery = '';
     let activeIsChannelSearch = false;
+    
+    // Переменные состояния текущего просматриваемого канала
     let activeChannelId = null;
     let activeChannelName = null;
+    let activeChannelSubTab = 'videos'; // 'videos' или 'shorts'
 
     const apiCache = new Map();
-    const CACHE_TTL = 30000; // Уменьшили TTL кэша до 30 секунд для свежести данных
+    const CACHE_TTL = 30000; 
 
     const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
 
-    // Списки ротации поисковых запросов для создания бесконечной умной ленты
     const HOME_FEED_KEYWORDS = ['популярное', 'музыка', 'юмор', 'кино', 'блоги', 'новости', 'игры', 'авто', 'наука'];
     const SHORTS_FEED_KEYWORDS = ['shorts trending', 'shorts популярное', 'vine shorts', 'юмор shorts', 'shorts mix', 'tik tok trends', 'лучшие shorts'];
 
@@ -311,7 +326,7 @@
                 if (res.ok) {
                     const json = await res.json();
                     if (Array.isArray(json) && json.length > 0) return json;
-                    if (json && !Array.isArray(json)) return json; // Для каналов
+                    if (json && !Array.isArray(json)) return json; 
                 }
             } catch (err) {}
         }
@@ -340,7 +355,7 @@
                 const json = await res.json();
                 
                 if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
-                    throw new Error('Empty Data Node'); // Отсекаем узлы, выдающие пустые списки
+                    throw new Error('Empty Data Node'); 
                 }
                 
                 lastSuccessfulNode = node;
@@ -397,12 +412,10 @@
         try {
             let endpoint;
             
-            // Настройка роутинга для предотвращения дубликатов ленты
             if (currentTab === 'shorts') {
                 if (query) {
                     endpoint = `search?q=${encodeURIComponent(query + ' shorts')}&type=video&page=${currentPage}`;
                 } else {
-                    // Если пользователь просто листает шортсы, циклически меняем поисковые фразы для разнообразия контента
                     const keyword = SHORTS_FEED_KEYWORDS[(currentPage - 1) % SHORTS_FEED_KEYWORDS.length];
                     const virtualPage = Math.floor((currentPage - 1) / SHORTS_FEED_KEYWORDS.length) + 1;
                     endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
@@ -412,11 +425,9 @@
             } else if (query) {
                 endpoint = `search?q=${encodeURIComponent(query)}&type=video&page=${currentPage}`;
             } else {
-                // Главная без поискового запроса
                 if (currentPage === 1) {
                     endpoint = `trending?region=RU`;
                 } else {
-                    // Так как тренды не имеют страниц, со 2-й страницы подмешиваем бесконечный микс поисковых категорий
                     const keyword = HOME_FEED_KEYWORDS[(currentPage - 2) % HOME_FEED_KEYWORDS.length];
                     const virtualPage = Math.floor((currentPage - 2) / HOME_FEED_KEYWORDS.length) + 1;
                     endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
@@ -452,6 +463,23 @@
         }
     }
 
+    // Инициализация загрузки канала с выбором подвкладки (Видео / Shorts канала)
+    async function switchChannelTab(subTab) {
+        if (activeChannelSubTab === subTab) return;
+        activeChannelSubTab = subTab;
+        
+        const view = document.getElementById('main-view');
+        closePlayer();
+        
+        if (subTab === 'shorts') {
+            view.className = 'main-content shorts-mode';
+        } else {
+            view.className = 'main-content';
+        }
+        
+        await loadChannelVideos(activeChannelId, activeChannelName, false);
+    }
+
     async function loadChannelVideos(channelId, channelName, isAppend = false) {
         if (!isAppend) {
             currentPage = 1;
@@ -460,39 +488,72 @@
             activeQuery = '';
             if (fetchAbortController) fetchAbortController.abort();
             fetchAbortController = new AbortController();
+            
             clearViewMemory();
-            document.getElementById('main-view').innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
+            
+            // Создаем верхние переключатели «Видео» / «Shorts» внутри канала
+            const view = document.getElementById('main-view');
+            
+            let tabsHtml = `
+                <div class="channel-header-tabs">
+                    <button class="channel-tab-btn ${activeChannelSubTab === 'videos' ? 'active' : ''}" onclick="switchChannelTab('videos')">🎬 Видео канала</button>
+                    <button class="channel-tab-btn ${activeChannelSubTab === 'shorts' ? 'active' : ''}" onclick="switchChannelTab('shorts')">⚡ Shorts канала</button>
+                </div>
+            `;
+            
+            if (activeChannelSubTab === 'shorts') {
+                view.innerHTML = tabsHtml;
+            } else {
+                view.innerHTML = tabsHtml + '<div class="grid" id="home-grid"></div>';
+            }
         }
         
-        const cacheKey = `channel_${channelId}_p${currentPage}`;
+        const cacheKey = `channel_${channelId}_${activeChannelSubTab}_p${currentPage}`;
         const cachedData = getCache(cacheKey);
         if (cachedData) {
-            renderHomeGrid(cachedData, isAppend);
+            if (activeChannelSubTab === 'shorts') {
+                renderShortsFeed(cachedData, true);
+            } else {
+                renderHomeGrid(cachedData, true);
+            }
             return;
         }
 
-        let bottomIndicator = null;
-        if (isAppend) {
-            bottomIndicator = document.createElement('div');
-            bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Загрузка...';
-            document.getElementById('main-view').appendChild(bottomIndicator);
-        }
+        let bottomIndicator = document.createElement('div');
+        bottomIndicator.className = 'scroll-loader';
+        bottomIndicator.innerText = 'Загрузка контента...';
+        document.getElementById('main-view').appendChild(bottomIndicator);
         
         try {
-            const endpoint = `channels/${channelId}/videos?page=${currentPage}`;
+            // Для шортсов используем поисковый хак по автору, для видео - классический вывод ленты канала
+            let endpoint = `channels/${channelId}/videos?page=${currentPage}`;
+            if (activeChannelSubTab === 'shorts') {
+                endpoint = `search?q=${encodeURIComponent(channelName + ' shorts')}&type=video&page=${currentPage}`;
+            }
+            
             const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
             const data = await fastApiFetch(endpoint, currentSignal);
-            const finalChannelVideos = (data.videos || data).map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30);
+            bottomIndicator.remove();
+
+            const rawItems = data.videos || data || [];
             
-            if (bottomIndicator) bottomIndicator.remove();
-            setCache(cacheKey, finalChannelVideos);
-            renderHomeGrid(finalChannelVideos, isAppend);
+            if (activeChannelSubTab === 'shorts') {
+                const parsedShorts = rawItems.map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 20);
+                setCache(cacheKey, parsedShorts);
+                renderShortsFeed(parsedShorts, true); 
+            } else {
+                const parsedVideos = rawItems.map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30);
+                setCache(cacheKey, parsedVideos);
+                renderHomeGrid(parsedVideos, true); 
+            }
         } catch (error) {
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                document.getElementById('main-view').innerHTML = '<div class="msg-box">Не удалось загрузить видео канала.</div>';
+                const errBox = document.createElement('div');
+                errBox.className = 'msg-box';
+                errBox.innerText = 'Не удалось загрузить этот раздел. Попробуйте еще раз.';
+                document.getElementById('main-view').appendChild(errBox);
             }
         }
     }
@@ -501,8 +562,9 @@
         if (isNextPageLoading || activeIsChannelSearch) return;
         const view = document.getElementById('main-view');
         
-        // Упреждающий порог срабатывания скролла. Для Shorts загрузка идет за 3 экрана до конца.
-        const triggerThreshold = currentTab === 'shorts' ? (view.clientHeight * 3) : 500;
+        // Упреждающий порог для бесшовного скролла
+        const isShortsMode = (currentTab === 'shorts' || (activeChannelId && activeChannelSubTab === 'shorts'));
+        const triggerThreshold = isShortsMode ? (view.clientHeight * 3) : 500;
         
         if (view.scrollTop + view.clientHeight >= view.scrollHeight - triggerThreshold) {
             isNextPageLoading = true;
@@ -528,6 +590,8 @@
 
     function changeTab(tabName) {
         currentTab = tabName;
+        activeChannelId = null; 
+        activeChannelSubTab = 'videos'; // Сброс подвкладки при выходе
         document.getElementById('tab-home').classList.remove('active');
         document.getElementById('tab-shorts').classList.remove('active');
         closePlayer();
@@ -572,7 +636,7 @@
             if (c.type !== 'channel' && !c.authorId) return;
             const thumb = c.authorThumbnails ? c.authorThumbnails[c.authorThumbnails.length - 1].url : 'https://img.youtube.com/vi/0/default.jpg';
             htmlStr += `
-                <div class="card-inner channel-card" onclick="loadChannelVideos('${c.authorId || c.channelId}', '${c.author.replace(/'/g, "\\'")}')">
+                <div class="card-inner channel-card" onclick="activeChannelSubTab='videos'; loadChannelVideos('${c.authorId || c.channelId}', '${c.author.replace(/'/g, "\\'")}')">
                     <img class="channel-avatar" src="${thumb}" loading="lazy">
                     <div class="meta">
                         <div class="title">${c.author}</div>
@@ -585,11 +649,6 @@
     }
 
     function renderHomeGrid(list, isAppend = false) {
-        if (!isAppend) {
-            clearViewMemory();
-            const view = document.getElementById('main-view');
-            view.innerHTML = '<div class="grid" id="home-grid"></div>';
-        }
         const grid = document.getElementById('home-grid');
         if (!grid) return;
         let htmlStr = '';
@@ -606,10 +665,7 @@
     }
 
     function renderShortsFeed(list, isAppend = false) {
-        if (!isAppend) clearViewMemory();
         const view = document.getElementById('main-view');
-        if (!isAppend && list.length === 0) { view.innerHTML = '<div class="msg-box">Видео отсутствуют.</div>'; return; }
-
         let htmlStr = '';
         list.forEach(v => {
             if (!v.id) return;
@@ -655,7 +711,8 @@
     document.getElementById('main-view').addEventListener('scroll', handleInfiniteScroll);
     
     window.addEventListener('keydown', e => {
-        if (currentTab === 'shorts') {
+        const isShortsMode = (currentTab === 'shorts' || (activeChannelId && activeChannelSubTab === 'shorts'));
+        if (isShortsMode) {
             if (e.key === 'ArrowDown') { e.preventDefault(); scrollShortsViaTv('down'); }
             else if (e.key === 'ArrowUp') { e.preventDefault(); scrollShortsViaTv('up'); }
         }
