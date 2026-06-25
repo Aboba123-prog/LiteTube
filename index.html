@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#465c71">
-    <title>LiteTube Ultra iOS6</title>
+    <title>LiteTube</title>
     
     <link rel="preconnect" href="https://img.youtube.com">
-    <link rel="preconnect" href="https://www.youtube.com">
-    <link rel="preconnect" href="https://www.youtube-nocookie.com">
 
     <style>
         :root {
@@ -22,6 +20,13 @@
             --card-shadow: rgba(0,0,0,0.1);
             --search-bg: #ffffff;
             --search-text: #000000;
+            
+            --shorts-bg: #d1d8e0;
+            --shorts-item-border: #b0b8c0;
+            --shorts-card-bg: #ffffff;
+            --shorts-text-main: #000000;
+            --shorts-text-sub: #444444;
+            --shorts-overlay: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 100%);
         }
 
         [data-theme="dark"] {
@@ -35,6 +40,13 @@
             --card-shadow: rgba(0,0,0,0.5);
             --search-bg: #333333;
             --search-text: #ffffff;
+
+            --shorts-bg: #0f0f0f;
+            --shorts-item-border: #222222;
+            --shorts-card-bg: #111111;
+            --shorts-text-main: #ffffff;
+            --shorts-text-sub: #cccccc;
+            --shorts-overlay: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
         }
 
         *, *::before, *::after { 
@@ -96,14 +108,15 @@
             height: calc(100vh - 135px); height: calc(100dvh - 135px);
             overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px;
             transform: translateZ(0); will-change: transform;
+            scroll-behavior: smooth;
         }
         
-        .main-content.shorts-mode { padding: 0; scroll-snap-type: y mandatory; background: #000; }
+        .main-content.shorts-mode { padding: 0; scroll-snap-type: y mandatory; background: var(--shorts-bg); transition: background 0.3s ease; }
 
         .grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); 
-            gap: 12px; max-width: 1200px; margin: 0 auto;
+            gap: 12px; max-width: 1600px; margin: 0 auto;
         }
 
         .card-inner {
@@ -124,22 +137,36 @@
         .title { font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: var(--text-main); }
         .channel { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
 
-        .shorts-item { width: 100%; height: calc(100vh - 135px); height: calc(100dvh - 135px); scroll-snap-align: start; position: relative; background: #000; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #333; }
-        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: #111; }
+        .shorts-item { width: 100%; height: calc(100vh - 135px); height: calc(100dvh - 135px); scroll-snap-align: start; position: relative; background: transparent; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid var(--shorts-item-border); }
+        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: var(--shorts-card-bg); box-shadow: 0 0 20px rgba(0,0,0,0.15); transition: background 0.3s ease; }
         .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
         
-        .shorts-overlay-info { background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%); padding: 20px 12px; color: #fff; }
-        .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold;}
-        .shorts-overlay-info p { margin: 0; font-size: 12px; color: #ccc;}
+        .shorts-overlay-info { background: var(--shorts-overlay); padding: 24px 14px; color: var(--shorts-text-main); transition: background 0.3s, color 0.3s; }
+        .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold; line-height: 1.3; }
+        .shorts-overlay-info p { margin: 0; font-size: 12px; color: var(--shorts-text-sub); }
 
         .play-btn-center {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: linear-gradient(to bottom, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.7) 100%);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(210,210,210,0.85) 100%);
             border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
+
+        .tv-scroll-controls {
+            display: none; position: fixed; right: 40px; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 16px; z-index: 150;
+        }
+        @media (min-width: 800px) {
+            .main-content.shorts-mode + .tv-scroll-controls { display: flex; }
+        }
+        .tv-nav-btn {
+            width: 55px; height: 55px; border-radius: 50%; background: var(--header-grad); border: 1px solid var(--header-border);
+            color: white; font-size: 22px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.2s; user-select: none;
+        }
+        .tv-nav-btn:hover { transform: scale(1.1); }
+        .tv-nav-btn:active { transform: scale(0.95); opacity: 0.8; }
 
         .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; }
         .ios-player-box { width: 100%; max-width: 700px; background: #222; border: 2px solid #555; border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000; }
@@ -148,12 +175,12 @@
         .ios-video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
 
         .msg-box { text-align: center; color: var(--text-sub); padding: 40px 10px; font-weight: bold; }
+        .scroll-loader { padding: 20px 10px; text-align: center; font-weight: bold; color: var(--text-sub); width: 100%; grid-column: 1 / -1; }
 
         .tab-bar {
             position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
             background: linear-gradient(to bottom, #444444 0%, #111111 50%, #000000 51%, #000000 100%);
-            border-top: 1px solid #222; display: flex; z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom);
+            border-top: 1px solid #222; display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom);
         }
         .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px; }
         .tab-item.active { color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%); box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); }
@@ -166,7 +193,7 @@
     <div class="header-top">
         <div class="logo" onclick="changeTab('home')">LiteTube</div>
         <div class="header-actions">
-            <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()" title="Сменить тему">🌙</div>
+            <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()">🌙</div>
             <div id="vpn-toggle" class="ios-btn active" onclick="toggleProxy()">● Анти-Блок</div>
         </div>
     </div>
@@ -177,6 +204,11 @@
 </header>
 
 <div id="main-view" class="main-content"></div>
+
+<div class="tv-scroll-controls">
+    <button class="tv-nav-btn" onclick="scrollShortsViaTv('up')">▲</button>
+    <button class="tv-nav-btn" onclick="scrollShortsViaTv('down')">▼</button>
+</div>
 
 <div id="ios-player" class="ios-player-modal">
     <div class="ios-player-box">
@@ -203,9 +235,15 @@
     let isProxyActive = true;
     let fetchAbortController = null; 
     
-    // Внутренняя система мгновенного кэширования ответов
+    let currentPage = 1;
+    let isNextPageLoading = false;
+    let activeQuery = '';
+    let activeIsChannelSearch = false;
+    let activeChannelId = null;
+    let activeChannelName = null;
+
     const apiCache = new Map();
-    const CACHE_TTL = 60000; // Кэш живет 1 минуту
+    const CACHE_TTL = 60000; 
 
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
@@ -221,7 +259,7 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
-    // Расширенный пул стабильных и быстрых узлов
+    // Пул стабильных узлов API
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
@@ -234,8 +272,6 @@
         "https://invidious.protokolla.fi/api/v1/"
     ];
     const UNIQUE_NODES = [...new Set(PROXY_NODES)];
-    
-    // Загрузка последнего успешного быстрого сервера из памяти устройства
     let lastSuccessfulNode = localStorage.getItem('litetube_fastest_node') || null;
 
     function toggleProxy() {
@@ -254,18 +290,26 @@
         return (match && match[1]) ? match[1] : null;
     }
 
+    // Функция генерации URL плеера в зависимости от текущего состояния сети
+    function getOptimizedEmbedUrl(id) {
+        if (isProxyActive && lastSuccessfulNode) {
+            // Трансформируем адрес API-узла в адрес веб-эмбеда этого же легкого сервера
+            // Пример: https://yewtu.be/api/v1/ -> https://yewtu.be/embed/
+            return lastSuccessfulNode.replace('/api/v1/', '/embed/') + id;
+        }
+        // Дефолтный плеер Google без кук, если прокси выключен
+        return "https://www.youtube-nocookie.com/embed/" + id;
+    }
+
     function clearViewMemory() {
         const view = document.getElementById('main-view');
         view.querySelectorAll('iframe').forEach(iframe => iframe.src = 'about:blank');
         view.innerHTML = '';
     }
 
-    // Оптимизированная функция проверки кэша
     function getCache(key) {
         const cached = apiCache.get(key);
-        if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-            return cached.data;
-        }
+        if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) return cached.data;
         return null;
     }
 
@@ -273,40 +317,43 @@
         apiCache.set(key, { data, timestamp: Date.now() });
     }
 
-    // Улучшенный адаптивный алгоритм рейсинга серверов с авто-повтором
+    // Гонка серверов для моментального выбора самого легкого региона
     async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
+        if (lastSuccessfulNode && attempt === 1) {
+            try {
+                const localController = new AbortController();
+                const timeoutId = setTimeout(() => localController.abort(), 1200); 
+                globalSignal.addEventListener('abort', () => localController.abort());
+                
+                const res = await fetch(lastSuccessfulNode + endpoint, { signal: localController.signal, cache: 'no-store' });
+                clearTimeout(timeoutId);
+                if (res.ok) return await res.json();
+            } catch (err) {}
+        }
+
         let pool = [...UNIQUE_NODES];
         let nodesToTry = [];
 
-        // Шаг 1: Если есть сервер, который успешно ответил прошлый раз, опрашиваем его ПЕРВЫМ
         if (lastSuccessfulNode && pool.includes(lastSuccessfulNode)) {
             nodesToTry.push(lastSuccessfulNode);
             pool = pool.filter(n => n !== lastSuccessfulNode);
         }
 
-        // Шаг 2: Добавляем еще 3 случайных сервера для подстраховки в параллельную гонку
         pool.sort(() => 0.5 - Math.random());
         nodesToTry = nodesToTry.concat(pool.slice(0, 4 - nodesToTry.length));
-
-        // Первая попытка — жесткая (2.5с). Если сервер лучший, он ответит моментально.
-        const timeoutDuration = attempt === 1 ? 2500 : 4500; 
+        const timeoutDuration = attempt === 1 ? 2500 : 5000; 
         
         const requests = nodesToTry.map(async (node) => {
             const localController = new AbortController();
             const timeoutId = setTimeout(() => localController.abort(), timeoutDuration); 
-            
-            globalSignal.addEventListener('abort', () => { 
-                localController.abort(); 
-                clearTimeout(timeoutId); 
-            });
+            globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
             
             try {
                 const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
                 clearTimeout(timeoutId);
-                if (!res.ok) throw new Error('Bad Status');
+                if (!res.ok) throw new Error('Bad Node');
                 const json = await res.json();
                 
-                // Запоминаем победителя гонки — теперь он наш фаворит
                 lastSuccessfulNode = node;
                 localStorage.setItem('litetube_fastest_node', node);
                 return json;
@@ -318,34 +365,51 @@
 
         try {
             return await Promise.any(requests);
-        } catch (aggregateError) {
-            // Если ВСЕ выбранные серверы выдали ошибку/таймаут на 1-й попытке, мгновенно запускаем каскадный повтор
+        } catch (error) {
             if (attempt === 1 && !globalSignal.aborted) {
                 lastSuccessfulNode = null;
                 localStorage.removeItem('litetube_fastest_node');
                 return fastApiFetch(endpoint, globalSignal, 2);
             }
-            throw aggregateError;
+            throw error;
         }
     }
 
-    async function loadDynamicContent(query = '', isChannelSearch = false) {
-        if (fetchAbortController) fetchAbortController.abort();
-        fetchAbortController = new AbortController();
+    // Фоновый пинг для определения лидера сразу при запуске приложения
+    function preWarmFastestNode() {
+        const controller = new AbortController();
+        fastApiFetch('trending?region=RU', controller.signal).catch(()=>{});
+    }
 
-        const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}`;
+    async function loadDynamicContent(query = '', isChannelSearch = false, isAppend = false) {
+        if (!isAppend) {
+            currentPage = 1;
+            activeQuery = query;
+            activeIsChannelSearch = isChannelSearch;
+            activeChannelId = null;
+            if (fetchAbortController) fetchAbortController.abort();
+            fetchAbortController = new AbortController();
+            clearViewMemory();
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Подключаемся к быстрому региону...</div>';
+        }
+
+        const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}_p${currentPage}`;
         const cachedData = getCache(cacheKey);
         
-        // Моментальный рендеринг из кэша (0 миллисекунд ожидания)
         if (cachedData) {
-            if (isChannelSearch) renderChannelsList(cachedData);
-            else if (currentTab === 'shorts') renderShortsFeed(cachedData);
-            else renderHomeGrid(cachedData);
+            if (isChannelSearch) renderChannelsList(cachedData, isAppend);
+            else if (currentTab === 'shorts') renderShortsFeed(cachedData, isAppend);
+            else renderHomeGrid(cachedData, isAppend);
             return;
         }
 
-        clearViewMemory();
-        document.getElementById('main-view').innerHTML = '<div class="msg-box">Поиск свободных серверов...</div>';
+        let bottomIndicator = null;
+        if (isAppend) {
+            bottomIndicator = document.createElement('div');
+            bottomIndicator.className = 'scroll-loader';
+            bottomIndicator.innerText = 'Подгружаем новые видео...';
+            document.getElementById('main-view').appendChild(bottomIndicator);
+        }
         
         try {
             let endpoint;
@@ -359,11 +423,14 @@
                 endpoint = `trending?region=RU`;
             }
             
-            const data = await fastApiFetch(endpoint, fetchAbortController.signal);
+            endpoint += (endpoint.includes('?') ? '&' : '?') + `page=${currentPage}`;
+            const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
+            const data = await fastApiFetch(endpoint, currentSignal);
+            if (bottomIndicator) bottomIndicator.remove();
             
             if (isChannelSearch) { 
                 setCache(cacheKey, data);
-                renderChannelsList(data); 
+                renderChannelsList(data, isAppend); 
                 return; 
             }
 
@@ -372,42 +439,88 @@
                 let filtered = parsed.filter(v => !v.sec || v.sec < 65);
                 const finalShorts = (filtered.length ? filtered : parsed).slice(0, 15);
                 setCache(cacheKey, finalShorts);
-                renderShortsFeed(finalShorts);
+                renderShortsFeed(finalShorts, isAppend);
             } else {
                 const finalHome = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24);
                 setCache(cacheKey, finalHome);
-                renderHomeGrid(finalHome);
+                renderHomeGrid(finalHome, isAppend);
             }
         } catch (error) {
-            if (error.name === 'AbortError' || error.name === 'AggregateError' && error.errors.some(e => e.name === 'AbortError')) return;
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Все узлы заняты. Пожалуйста, нажмите «Найти» еще раз.</div>';
+            if (bottomIndicator) bottomIndicator.remove();
+            if (error.name === 'AbortError') return;
+            if (!isAppend) {
+                document.getElementById('main-view').innerHTML = '<div class="msg-box">Все узлы перегружены. Попробуйте нажать кнопку поиска еще раз.</div>';
+            }
         }
     }
 
-    async function loadChannelVideos(channelId, channelName) {
-        if (fetchAbortController) fetchAbortController.abort();
-        fetchAbortController = new AbortController();
+    async function loadChannelVideos(channelId, channelName, isAppend = false) {
+        if (!isAppend) {
+            currentPage = 1;
+            activeChannelId = channelId;
+            activeChannelName = channelName;
+            activeQuery = '';
+            if (fetchAbortController) fetchAbortController.abort();
+            fetchAbortController = new AbortController();
+            clearViewMemory();
+            document.getElementById('main-view').innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
+        }
         
-        const cacheKey = `channel_${channelId}`;
+        const cacheKey = `channel_${channelId}_p${currentPage}`;
         const cachedData = getCache(cacheKey);
         if (cachedData) {
-            renderHomeGrid(cachedData);
+            renderHomeGrid(cachedData, isAppend);
             return;
         }
 
-        clearViewMemory();
-        document.getElementById('main-view').innerHTML = `<div class="msg-box">Загрузка канала...</div>`;
+        let bottomIndicator = null;
+        if (isAppend) {
+            bottomIndicator = document.createElement('div');
+            bottomIndicator.className = 'scroll-loader';
+            bottomIndicator.innerText = 'Загрузка контента канала...';
+            document.getElementById('main-view').appendChild(bottomIndicator);
+        }
         
         try {
-            const endpoint = `channels/${channelId}/videos`;
-            const data = await fastApiFetch(endpoint, fetchAbortController.signal);
+            const endpoint = `channels/${channelId}/videos?page=${currentPage}`;
+            const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
+            const data = await fastApiFetch(endpoint, currentSignal);
             const finalChannelVideos = (data.videos || data).map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30);
             
+            if (bottomIndicator) bottomIndicator.remove();
             setCache(cacheKey, finalChannelVideos);
-            renderHomeGrid(finalChannelVideos);
+            renderHomeGrid(finalChannelVideos, isAppend);
         } catch (error) {
-            if (error.name === 'AbortError' || error.name === 'AggregateError' && error.errors.some(e => e.name === 'AbortError')) return;
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка загрузки видео канала. Повторите попытку.</div>';
+            if (bottomIndicator) bottomIndicator.remove();
+            if (error.name === 'AbortError') return;
+            if (!isAppend) {
+                document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка сети при получении данных канала.</div>';
+            }
+        }
+    }
+
+    async function handleInfiniteScroll() {
+        if (isNextPageLoading || activeIsChannelSearch) return;
+        const view = document.getElementById('main-view');
+        if (view.scrollTop + view.clientHeight >= view.scrollHeight - 400) {
+            isNextPageLoading = true;
+            currentPage++;
+            if (activeChannelId) {
+                await loadChannelVideos(activeChannelId, activeChannelName, true);
+            } else {
+                await loadDynamicContent(activeQuery, false, true);
+            }
+            isNextPageLoading = false;
+        }
+    }
+
+    function scrollShortsViaTv(direction) {
+        const view = document.getElementById('main-view');
+        const scrollAmount = view.clientHeight;
+        if (direction === 'up') {
+            view.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
+        } else {
+            view.scrollBy({ top: scrollAmount, behavior: 'smooth' });
         }
     }
 
@@ -441,13 +554,16 @@
         loadDynamicContent(query, query.startsWith('@'));
     }
 
-    function renderChannelsList(channels) {
-        clearViewMemory();
-        const view = document.getElementById('main-view');
-        if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Канал не найден.</div>'; return; }
+    function renderChannelsList(channels, isAppend = false) {
+        if (!isAppend) {
+            clearViewMemory();
+            const view = document.getElementById('main-view');
+            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Канал не найден.</div>'; return; }
+            view.innerHTML = '<div class="grid" id="home-grid"></div>';
+        }
         
-        view.innerHTML = '<div class="grid" id="home-grid"></div>';
         const grid = document.getElementById('home-grid');
+        if (!grid) return;
         let htmlStr = '';
 
         channels.forEach(c => {
@@ -463,13 +579,17 @@
                     </div>
                 </div>`;
         });
-        grid.innerHTML = htmlStr;
+        grid.insertAdjacentHTML('beforeend', htmlStr);
     }
 
-    function renderHomeGrid(list) {
-        clearViewMemory();
-        const view = document.getElementById('main-view');
-        view.innerHTML = '<div class="grid" id="home-grid"></div>';
+    function renderHomeGrid(list, isAppend = false) {
+        if (!isAppend) {
+            clearViewMemory();
+            const view = document.getElementById('main-view');
+            view.innerHTML = '<div class="grid" id="home-grid"></div>';
+        }
+        const grid = document.getElementById('home-grid');
+        if (!grid) return;
         let htmlStr = '';
         
         list.forEach(v => {
@@ -480,13 +600,13 @@
                     <div class="meta"><div class="title">${v.title}</div><div class="channel">${v.author}</div></div>
                 </div>`;
         });
-        document.getElementById('home-grid').innerHTML = htmlStr;
+        grid.insertAdjacentHTML('beforeend', htmlStr);
     }
 
-    function renderShortsFeed(list) {
-        clearViewMemory();
+    function renderShortsFeed(list, isAppend = false) {
+        if (!isAppend) clearViewMemory();
         const view = document.getElementById('main-view');
-        if(list.length === 0) { view.innerHTML = '<div class="msg-box">Нет видео.</div>'; return; }
+        if (!isAppend && list.length === 0) { view.innerHTML = '<div class="msg-box">Видео отсутствуют.</div>'; return; }
 
         let htmlStr = '';
         list.forEach(v => {
@@ -501,7 +621,7 @@
                     </div>
                 </div>`;
         });
-        view.innerHTML = htmlStr;
+        view.insertAdjacentHTML('beforeend', htmlStr);
     }
 
     function activateShortsPlayer(id) {
@@ -512,14 +632,14 @@
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
         
-        const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${domain}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
+        const calculatedUrl = getOptimizedEmbedUrl(id);
+        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${calculatedUrl}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
     }
 
     function startInlinePlayer(id) {
         closePlayer();
-        const domain = isProxyActive ? "https://www.youtube-nocookie.com/embed/" : "https://www.youtube.com/embed/";
-        document.getElementById('player-target').innerHTML = `<iframe src="${domain}${id}?autoplay=1&rel=0&modestbranding=1" allowfullscreen eager></iframe>`;
+        const calculatedUrl = getOptimizedEmbedUrl(id);
+        document.getElementById('player-target').innerHTML = `<iframe src="${calculatedUrl}?autoplay=1&rel=0&modestbranding=1" allowfullscreen eager></iframe>`;
         document.getElementById('ios-player').style.display = 'flex';
     }
 
@@ -527,14 +647,22 @@
         document.getElementById('ios-player').style.display = 'none';
         const target = document.getElementById('player-target');
         const iframe = target.querySelector('iframe');
-        
         if (iframe) iframe.src = 'about:blank';
         target.innerHTML = ''; 
     }
 
     document.getElementById('search-bar').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
+    document.getElementById('main-view').addEventListener('scroll', handleInfiniteScroll);
+    
+    window.addEventListener('keydown', e => {
+        if (currentTab === 'shorts') {
+            if (e.key === 'ArrowDown') { e.preventDefault(); scrollShortsViaTv('down'); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); scrollShortsViaTv('up'); }
+        }
+    });
     
     initTheme();
+    preWarmFastestNode(); // Прогрев балансировщика регионов при инициализации страницы
     changeTab('home');
 </script>
 
