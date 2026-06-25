@@ -22,7 +22,6 @@
             --search-bg: #ffffff;
             --search-text: #000000;
             
-            /* Светлая тема для Shorts */
             --shorts-bg: #d1d8e0;
             --shorts-item-border: #b0b8c0;
             --shorts-card-bg: #ffffff;
@@ -43,7 +42,6 @@
             --search-bg: #333333;
             --search-text: #ffffff;
 
-            /* Темная тема для Shorts */
             --shorts-bg: #0f0f0f;
             --shorts-item-border: #222222;
             --shorts-card-bg: #111111;
@@ -155,7 +153,6 @@
         }
         .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
 
-        /* Навигация для Больших Мониторов / ТВ */
         .tv-scroll-controls {
             display: none; position: fixed; right: 40px; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 16px; z-index: 150;
         }
@@ -241,10 +238,13 @@
     let activeChannelName = null;
 
     const apiCache = new Map();
-    const CACHE_TTL = 60000; 
+    const CACHE_TTL = 30000; // Уменьшили TTL кэша до 30 секунд для свежести данных
 
-    // Базовый нативный адрес легкого плеера Google без лишнего трекинга кук
     const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
+
+    // Списки ротации поисковых запросов для создания бесконечной умной ленты
+    const HOME_FEED_KEYWORDS = ['популярное', 'музыка', 'юмор', 'кино', 'блоги', 'новости', 'игры', 'авто', 'наука'];
+    const SHORTS_FEED_KEYWORDS = ['shorts trending', 'shorts популярное', 'vine shorts', 'юмор shorts', 'shorts mix', 'tik tok trends', 'лучшие shorts'];
 
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
@@ -260,7 +260,6 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
-    // Пул серверов исключительно для быстрого сбора текстовых данных
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
@@ -300,17 +299,20 @@
         apiCache.set(key, { data, timestamp: Date.now() });
     }
 
-    // Поиск быстрейшего текстового узла
     async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
         if (lastSuccessfulNode && attempt === 1) {
             try {
                 const localController = new AbortController();
-                const timeoutId = setTimeout(() => localController.abort(), 1200); 
+                const timeoutId = setTimeout(() => localController.abort(), 1500); 
                 globalSignal.addEventListener('abort', () => localController.abort());
                 
                 const res = await fetch(lastSuccessfulNode + endpoint, { signal: localController.signal, cache: 'no-store' });
                 clearTimeout(timeoutId);
-                if (res.ok) return await res.json();
+                if (res.ok) {
+                    const json = await res.json();
+                    if (Array.isArray(json) && json.length > 0) return json;
+                    if (json && !Array.isArray(json)) return json; // Для каналов
+                }
             } catch (err) {}
         }
 
@@ -336,6 +338,10 @@
                 clearTimeout(timeoutId);
                 if (!res.ok) throw new Error('Bad Node');
                 const json = await res.json();
+                
+                if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
+                    throw new Error('Empty Data Node'); // Отсекаем узлы, выдающие пустые списки
+                }
                 
                 lastSuccessfulNode = node;
                 localStorage.setItem('litetube_fastest_node', node);
@@ -390,17 +396,33 @@
         
         try {
             let endpoint;
+            
+            // Настройка роутинга для предотвращения дубликатов ленты
             if (currentTab === 'shorts') {
-                endpoint = `search?q=${encodeURIComponent(query ? query + ' shorts' : 'shorts trending')}&type=video`;
+                if (query) {
+                    endpoint = `search?q=${encodeURIComponent(query + ' shorts')}&type=video&page=${currentPage}`;
+                } else {
+                    // Если пользователь просто листает шортсы, циклически меняем поисковые фразы для разнообразия контента
+                    const keyword = SHORTS_FEED_KEYWORDS[(currentPage - 1) % SHORTS_FEED_KEYWORDS.length];
+                    const virtualPage = Math.floor((currentPage - 1) / SHORTS_FEED_KEYWORDS.length) + 1;
+                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
+                }
             } else if (isChannelSearch) {
-                endpoint = `search?q=${encodeURIComponent(query)}&type=channel`;
+                endpoint = `search?q=${encodeURIComponent(query)}&type=channel&page=${currentPage}`;
             } else if (query) {
-                endpoint = `search?q=${encodeURIComponent(query)}&type=video`;
+                endpoint = `search?q=${encodeURIComponent(query)}&type=video&page=${currentPage}`;
             } else {
-                endpoint = `trending?region=RU`;
+                // Главная без поискового запроса
+                if (currentPage === 1) {
+                    endpoint = `trending?region=RU`;
+                } else {
+                    // Так как тренды не имеют страниц, со 2-й страницы подмешиваем бесконечный микс поисковых категорий
+                    const keyword = HOME_FEED_KEYWORDS[(currentPage - 2) % HOME_FEED_KEYWORDS.length];
+                    const virtualPage = Math.floor((currentPage - 2) / HOME_FEED_KEYWORDS.length) + 1;
+                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
+                }
             }
             
-            endpoint += (endpoint.includes('?') ? '&' : '?') + `page=${currentPage}`;
             const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
             const data = await fastApiFetch(endpoint, currentSignal);
             if (bottomIndicator) bottomIndicator.remove();
@@ -412,13 +434,12 @@
             }
 
             if (currentTab === 'shorts') {
-                let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author, sec: v.lengthSeconds }));
-                let filtered = parsed.filter(v => !v.sec || v.sec < 65);
-                const finalShorts = (filtered.length ? filtered : parsed).slice(0, 15);
-                setCache(cacheKey, finalShorts);
-                renderShortsFeed(finalShorts, isAppend);
+                let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 20);
+                setCache(cacheKey, parsed);
+                renderShortsFeed(parsed, isAppend);
             } else {
-                const finalHome = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24);
+                const items = data.videos || data;
+                const finalHome = items.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24);
                 setCache(cacheKey, finalHome);
                 renderHomeGrid(finalHome, isAppend);
             }
@@ -426,7 +447,7 @@
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                document.getElementById('main-view').innerHTML = '<div class="msg-box">Ошибка соединения. Нажмите кнопку поиска еще раз.</div>';
+                document.getElementById('main-view').innerHTML = '<div class="msg-box">Узел занят. Повторите попытку поиска.</div>';
             }
         }
     }
@@ -479,7 +500,11 @@
     async function handleInfiniteScroll() {
         if (isNextPageLoading || activeIsChannelSearch) return;
         const view = document.getElementById('main-view');
-        if (view.scrollTop + view.clientHeight >= view.scrollHeight - 400) {
+        
+        // Упреждающий порог срабатывания скролла. Для Shorts загрузка идет за 3 экрана до конца.
+        const triggerThreshold = currentTab === 'shorts' ? (view.clientHeight * 3) : 500;
+        
+        if (view.scrollTop + view.clientHeight >= view.scrollHeight - triggerThreshold) {
             isNextPageLoading = true;
             currentPage++;
             if (activeChannelId) {
@@ -601,7 +626,6 @@
         view.insertAdjacentHTML('beforeend', htmlStr);
     }
 
-    // Мгновенная инициализация нативного легкого HTML5-плеера для Shorts
     function activateShortsPlayer(id) {
         document.querySelectorAll('.shorts-item iframe').forEach(iframe => {
             const parent = iframe.parentElement;
@@ -610,11 +634,9 @@
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
         
-        // Параметры для максимальной совместимости со старыми WebView/Safari (playsinline=1 и html5=1)
         document.getElementById(`container-${id}`).innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}&playsinline=1&html5=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
     }
 
-    // Мгновенная инициализация нативного легкого HTML5-плеера для обычных видео
     function startInlinePlayer(id) {
         closePlayer();
         document.getElementById('player-target').innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&html5=1" allowfullscreen eager></iframe>`;
