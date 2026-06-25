@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#465c71">
-    <title>LiteTube Legacy</title>
+    <title>LiteTube Endless Edition</title>
     
-    <link rel="preconnect" href="https://img.youtube.com">
     <link rel="preconnect" href="https://www.youtube-nocookie.com">
+    <link rel="preconnect" href="https://img.youtube.com">
+    <link rel="preconnect" href="https://i.ytimg.com">
+    <link rel="preconnect" href="https://s.ytimg.com">
+    <link rel="dns-prefetch" href="https://www.youtube-nocookie.com">
 
     <style>
         :root {
@@ -103,7 +106,6 @@
             cursor: pointer; box-shadow: 0 1px 0 #fff; flex-shrink: 0;
         }
 
-        /* Навигация внутри каналов */
         .channel-header-tabs {
             display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 600px;
         }
@@ -150,7 +152,7 @@
         .channel { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
 
         .shorts-item { width: 100%; height: calc(100vh - 135px); height: calc(100dvh - 135px); scroll-snap-align: start; position: relative; background: transparent; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid var(--shorts-item-border); }
-        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: var(--shorts-card-bg); box-shadow: 0 0 20px rgba(0,0,0,0.15); transition: background 0.3s ease; }
+        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: var(--shorts-card-bg); box-shadow: 0 0 20px rgba(0,0,0,0.15); transition: background 0.3s ease; transform: translateZ(0); }
         .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
         .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
         
@@ -177,10 +179,8 @@
             color: white; font-size: 22px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
             display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.2s; user-select: none;
         }
-        .tv-nav-btn:hover { transform: scale(1.1); }
-        .tv-nav-btn:active { transform: scale(0.95); opacity: 0.8; }
 
-        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; }
+        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; transform: translateZ(0); }
         .ios-player-box { width: 100%; max-width: 700px; background: #222; border: 2px solid #555; border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000; }
         .ios-player-bar { background: linear-gradient(to bottom, #4c5a70 0%, #243249 100%); padding: 6px; display: flex; justify-content: flex-end; border-bottom: 1px solid #111; }
         .ios-video-container { position: relative; padding-top: 56.25%; background: #000; }
@@ -197,6 +197,8 @@
         .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px; }
         .tab-item.active { color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%); box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); }
         .tab-icon { width: 22px; height: 22px; fill: currentColor; }
+        
+        .retry-btn { display: inline-block; margin-top: 12px; padding: 6px 16px; background: var(--header-grad); color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -248,18 +250,18 @@
     let activeQuery = '';
     let activeIsChannelSearch = false;
     
-    // Переменные состояния текущего просматриваемого канала
     let activeChannelId = null;
     let activeChannelName = null;
-    let activeChannelSubTab = 'videos'; // 'videos' или 'shorts'
+    let activeChannelSubTab = 'videos'; 
 
     const apiCache = new Map();
-    const CACHE_TTL = 30000; 
+    const CACHE_TTL = 45000; // Увеличили кэш до 45 секунд для экономии трафика
 
     const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
 
-    const HOME_FEED_KEYWORDS = ['популярное', 'музыка', 'юмор', 'кино', 'блоги', 'новости', 'игры', 'авто', 'наука'];
-    const SHORTS_FEED_KEYWORDS = ['shorts trending', 'shorts популярное', 'vine shorts', 'юмор shorts', 'shorts mix', 'tik tok trends', 'лучшие shorts'];
+    // Списки тем для постоянного обновления контента
+    const HOME_FEED_KEYWORDS = ['клипы', 'трейлеры', 'музыка 2026', 'юмор', 'технологии', 'гаджеты', 'игры обзор', 'авто', 'наука', 'travel', 'лекции', 'подкаст'];
+    const SHORTS_FEED_KEYWORDS = ['shorts trending', 'vine', 'мемы shorts', 'tik tok trends', 'shorts mix', 'лучшее shorts', 'лайфхаки shorts', 'funny shorts'];
 
     function initTheme() {
         const savedTheme = localStorage.getItem('litetube_theme') || 'light';
@@ -275,16 +277,20 @@
         document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
     }
     
+    // Расширенный отказоустойчивый пул серверов
     const PROXY_NODES = [
         "https://inv.tux.pizza/api/v1/",
         "https://invidious.nerdvpn.de/api/v1/",
         "https://invidious.projectsegfau.lt/api/v1/",
         "https://yewtu.be/api/v1/",
+        "https://invidious.privacydev.net/api/v1/",
+        "https://iv.melmac.space/api/v1/",
+        "https://invidious.perennialte.ch/api/v1/",
         "https://invidious.flokinet.to/api/v1/",
         "https://vid.puffyan.us/api/v1/",
-        "https://invidious.privacydev.net/api/v1/",
         "https://invidious.drgns.space/api/v1/",
-        "https://invidious.protokolla.fi/api/v1/"
+        "https://invidious.protokolla.fi/api/v1/",
+        "https://invidious.slipfox.xyz/api/v1/"
     ];
     const UNIQUE_NODES = [...new Set(PROXY_NODES)];
     let lastSuccessfulNode = localStorage.getItem('litetube_fastest_node') || null;
@@ -314,68 +320,58 @@
         apiCache.set(key, { data, timestamp: Date.now() });
     }
 
-    async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
-        if (lastSuccessfulNode && attempt === 1) {
+    // Движок многоступенчатого параллельного забега
+    async function fastApiFetch(endpoint, globalSignal) {
+        // Мы делаем до 3 автоматических скрытых попыток перед тем, как выдать ошибку
+        for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-                const localController = new AbortController();
-                const timeoutId = setTimeout(() => localController.abort(), 1500); 
-                globalSignal.addEventListener('abort', () => localController.abort());
+                let pool = [...UNIQUE_NODES];
+                // Случайное перемешивание пула для эффекта новизны результатов поиска
+                pool.sort(() => 0.5 - Math.random());
                 
-                const res = await fetch(lastSuccessfulNode + endpoint, { signal: localController.signal, cache: 'no-store' });
-                clearTimeout(timeoutId);
-                if (res.ok) {
-                    const json = await res.json();
-                    if (Array.isArray(json) && json.length > 0) return json;
-                    if (json && !Array.isArray(json)) return json; 
+                // На каждой попытке берем пачку из 6 серверов для одновременного параллельного запроса!
+                let nodesToTry = pool.slice(0, 6);
+                
+                if (lastSuccessfulNode && UNIQUE_NODES.includes(lastSuccessfulNode) && attempt === 1) {
+                    nodesToTry = [lastSuccessfulNode, ...nodesToTry.filter(n => n !== lastSuccessfulNode)].slice(0, 6);
                 }
-            } catch (err) {}
-        }
 
-        let pool = [...UNIQUE_NODES];
-        let nodesToTry = [];
+                // С каждой попыткой плавно увеличиваем лимит времени (1.5с -> 3с -> 5с)
+                const timeoutDuration = attempt === 1 ? 1500 : (attempt === 2 ? 3000 : 5000);
 
-        if (lastSuccessfulNode && pool.includes(lastSuccessfulNode)) {
-            nodesToTry.push(lastSuccessfulNode);
-            pool = pool.filter(n => n !== lastSuccessfulNode);
-        }
+                const requests = nodesToTry.map(async (node) => {
+                    const localController = new AbortController();
+                    const timeoutId = setTimeout(() => localController.abort(), timeoutDuration);
+                    if (globalSignal) globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
 
-        pool.sort(() => 0.5 - Math.random());
-        nodesToTry = nodesToTry.concat(pool.slice(0, 4 - nodesToTry.length));
-        const timeoutDuration = attempt === 1 ? 2500 : 5000; 
-        
-        const requests = nodesToTry.map(async (node) => {
-            const localController = new AbortController();
-            const timeoutId = setTimeout(() => localController.abort(), timeoutDuration); 
-            globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
-            
-            try {
-                const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
-                clearTimeout(timeoutId);
-                if (!res.ok) throw new Error('Bad Node');
-                const json = await res.json();
-                
-                if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
-                    throw new Error('Empty Data Node'); 
-                }
-                
-                lastSuccessfulNode = node;
-                localStorage.setItem('litetube_fastest_node', node);
-                return json;
-            } catch (err) {
-                clearTimeout(timeoutId);
-                throw err;
+                    try {
+                        const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
+                        clearTimeout(timeoutId);
+                        if (!res.ok) throw new Error('Fail Status');
+                        const json = await res.json();
+                        
+                        if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
+                            throw new Error('Empty Payload');
+                        }
+                        
+                        lastSuccessfulNode = node;
+                        localStorage.setItem('litetube_fastest_node', node);
+                        return json;
+                    } catch (err) {
+                        clearTimeout(timeoutId);
+                        throw err;
+                    }
+                });
+
+                // Кто первый из 6 серверов прислал данные - тот выиграл гонку
+                return await Promise.any(requests);
+            } catch (error) {
+                if (globalSignal && globalSignal.aborted) throw error;
+                // Если это была последняя 3-я попытка и всё упало, прокидываем ошибку дальше
+                if (attempt === 3) throw error;
+                // Иначе ждем 200мс и переходим на следующий каскад серверов
+                await new Promise(r => setTimeout(r, 200));
             }
-        });
-
-        try {
-            return await Promise.any(requests);
-        } catch (error) {
-            if (attempt === 1 && !globalSignal.aborted) {
-                lastSuccessfulNode = null;
-                localStorage.removeItem('litetube_fastest_node');
-                return fastApiFetch(endpoint, globalSignal, 2);
-            }
-            throw error;
         }
     }
 
@@ -388,7 +384,7 @@
             if (fetchAbortController) fetchAbortController.abort();
             fetchAbortController = new AbortController();
             clearViewMemory();
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Загрузка списков...</div>';
+            document.getElementById('main-view').innerHTML = '<div class="msg-box">Подключение к сети серверов...</div>';
         }
 
         const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}_p${currentPage}`;
@@ -405,20 +401,22 @@
         if (isAppend) {
             bottomIndicator = document.createElement('div');
             bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Загрузка...';
+            bottomIndicator.innerText = 'Синхронизация контента...';
             document.getElementById('main-view').appendChild(bottomIndicator);
         }
         
         try {
             let endpoint;
+            // Перемешиваем категории на лету, чтобы рекомендации никогда не повторялись
+            const randHomeKeywords = [...HOME_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
+            const randShortsKeywords = [...SHORTS_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
             
             if (currentTab === 'shorts') {
                 if (query) {
                     endpoint = `search?q=${encodeURIComponent(query + ' shorts')}&type=video&page=${currentPage}`;
                 } else {
-                    const keyword = SHORTS_FEED_KEYWORDS[(currentPage - 1) % SHORTS_FEED_KEYWORDS.length];
-                    const virtualPage = Math.floor((currentPage - 1) / SHORTS_FEED_KEYWORDS.length) + 1;
-                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
+                    const keyword = randShortsKeywords[currentPage % randShortsKeywords.length];
+                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
                 }
             } else if (isChannelSearch) {
                 endpoint = `search?q=${encodeURIComponent(query)}&type=channel&page=${currentPage}`;
@@ -426,11 +424,13 @@
                 endpoint = `search?q=${encodeURIComponent(query)}&type=video&page=${currentPage}`;
             } else {
                 if (currentPage === 1) {
-                    endpoint = `trending?region=RU`;
+                    // Случайный выбор региона для разнообразия рекомендаций на главной
+                    const regions = ['RU', 'BY', 'KZ'];
+                    const randomRegion = regions[Math.floor(Math.random() * regions.length)];
+                    endpoint = `trending?region=${randomRegion}`;
                 } else {
-                    const keyword = HOME_FEED_KEYWORDS[(currentPage - 2) % HOME_FEED_KEYWORDS.length];
-                    const virtualPage = Math.floor((currentPage - 2) / HOME_FEED_KEYWORDS.length) + 1;
-                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${virtualPage}`;
+                    const keyword = randHomeKeywords[currentPage % randHomeKeywords.length];
+                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
                 }
             }
             
@@ -446,10 +446,12 @@
 
             if (currentTab === 'shorts') {
                 let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 20);
+                // Перемешаем внутри страницы для дополнительного хаоса новизны
+                parsed.sort(() => 0.5 - Math.random());
                 setCache(cacheKey, parsed);
                 renderShortsFeed(parsed, isAppend);
             } else {
-                const items = data.videos || data;
+                const items = data.videos || data || [];
                 const finalHome = items.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24);
                 setCache(cacheKey, finalHome);
                 renderHomeGrid(finalHome, isAppend);
@@ -458,12 +460,16 @@
             if (bottomIndicator) bottomIndicator.remove();
             if (error.name === 'AbortError') return;
             if (!isAppend) {
-                document.getElementById('main-view').innerHTML = '<div class="msg-box">Узел занят. Повторите попытку поиска.</div>';
+                // Если произошло чудо и упало всё, даем красивую кнопку переподключения вместо глухого текста
+                document.getElementById('main-view').innerHTML = `
+                    <div class="msg-box">
+                        Сеть перегружена. Пробуем переподключиться?<br>
+                        <button class="retry-btn" onclick="loadDynamicContent('${query}', ${isChannelSearch})">Обновить поток</button>
+                    </div>`;
             }
         }
     }
 
-    // Инициализация загрузки канала с выбором подвкладки (Видео / Shorts канала)
     async function switchChannelTab(subTab) {
         if (activeChannelSubTab === subTab) return;
         activeChannelSubTab = subTab;
@@ -490,8 +496,6 @@
             fetchAbortController = new AbortController();
             
             clearViewMemory();
-            
-            // Создаем верхние переключатели «Видео» / «Shorts» внутри канала
             const view = document.getElementById('main-view');
             
             let tabsHtml = `
@@ -511,21 +515,17 @@
         const cacheKey = `channel_${channelId}_${activeChannelSubTab}_p${currentPage}`;
         const cachedData = getCache(cacheKey);
         if (cachedData) {
-            if (activeChannelSubTab === 'shorts') {
-                renderShortsFeed(cachedData, true);
-            } else {
-                renderHomeGrid(cachedData, true);
-            }
+            if (activeChannelSubTab === 'shorts') renderShortsFeed(cachedData, true);
+            else renderHomeGrid(cachedData, true);
             return;
         }
 
         let bottomIndicator = document.createElement('div');
         bottomIndicator.className = 'scroll-loader';
-        bottomIndicator.innerText = 'Загрузка контента...';
+        bottomIndicator.innerText = 'Чтение архива канала...';
         document.getElementById('main-view').appendChild(bottomIndicator);
         
         try {
-            // Для шортсов используем поисковый хак по автору, для видео - классический вывод ленты канала
             let endpoint = `channels/${channelId}/videos?page=${currentPage}`;
             if (activeChannelSubTab === 'shorts') {
                 endpoint = `search?q=${encodeURIComponent(channelName + ' shorts')}&type=video&page=${currentPage}`;
@@ -552,7 +552,7 @@
             if (!isAppend) {
                 const errBox = document.createElement('div');
                 errBox.className = 'msg-box';
-                errBox.innerText = 'Не удалось загрузить этот раздел. Попробуйте еще раз.';
+                errBox.innerHTML = `Не удалось открыть архив. <button class="retry-btn" onclick="loadChannelVideos('${channelId}', '${channelName}')">Повторить</button>`;
                 document.getElementById('main-view').appendChild(errBox);
             }
         }
@@ -562,7 +562,6 @@
         if (isNextPageLoading || activeIsChannelSearch) return;
         const view = document.getElementById('main-view');
         
-        // Упреждающий порог для бесшовного скролла
         const isShortsMode = (currentTab === 'shorts' || (activeChannelId && activeChannelSubTab === 'shorts'));
         const triggerThreshold = isShortsMode ? (view.clientHeight * 3) : 500;
         
@@ -591,7 +590,7 @@
     function changeTab(tabName) {
         currentTab = tabName;
         activeChannelId = null; 
-        activeChannelSubTab = 'videos'; // Сброс подвкладки при выходе
+        activeChannelSubTab = 'videos'; 
         document.getElementById('tab-home').classList.remove('active');
         document.getElementById('tab-shorts').classList.remove('active');
         closePlayer();
@@ -624,7 +623,7 @@
         if (!isAppend) {
             clearViewMemory();
             const view = document.getElementById('main-view');
-            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Канал не найден.</div>'; return; }
+            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Автор или канал не найден.</div>'; return; }
             view.innerHTML = '<div class="grid" id="home-grid"></div>';
         }
         
@@ -641,7 +640,7 @@
                     <div class="meta">
                         <div class="title">${c.author}</div>
                         <div class="channel">${c.subCountText || ''}</div>
-                        <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
+                        <div class="channel-badge-text">ОТКРЫТЬ В КЛАДКИ</div>
                     </div>
                 </div>`;
         });
@@ -690,12 +689,12 @@
             parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
         });
         
-        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}&playsinline=1&html5=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
+        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}&playsinline=1&iv_load_policy=3&html5=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
     }
 
     function startInlinePlayer(id) {
         closePlayer();
-        document.getElementById('player-target').innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&html5=1" allowfullscreen eager></iframe>`;
+        document.getElementById('player-target').innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&html5=1" allowfullscreen eager></iframe>`;
         document.getElementById('ios-player').style.display = 'flex';
     }
 
