@@ -3,734 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#465c71">
-    <title>LiteTube Speed & Stable</title>
+    <meta name="theme-color" content="#ffffff">
+    <title>LiteTube Modern</title>
     
-    <link rel="preconnect" href="https://www.youtube-nocookie.com">
     <link rel="preconnect" href="https://img.youtube.com">
-    <link rel="preconnect" href="https://i.ytimg.com">
-    <link rel="preconnect" href="https://s.ytimg.com">
-    <link rel="dns-prefetch" href="https://www.youtube-nocookie.com">
 
     <style>
         :root {
-            --bg-texture: #c5ccd4 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%23c5ccd4"/><circle cx="2" cy="2" r="1" fill="%23b8bfc7"/></svg>');
-            --text-main: #000000;
-            --text-sub: #555555;
-            --header-grad: linear-gradient(to bottom, #768a9e 0%, #465c71 50%, #3a4f64 51%, #314355 100%);
-            --header-border: #2d3e4f;
-            --card-bg: #ffffff;
-            --card-border: #ababab;
-            --card-shadow: rgba(0,0,0,0.1);
-            --search-bg: #ffffff;
-            --search-text: #000000;
-            
-            --shorts-bg: #d1d8e0;
-            --shorts-item-border: #b0b8c0;
-            --shorts-card-bg: #ffffff;
-            --shorts-text-main: #000000;
-            --shorts-text-sub: #444444;
-            --shorts-overlay: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.95) 100%);
+            --bg-color: #ffffff;
+            --text-main: #0f0f0f;
+            --text-sub: #606060;
+            --accent: #ff0000;
+            --border: #e5e5e5;
+            --chip-bg: #f2f2f2;
+            --chip-bg-hover: #e5e5e5;
+            --header-bg: rgba(255, 255, 255, 0.98);
         }
 
         [data-theme="dark"] {
-            --bg-texture: #1e1e1e url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><rect width="4" height="4" fill="%231e1e1e"/><circle cx="2" cy="2" r="1" fill="%232a2a2a"/></svg>');
-            --text-main: #f0f0f0;
+            --bg-color: #0f0f0f;
+            --text-main: #f1f1f1;
             --text-sub: #aaaaaa;
-            --header-grad: linear-gradient(to bottom, #3a3a3a 0%, #1f1f1f 50%, #111111 51%, #000000 100%);
-            --header-border: #000000;
-            --card-bg: #2a2a2a;
-            --card-border: #111111;
-            --card-shadow: rgba(0,0,0,0.5);
-            --search-bg: #333333;
-            --search-text: #ffffff;
-
-            --shorts-bg: #0f0f0f;
-            --shorts-item-border: #222222;
-            --shorts-card-bg: #111111;
-            --shorts-text-main: #ffffff;
-            --shorts-text-sub: #cccccc;
-            --shorts-overlay: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 100%);
+            --accent: #ff0000;
+            --border: #272727;
+            --chip-bg: #272727;
+            --chip-bg-hover: #3f3f3f;
+            --header-bg: rgba(15, 15, 15, 0.98);
         }
 
-        *, *::before, *::after { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent;
-            text-shadow: none !important;
-            font-smooth: antialiased;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            background: var(--bg-texture);
-            color: var(--text-main);
-            margin: 0; padding: 0;
-            overflow: hidden; 
-            height: 100vh; height: 100dvh; 
-            transition: background 0.3s ease, color 0.3s ease;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-color); color: var(--text-main);
+            margin: 0; padding: 0; overflow: hidden; height: 100vh; height: 100dvh;
         }
-        
+
         header {
-            background: var(--header-grad);
-            border-bottom: 1px solid var(--header-border);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-            padding: 8px 10px;
-            display: flex; flex-direction: column; gap: 8px;
-            height: 85px; position: relative; z-index: 10;
+            background: var(--header-bg); border-bottom: 1px solid var(--border);
+            padding: 10px 16px; display: flex; flex-direction: column; gap: 12px;
+            position: relative; z-index: 10;
         }
 
-        .header-top { display: flex; align-items: center; justify-content: space-between; height: 30px; }
-        .logo { font-size: 19px; font-weight: bold; color: #fff; text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important; cursor: pointer; }
-
-        .ios-btn {
-            font-size: 12px;
-            background: linear-gradient(to bottom, #5a7491 0%, #34465d 100%);
-            border: 1px solid #283748; border-radius: 4px; color: white;
-            padding: 4px 12px; font-weight: bold; cursor: pointer;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 1px 1px rgba(0,0,0,0.2);
-            display: flex; align-items: center; justify-content: center;
-        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
         
+        .logo { 
+            font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; cursor: pointer; letter-spacing: -0.5px;
+        }
+        .logo span { background: var(--accent); color: white; padding: 2px 6px; border-radius: 6px; font-size: 14px; }
+        
+        .header-actions { display: flex; gap: 15px; }
+        .action-btn { background: none; border: none; color: var(--text-main); font-size: 18px; cursor: pointer; padding: 0; }
+
+        .search-bar-container { display: flex; gap: 8px; }
         .search-box {
-            display: flex; background: var(--search-bg); border: 1px solid #717171;
-            border-radius: 14px; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-            padding: 1px 3px; height: 30px; align-items: center;
+            display: flex; background: var(--chip-bg); border: 1px solid var(--border);
+            border-radius: 40px; padding: 0 16px; height: 36px; align-items: center; flex-grow: 1;
         }
         .search-box input {
-            flex-grow: 1; padding: 2px 8px; border: none; background: transparent;
-            color: var(--search-text); font-size: 14px; outline: none; width: 100%;
+            flex-grow: 1; border: none; background: transparent; color: var(--text-main);
+            font-size: 15px; outline: none; width: 100%;
         }
-        .search-box button {
-            background: linear-gradient(to bottom, #fafafa 0%, #cecece 100%); border: 1px solid #9c9c9c;
-            border-radius: 11px; padding: 2px 12px; color: #444; font-size: 12px; font-weight: bold;
-            cursor: pointer; box-shadow: 0 1px 0 #fff; flex-shrink: 0;
+        .search-btn {
+            background: var(--chip-bg); border: none; border-radius: 40px;
+            padding: 0 16px; height: 36px; color: var(--text-main); cursor: pointer; font-weight: 500;
         }
 
-        .channel-header-tabs {
-            display: flex; gap: 8px; margin-bottom: 12px; width: 100%; max-width: 600px;
+        .chips-container {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
         }
-        .channel-tab-btn {
-            flex: 1; padding: 8px; font-size: 13px; font-weight: bold; text-align: center;
-            background: var(--card-bg); color: var(--text-main); border: 1px solid var(--card-border);
-            border-radius: 6px; cursor: pointer; box-shadow: 0 1px 2px var(--card-shadow);
+        .chips-container::-webkit-scrollbar { display: none; }
+        .chip {
+            background: var(--chip-bg); color: var(--text-main); padding: 6px 12px;
+            border-radius: 8px; font-size: 14px; white-space: nowrap; cursor: pointer; border: none;
         }
-        .channel-tab-btn.active {
-            background: linear-gradient(to bottom, #768a9e 0%, #465c71 100%); color: white; border-color: #2d3e4f;
-        }
+        .chip.active { background: var(--text-main); color: var(--bg-color); }
 
         .main-content {
-            height: calc(100vh - 135px); height: calc(100dvh - 135px);
-            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px;
-            transform: translateZ(0); will-change: transform;
-            scroll-behavior: smooth;
+            height: calc(100vh - 150px); overflow-y: auto; padding: 0; margin-bottom: 50px;
         }
+
+        .video-card { cursor: pointer; margin-bottom: 16px; }
+        .video-card:active { opacity: 0.7; }
         
-        .main-content.shorts-mode { padding: 0; scroll-snap-type: y mandatory; background: var(--shorts-bg); transition: background 0.3s ease; }
-
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); 
-            gap: 12px; max-width: 1600px; margin: 0 auto;
-        }
-
-        .card-inner {
-            background: var(--card-bg); border: 1px solid var(--card-border);
-            border-radius: 8px; padding: 6px; display: flex; gap: 10px;
-            cursor: pointer; box-shadow: 0 1px 2px var(--card-shadow);
-            transition: background 0.3s;
-        }
-
-        .card-inner.channel-card { align-items: center; }
-        .channel-avatar { width: 60px; height: 60px; border-radius: 50%; border: 1px solid var(--card-border); object-fit: cover; flex-shrink: 0; }
-        .channel-badge-text { font-size: 10px; background: var(--header-grad); color: #fff; padding: 2px 6px; border-radius: 3px; margin-top: 4px; font-weight: bold; display: inline-block; }
-
-        .thumb { position: relative; width: 120px; height: 75px; background-color: #000; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+        .thumb { position: relative; width: 100%; padding-top: 56.25%; background: var(--border); }
         .thumb img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
         
-        .meta { display: flex; flex-direction: column; justify-content: center; overflow: hidden; width: 100%; }
-        .title { font-size: 13px; font-weight: bold; line-height: 1.2; max-height: 2.4em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: var(--text-main); }
-        .channel { font-size: 11px; color: var(--text-sub); margin-top: 4px; }
+        .meta-container { display: flex; gap: 12px; padding: 12px 16px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--chip-bg); flex-shrink: 0; }
+        .meta { display: flex; flex-direction: column; }
+        .title { font-size: 16px; font-weight: 500; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+        .channel { font-size: 14px; color: var(--text-sub); }
 
-        .shorts-item { width: 100%; height: calc(100vh - 135px); height: calc(100dvh - 135px); scroll-snap-align: start; position: relative; background: transparent; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid var(--shorts-item-border); }
-        .shorts-media-container { width: 100%; max-width: 420px; height: 100%; position: relative; background: var(--shorts-card-bg); box-shadow: 0 0 20px rgba(0,0,0,0.15); transition: background 0.3s ease; transform: translateZ(0); }
-        .shorts-item iframe, .shorts-item .shorts-placeholder { width: 100%; height: 100%; border: none; position: absolute; top: 0; left: 0; }
-        .shorts-placeholder { background-size: cover; background-position: center; display: flex; flex-direction: column; justify-content: flex-end; cursor: pointer; }
-        
-        .shorts-overlay-info { background: var(--shorts-overlay); padding: 24px 14px; color: var(--shorts-text-main); transition: background 0.3s, color 0.3s; }
-        .shorts-overlay-info h3 { margin: 0 0 4px 0; font-size: 14px; font-weight: bold; line-height: 1.3; }
-        .shorts-overlay-info p { margin: 0; font-size: 12px; color: var(--shorts-text-sub); }
-
-        .play-btn-center {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(210,210,210,0.85) 100%);
-            border: 2px solid #fff; border-radius: 50%; width: 60px; height: 60px;
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .play-btn-center::after { content: ''; display: block; margin-left: 4px; border-style: solid; border-width: 10px 0 10px 16px; border-color: transparent transparent transparent #111; }
-
-        .tv-scroll-controls {
-            display: none; position: fixed; right: 40px; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 16px; z-index: 150;
-        }
-        @media (min-width: 800px) {
-            .main-content.shorts-mode + .tv-scroll-controls { display: flex; }
-        }
-        .tv-nav-btn {
-            width: 55px; height: 55px; border-radius: 50%; background: var(--header-grad); border: 1px solid var(--header-border);
-            color: white; font-size: 22px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
-            display: flex; align-items: center; justify-content: center; transition: transform 0.1s, opacity 0.2s; user-select: none;
-        }
-
-        .ios-player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 200; padding: 10px; flex-direction: column; justify-content: center; align-items: center; transform: translateZ(0); }
-        .ios-player-box { width: 100%; max-width: 700px; background: #222; border: 2px solid #555; border-radius: 6px; overflow: hidden; box-shadow: 0 5px 25px #000; }
-        .ios-player-bar { background: linear-gradient(to bottom, #4c5a70 0%, #243249 100%); padding: 6px; display: flex; justify-content: flex-end; border-bottom: 1px solid #111; }
-        .ios-video-container { position: relative; padding-top: 56.25%; background: #000; }
-        .ios-video-container iframe { position: absolute; top:0; left:0; width:100%; height:100%; border:none; }
-
-        .msg-box { text-align: center; color: var(--text-sub); padding: 40px 10px; font-weight: bold; }
-        .scroll-loader { padding: 20px 10px; text-align: center; font-weight: bold; color: var(--text-sub); width: 100%; grid-column: 1 / -1; }
+        .player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 200; flex-direction: column; }
+        .player-header { padding: 12px 16px; display: flex; justify-content: space-between; background: #0f0f0f; border-bottom: 1px solid #272727; }
+        .player-header button { background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .player-controls { padding: 16px; display: flex; justify-content: center; gap: 10px; background: #0f0f0f; flex-grow: 1;}
+        .switch-btn { background: #272727; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; }
 
         .tab-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 50px;
-            background: linear-gradient(to bottom, #444444 0%, #111111 50%, #000000 51%, #000000 100%);
-            border-top: 1px solid #222; display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--header-bg);
+            border-top: 1px solid var(--border); display: flex; z-index: 100;
         }
-        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #999; font-size: 10px; font-weight: bold; cursor: pointer; gap: 3px; }
-        .tab-item.active { color: #fff; background: linear-gradient(to bottom, #2d2d2d 0%, #111111 100%); box-shadow: inset 0 1px 5px rgba(0,0,0,0.8); }
-        .tab-icon { width: 22px; height: 22px; fill: currentColor; }
-        
-        .retry-btn { display: inline-block; margin-top: 12px; padding: 6px 16px; background: var(--header-grad); color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); font-size: 10px; cursor: pointer; opacity: 0.5; }
+        .tab-item.active { opacity: 1; font-weight: 500; }
+        .msg-box { text-align: center; color: var(--text-sub); padding: 40px 20px; font-size: 15px; }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <header>
     <div class="header-top">
-        <div class="logo" onclick="changeTab('home')">LiteTube</div>
-        <div id="theme-toggle" class="ios-btn" onclick="toggleTheme()">🌙</div>
+        <div class="logo" onclick="initLoad('')">Lite<span>Tube</span></div>
+        <div class="header-actions">
+            <button class="action-btn" onclick="toggleTheme()">🌗</button>
+            <button class="action-btn" onclick="toggleProxy()" id="proxy-btn">🛡️</button>
+        </div>
     </div>
-    <div class="search-box">
-        <input type="text" id="search-bar" placeholder="Поиск видео или @автора...">
-        <button onclick="triggerSearch()">Найти</button>
+    <div class="search-bar-container">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Введите запрос...">
+        </div>
+        <button class="search-btn" onclick="triggerSearch()">Поиск</button>
+    </div>
+    <div class="chips-container">
+        <button class="chip active" onclick="setFilter('', this)">В тренде</button>
+        <button class="chip" onclick="setFilter('shorts', this)">Shorts</button>
+        <button class="chip" onclick="setFilter('music', this)">Музыка</button>
+        <button class="chip" onclick="setFilter('gaming', this)">Игры</button>
     </div>
 </header>
 
 <div id="main-view" class="main-content"></div>
 
-<div class="tv-scroll-controls">
-    <button class="tv-nav-btn" onclick="scrollShortsViaTv('up')">▲</button>
-    <button class="tv-nav-btn" onclick="scrollShortsViaTv('down')">▼</button>
-</div>
-
-<div id="ios-player" class="ios-player-modal">
-    <div class="ios-player-box">
-        <div class="ios-player-bar">
-            <button class="ios-btn" onclick="closePlayer()">✕ Готово</button>
-        </div>
-        <div class="ios-video-container" id="player-target"></div>
+<div id="player-modal" class="player-modal">
+    <div class="player-header">
+        <button onclick="closePlayer()">✕ Назад</button>
+        <span style="color:#fff; font-size:14px; opacity:0.5;">Плеер</span>
+        <div style="width: 50px;"></div>
+    </div>
+    <div class="video-wrapper" id="player-target"></div>
+    <div class="player-controls">
+        <button class="switch-btn" onclick="switchPlayerType('piped')">Прокси плеер</button>
+        <button class="switch-btn" onclick="switchPlayerType('youtube')">Оригинал (YT)</button>
     </div>
 </div>
 
 <nav class="tab-bar">
-    <div id="tab-home" class="tab-item active" onclick="changeTab('home')">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        Главная
-    </div>
-    <div id="tab-shorts" class="tab-item" onclick="changeTab('shorts')">
-        <svg class="tab-icon" viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-        Shorts
-    </div>
+    <div class="tab-item active" onclick="initLoad('')">Главная</div>
+    <div class="tab-item" onclick="setFilter('shorts', document.querySelectorAll('.chip')[1])">Shorts</div>
 </nav>
 
 <script>
-    let currentTab = 'home';
-    let fetchAbortController = null; 
-    
-    let currentPage = 1;
-    let isNextPageLoading = false;
-    let activeQuery = '';
-    let activeIsChannelSearch = false;
-    
-    let activeChannelId = null;
-    let activeChannelName = null;
-    let activeChannelSubTab = 'videos'; 
+    let isProxy = true;
+    let currentVideoId = null;
 
-    const apiCache = new Map();
-    const CACHE_TTL = 30000; 
-
-    const EMBED_BASE_URL = "https://www.youtube-nocookie.com/embed/";
-
-    // Свежая база тем (2026) для разнообразия рекомендаций
-    const HOME_FEED_KEYWORDS = ['музыка 2026', 'новые технологии', 'авто обзоры', 'наука и космос', ' travel тренды', 'лучшие блоги', 'игровые стримы', 'юмор клипы', 'подкасты'];
-    const SHORTS_FEED_KEYWORDS = ['shorts тренды', 'мемы shorts', 'vine mix', 'тик ток тренды', 'интересные факты shorts', 'юмор shorts', 'лайфхаки shorts'];
-
-    function initTheme() {
-        const savedTheme = localStorage.getItem('litetube_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('theme-toggle').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
+    const API_URLS = [
+        "https://pipedapi.kavin.rocks/",
+        "https://pipedapi.tokhmi.xyz/",
+        "https://pipedapi.smnz.de/"
+    ];
 
     function toggleTheme() {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('litetube_theme', newTheme);
-        document.getElementById('theme-toggle').innerText = newTheme === 'dark' ? '☀️' : '🌙';
-    }
-    
-    const PROXY_NODES = [
-        "https://inv.tux.pizza/api/v1/",
-        "https://invidious.nerdvpn.de/api/v1/",
-        "https://invidious.projectsegfau.lt/api/v1/",
-        "https://yewtu.be/api/v1/",
-        "https://invidious.flokinet.to/api/v1/",
-        "https://vid.puffyan.us/api/v1/",
-        "https://invidious.privacydev.net/api/v1/",
-        "https://invidious.drgns.space/api/v1/",
-        "https://invidious.protokolla.fi/api/v1/",
-        "https://invidious.perennialte.ch/api/v1/"
-    ];
-    const UNIQUE_NODES = [...new Set(PROXY_NODES)];
-    let lastSuccessfulNode = localStorage.getItem('litetube_fastest_node') || null;
-
-    function extractVideoId(url) {
-        if (!url) return null;
-        url = url.trim();
-        if (url.length === 11 && !url.includes('/')) return url;
-        const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
-        const match = url.match(regExp);
-        return (match && match[1]) ? match[1] : null;
+        const root = document.body;
+        root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     }
 
-    function clearViewMemory() {
-        const view = document.getElementById('main-view');
-        view.querySelectorAll('iframe').forEach(iframe => iframe.src = 'about:blank');
-        view.innerHTML = '';
+    function toggleProxy() {
+        isProxy = !isProxy;
+        document.getElementById('proxy-btn').style.opacity = isProxy ? '1' : '0.3';
+        alert(isProxy ? "Анти-блок включен. Используются резервные плееры." : "Анти-блок выключен. Используется стандартный плеер YouTube.");
     }
 
-    function getCache(key) {
-        const cached = apiCache.get(key);
-        if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) return cached.data;
-        return null;
-    }
-
-    function setCache(key, data) {
-        apiCache.set(key, { data, timestamp: Date.now() });
-    }
-
-    // Тот самый стабильный сетевой движок из второй версии
-    async function fastApiFetch(endpoint, globalSignal, attempt = 1) {
-        // Шаг 1: Одиночный быстрый запрос к последнему рабочему узлу (минимальная нагрузка)
-        if (lastSuccessfulNode && attempt === 1) {
-            try {
-                const localController = new AbortController();
-                const timeoutId = setTimeout(() => localController.abort(), 1200); 
-                globalSignal.addEventListener('abort', () => localController.abort());
-                
-                const res = await fetch(lastSuccessfulNode + endpoint, { signal: localController.signal, cache: 'no-store' });
-                clearTimeout(timeoutId);
-                if (res.ok) {
-                    const json = await res.json();
-                    if (Array.isArray(json) && json.length > 0) return json;
-                    if (json && !Array.isArray(json)) return json; 
-                }
-            } catch (err) {}
-        }
-
-        // Шаг 2: Если узел молчит, запускаем параллельный забег по 4 случайным базам
-        let pool = [...UNIQUE_NODES];
-        let nodesToTry = [];
-
-        if (lastSuccessfulNode && pool.includes(lastSuccessfulNode)) {
-            nodesToTry.push(lastSuccessfulNode);
-            pool = pool.filter(n => n !== lastSuccessfulNode);
-        }
-
-        pool.sort(() => 0.5 - Math.random());
-        nodesToTry = nodesToTry.concat(pool.slice(0, 4 - nodesToTry.length));
-        const timeoutDuration = attempt === 1 ? 1800 : 4000; 
-        
-        const requests = nodesToTry.map(async (node) => {
-            const localController = new AbortController();
-            const timeoutId = setTimeout(() => localController.abort(), timeoutDuration); 
-            globalSignal.addEventListener('abort', () => { localController.abort(); clearTimeout(timeoutId); });
-            
-            try {
-                const res = await fetch(node + endpoint, { signal: localController.signal, cache: 'no-store' });
-                clearTimeout(timeoutId);
-                if (!res.ok) throw new Error('Bad Node');
-                const json = await res.json();
-                
-                if (endpoint.includes('search') && Array.isArray(json) && json.length === 0) {
-                    throw new Error('Empty Data Node'); 
-                }
-                
-                lastSuccessfulNode = node;
-                localStorage.setItem('litetube_fastest_node', node);
-                return json;
-            } catch (err) {
-                clearTimeout(timeoutId);
-                throw err;
-            }
-        });
-
-        try {
-            return await Promise.any(requests);
-        } catch (error) {
-            // Тихое автоматическое переподключение вместо вывода ошибки
-            if (attempt === 1 && !globalSignal.aborted) {
-                lastSuccessfulNode = null;
-                localStorage.removeItem('litetube_fastest_node');
-                return fastApiFetch(endpoint, globalSignal, 2);
-            }
-            throw error;
-        }
-    }
-
-    async function loadDynamicContent(query = '', isChannelSearch = false, isAppend = false) {
-        if (!isAppend) {
-            currentPage = 1;
-            activeQuery = query;
-            activeIsChannelSearch = isChannelSearch;
-            activeChannelId = null;
-            if (fetchAbortController) fetchAbortController.abort();
-            fetchAbortController = new AbortController();
-            clearViewMemory();
-            document.getElementById('main-view').innerHTML = '<div class="msg-box">Загрузка ленты новостей...</div>';
-        }
-
-        const cacheKey = `dyn_${currentTab}_${query}_${isChannelSearch}_p${currentPage}`;
-        const cachedData = getCache(cacheKey);
-        
-        if (cachedData) {
-            if (isChannelSearch) renderChannelsList(cachedData, isAppend);
-            else if (currentTab === 'shorts') renderShortsFeed(cachedData, isAppend);
-            else renderHomeGrid(cachedData, isAppend);
-            return;
-        }
-
-        let bottomIndicator = null;
-        if (isAppend) {
-            bottomIndicator = document.createElement('div');
-            bottomIndicator.className = 'scroll-loader';
-            bottomIndicator.innerText = 'Синхронизация данных...';
-            document.getElementById('main-view').appendChild(bottomIndicator);
-        }
-        
-        try {
-            let endpoint;
-            
-            // Запускаем алгоритм перемешивания ключевых слов на лету для эффекта новизны контента
-            const mixedHome = [...HOME_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
-            const mixedShorts = [...SHORTS_FEED_KEYWORDS].sort(() => 0.5 - Math.random());
-
-            if (currentTab === 'shorts') {
-                if (query) {
-                    endpoint = `search?q=${encodeURIComponent(query + ' shorts')}&type=video&page=${currentPage}`;
-                } else {
-                    const keyword = mixedShorts[currentPage % mixedShorts.length];
-                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
-                }
-            } else if (isChannelSearch) {
-                endpoint = `search?q=${encodeURIComponent(query)}&type=channel&page=${currentPage}`;
-            } else if (query) {
-                endpoint = `search?q=${encodeURIComponent(query)}&type=video&page=${currentPage}`;
-            } else {
-                if (currentPage === 1) {
-                    const regions = ['RU', 'BY', 'KZ'];
-                    const randomRegion = regions[Math.floor(Math.random() * regions.length)];
-                    endpoint = `trending?region=${randomRegion}`;
-                } else {
-                    const keyword = mixedHome[currentPage % mixedHome.length];
-                    endpoint = `search?q=${encodeURIComponent(keyword)}&type=video&page=${currentPage}`;
-                }
-            }
-            
-            const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
-            const data = await fastApiFetch(endpoint, currentSignal);
-            if (bottomIndicator) bottomIndicator.remove();
-            
-            if (isChannelSearch) { 
-                setCache(cacheKey, data);
-                renderChannelsList(data, isAppend); 
-                return; 
-            }
-
-            if (currentTab === 'shorts') {
-                let parsed = data.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 20);
-                setCache(cacheKey, parsed);
-                renderShortsFeed(parsed, isAppend);
-            } else {
-                const items = data.videos || data || [];
-                const finalHome = items.map(v => ({ id: v.videoId, title: v.title, author: v.author })).slice(0, 24);
-                setCache(cacheKey, finalHome);
-                renderHomeGrid(finalHome, isAppend);
-            }
-        } catch (error) {
-            if (bottomIndicator) bottomIndicator.remove();
-            if (error.name === 'AbortError') return;
-            if (!isAppend) {
-                document.getElementById('main-view').innerHTML = `
-                    <div class="msg-box">
-                        Все узлы заняты. Попробуем обновить поток?<br>
-                        <button class="retry-btn" onclick="loadDynamicContent('${query}', ${isChannelSearch})">Обновить</button>
-                    </div>`;
-            }
-        }
-    }
-
-    async function switchChannelTab(subTab) {
-        if (activeChannelSubTab === subTab) return;
-        activeChannelSubTab = subTab;
-        
-        const view = document.getElementById('main-view');
-        closePlayer();
-        
-        if (subTab === 'shorts') {
-            view.className = 'main-content shorts-mode';
-        } else {
-            view.className = 'main-content';
-        }
-        
-        await loadChannelVideos(activeChannelId, activeChannelName, false);
-    }
-
-    async function loadChannelVideos(channelId, channelName, isAppend = false) {
-        if (!isAppend) {
-            currentPage = 1;
-            activeChannelId = channelId;
-            activeChannelName = channelName;
-            activeQuery = '';
-            if (fetchAbortController) fetchAbortController.abort();
-            fetchAbortController = new AbortController();
-            
-            clearViewMemory();
-            
-            const view = document.getElementById('main-view');
-            
-            let tabsHtml = `
-                <div class="channel-header-tabs">
-                    <button class="channel-tab-btn ${activeChannelSubTab === 'videos' ? 'active' : ''}" onclick="switchChannelTab('videos')">🎬 Видео канала</button>
-                    <button class="channel-tab-btn ${activeChannelSubTab === 'shorts' ? 'active' : ''}" onclick="switchChannelTab('shorts')">⚡ Shorts канала</button>
-                </div>
-            `;
-            
-            if (activeChannelSubTab === 'shorts') {
-                view.innerHTML = tabsHtml;
-            } else {
-                view.innerHTML = tabsHtml + '<div class="grid" id="home-grid"></div>';
-            }
-        }
-        
-        const cacheKey = `channel_${channelId}_${activeChannelSubTab}_p${currentPage}`;
-        const cachedData = getCache(cacheKey);
-        if (cachedData) {
-            if (activeChannelSubTab === 'shorts') {
-                renderShortsFeed(cachedData, true);
-            } else {
-                renderHomeGrid(cachedData, true);
-            }
-            return;
-        }
-
-        let bottomIndicator = document.createElement('div');
-        bottomIndicator.className = 'scroll-loader';
-        bottomIndicator.innerText = 'Загрузка контента...';
-        document.getElementById('main-view').appendChild(bottomIndicator);
-        
-        try {
-            let endpoint = `channels/${channelId}/videos?page=${currentPage}`;
-            if (activeChannelSubTab === 'shorts') {
-                endpoint = `search?q=${encodeURIComponent(channelName + ' shorts')}&type=video&page=${currentPage}`;
-            }
-            
-            const currentSignal = isAppend ? (new AbortController()).signal : fetchAbortController.signal;
-            const data = await fastApiFetch(endpoint, currentSignal);
-            bottomIndicator.remove();
-
-            const rawItems = data.videos || data || [];
-            
-            if (activeChannelSubTab === 'shorts') {
-                const parsedShorts = rawItems.map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 20);
-                setCache(cacheKey, parsedShorts);
-                renderShortsFeed(parsedShorts, true); 
-            } else {
-                const parsedVideos = rawItems.map(v => ({ id: v.videoId, title: v.title, author: channelName })).slice(0, 30);
-                setCache(cacheKey, parsedVideos);
-                renderHomeGrid(parsedVideos, true); 
-            }
-        } catch (error) {
-            if (bottomIndicator) bottomIndicator.remove();
-            if (error.name === 'AbortError') return;
-            if (!isAppend) {
-                const errBox = document.createElement('div');
-                errBox.className = 'msg-box';
-                errBox.innerText = 'Ошибка чтения данных канала. Попробуйте еще раз.';
-                document.getElementById('main-view').appendChild(errBox);
-            }
-        }
-    }
-
-    async function handleInfiniteScroll() {
-        if (isNextPageLoading || activeIsChannelSearch) return;
-        const view = document.getElementById('main-view');
-        
-        const isShortsMode = (currentTab === 'shorts' || (activeChannelId && activeChannelSubTab === 'shorts'));
-        const triggerThreshold = isShortsMode ? (view.clientHeight * 3) : 500;
-        
-        if (view.scrollTop + view.clientHeight >= view.scrollHeight - triggerThreshold) {
-            isNextPageLoading = true;
-            currentPage++;
-            if (activeChannelId) {
-                await loadChannelVideos(activeChannelId, activeChannelName, true);
-            } else {
-                await loadDynamicContent(activeQuery, false, true);
-            }
-            isNextPageLoading = false;
-        }
-    }
-
-    function scrollShortsViaTv(direction) {
-        const view = document.getElementById('main-view');
-        const scrollAmount = view.clientHeight;
-        if (direction === 'up') {
-            view.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
-        } else {
-            view.scrollBy({ top: scrollAmount, behavior: 'smooth' });
-        }
-    }
-
-    function changeTab(tabName) {
-        currentTab = tabName;
-        activeChannelId = null; 
-        activeChannelSubTab = 'videos'; 
-        document.getElementById('tab-home').classList.remove('active');
-        document.getElementById('tab-shorts').classList.remove('active');
-        closePlayer();
-
-        const view = document.getElementById('main-view');
-        if (tabName === 'home') {
-            document.getElementById('tab-home').classList.add('active');
-            view.className = 'main-content';
-        } else {
-            document.getElementById('tab-shorts').classList.add('active');
-            view.className = 'main-content shorts-mode';
-        }
-        loadDynamicContent();
+    function setFilter(query, element) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        if(element) element.classList.add('active');
+        initLoad(query);
     }
 
     function triggerSearch() {
-        let query = document.getElementById('search-bar').value.trim();
-        if (!query) return;
-        
-        const id = extractVideoId(query);
-        if (id) {
-            startInlinePlayer(id);
-            document.getElementById('search-bar').value = '';
-            return;
+        const query = document.getElementById('search-input').value.trim();
+        if (query) setFilter(query, null);
+    }
+
+    async function fetchPiped(endpoint) {
+        let lastError = "";
+        for (let url of API_URLS) {
+            try {
+                const res = await fetch(url + endpoint);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                lastError = e.message;
+            }
         }
-        loadDynamicContent(query, query.startsWith('@'));
+        throw new Error("Не удалось подключиться ни к одному серверу.");
     }
 
-    function renderChannelsList(channels, isAppend = false) {
-        if (!isAppend) {
-            clearViewMemory();
-            const view = document.getElementById('main-view');
-            if (!channels || channels.length === 0) { view.innerHTML = '<div class="msg-box">Автор не найден.</div>'; return; }
-            view.innerHTML = '<div class="grid" id="home-grid"></div>';
-        }
-        
-        const grid = document.getElementById('home-grid');
-        if (!grid) return;
-        let htmlStr = '';
-
-        channels.forEach(c => {
-            if (c.type !== 'channel' && !c.authorId) return;
-            const thumb = c.authorThumbnails ? c.authorThumbnails[c.authorThumbnails.length - 1].url : 'https://img.youtube.com/vi/0/default.jpg';
-            htmlStr += `
-                <div class="card-inner channel-card" onclick="activeChannelSubTab='videos'; loadChannelVideos('${c.authorId || c.channelId}', '${c.author.replace(/'/g, "\\'")}')">
-                    <img class="channel-avatar" src="${thumb}" loading="lazy">
-                    <div class="meta">
-                        <div class="title">${c.author}</div>
-                        <div class="channel">${c.subCountText || ''}</div>
-                        <div class="channel-badge-text">ПЕРЕЙТИ НА КАНАЛ</div>
-                    </div>
-                </div>`;
-        });
-        grid.insertAdjacentHTML('beforeend', htmlStr);
-    }
-
-    function renderHomeGrid(list, isAppend = false) {
-        const grid = document.getElementById('home-grid');
-        if (!grid) return;
-        let htmlStr = '';
-        
-        list.forEach(v => {
-            if (!v.id) return;
-            htmlStr += `
-                <div class="card-inner" onclick="startInlinePlayer('${v.id}')">
-                    <div class="thumb"><img src="https://img.youtube.com/vi/${v.id}/mqdefault.jpg" loading="lazy"></div>
-                    <div class="meta"><div class="title">${v.title}</div><div class="channel">${v.author}</div></div>
-                </div>`;
-        });
-        grid.insertAdjacentHTML('beforeend', htmlStr);
-    }
-
-    function renderShortsFeed(list, isAppend = false) {
+    async function initLoad(query) {
         const view = document.getElementById('main-view');
-        let htmlStr = '';
-        list.forEach(v => {
-            if (!v.id) return;
-            htmlStr += `
-                <div class="shorts-item">
-                    <div class="shorts-media-container" id="container-${v.id}">
-                        <div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${v.id}/hqdefault.jpg')" onclick="activateShortsPlayer('${v.id}')">
-                            <div class="play-btn-center"></div>
-                            <div class="shorts-overlay-info"><h3>${v.title}</h3><p>@${v.author}</p></div>
-                        </div>
-                    </div>
-                </div>`;
-        });
-        view.insertAdjacentHTML('beforeend', htmlStr);
-    }
-
-    function activateShortsPlayer(id) {
-        document.querySelectorAll('.shorts-item iframe').forEach(iframe => {
-            const parent = iframe.parentElement;
-            const oldId = parent.id.replace('container-', '');
-            iframe.src = 'about:blank'; 
-            parent.innerHTML = `<div class="shorts-placeholder" style="background-image: url('https://img.youtube.com/vi/${oldId}/hqdefault.jpg')" onclick="activateShortsPlayer('${oldId}')"><div class="play-btn-center"></div></div>`;
-        });
+        view.innerHTML = '<div class="msg-box">Загрузка...</div>';
         
-        document.getElementById(`container-${id}`).innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&controls=1&modestbranding=1&rel=0&loop=1&playlist=${id}&playsinline=1&iv_load_policy=3&html5=1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen eager></iframe>`;
+        try {
+            let endpoint = query ? `search?q=${encodeURIComponent(query)}&filter=all` : `trending?region=RU`;
+            const data = await fetchPiped(endpoint);
+            
+            const items = data.items || data; // Зависит от эндпоинта
+            if (!items || items.length === 0) {
+                view.innerHTML = '<div class="msg-box">Ничего не найдено.</div>';
+                return;
+            }
+
+            let html = '';
+            items.forEach(v => {
+                if (v.type !== 'stream') return;
+                let id = v.url.replace('/watch?v=', '');
+                html += `
+                    <div class="video-card" onclick="openPlayer('${id}')">
+                        <div class="thumb"><img src="${v.thumbnail}"></div>
+                        <div class="meta-container">
+                            <div class="avatar"></div>
+                            <div class="meta">
+                                <div class="title">${v.title}</div>
+                                <div class="channel">${v.uploaderName} • ${v.uploadedDate || 'Недавно'}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            view.innerHTML = html;
+        } catch (error) {
+            view.innerHTML = `<div class="msg-box">Ошибка: ${error.message}</div>`;
+        }
     }
 
-    function startInlinePlayer(id) {
-        closePlayer();
-        document.getElementById('player-target').innerHTML = `<iframe src="${EMBED_BASE_URL}${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&html5=1" allowfullscreen eager></iframe>`;
-        document.getElementById('ios-player').style.display = 'flex';
+    function openPlayer(id) {
+        currentVideoId = id;
+        document.getElementById('player-modal').style.display = 'flex';
+        switchPlayerType(isProxy ? 'piped' : 'youtube');
+    }
+
+    function switchPlayerType(type) {
+        const target = document.getElementById('player-target');
+        if (type === 'piped') {
+            target.innerHTML = `<iframe src="https://piped.video/embed/${currentVideoId}?autoplay=1" allowfullscreen></iframe>`;
+        } else {
+            target.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1" allowfullscreen></iframe>`;
+        }
     }
 
     function closePlayer() {
-        document.getElementById('ios-player').style.display = 'none';
-        const target = document.getElementById('player-target');
-        const iframe = target.querySelector('iframe');
-        if (iframe) iframe.src = 'about:blank';
-        target.innerHTML = ''; 
+        document.getElementById('player-modal').style.display = 'none';
+        document.getElementById('player-target').innerHTML = '';
+        currentVideoId = null;
     }
 
-    document.getElementById('search-bar').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
-    document.getElementById('main-view').addEventListener('scroll', handleInfiniteScroll);
-    
-    window.addEventListener('keydown', e => {
-        const isShortsMode = (currentTab === 'shorts' || (activeChannelId && activeChannelSubTab === 'shorts'));
-        if (isShortsMode) {
-            if (e.key === 'ArrowDown') { e.preventDefault(); scrollShortsViaTv('down'); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); scrollShortsViaTv('up'); }
-        }
-    });
-    
-    initTheme();
-    changeTab('home');
+    document.getElementById('search-input').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
+
+    // Старт
+    initLoad('');
 </script>
 
 </body>
