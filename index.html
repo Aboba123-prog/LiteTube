@@ -2,267 +2,241 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#ffffff">
-    <title>LiteTube Modern</title>
-    
-    <link rel="preconnect" href="https://img.youtube.com">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LiteTube Premium Speed</title>
     <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-main: #0f0f0f;
-            --text-sub: #606060;
-            --accent: #ff0000;
-            --border: #e5e5e5;
-            --chip-bg: #f2f2f2;
-            --chip-bg-hover: #e5e5e5;
-            --header-bg: rgba(255, 255, 255, 0.98);
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #0f0f0f;
-            --text-main: #f1f1f1;
-            --text-sub: #aaaaaa;
-            --accent: #ff0000;
-            --border: #272727;
-            --chip-bg: #272727;
-            --chip-bg-hover: #3f3f3f;
-            --header-bg: rgba(15, 15, 15, 0.98);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: var(--bg-color); color: var(--text-main);
-            margin: 0; padding: 0; overflow: hidden; height: 100vh; height: 100dvh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f9f9f9; color: #0f0f0f;
+            -webkit-tap-highlight-color: transparent;
         }
 
         header {
-            background: var(--header-bg); border-bottom: 1px solid var(--border);
-            padding: 10px 16px; display: flex; flex-direction: column; gap: 12px;
-            position: relative; z-index: 10;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 15px; background-color: #ffffff;
+            border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100;
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; }
-        
-        .logo { 
-            font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; cursor: pointer; letter-spacing: -0.5px;
-        }
-        .logo span { background: var(--accent); color: white; padding: 2px 6px; border-radius: 6px; font-size: 14px; }
-        
-        .header-actions { display: flex; gap: 15px; }
-        .action-btn { background: none; border: none; color: var(--text-main); font-size: 18px; cursor: pointer; padding: 0; }
-
-        .search-bar-container { display: flex; gap: 8px; }
-        .search-box {
-            display: flex; background: var(--chip-bg); border: 1px solid var(--border);
-            border-radius: 40px; padding: 0 16px; height: 36px; align-items: center; flex-grow: 1;
-        }
+        .logo { font-size: 20px; font-weight: bold; color: #ff0000; cursor: pointer; user-select: none; }
+        .search-box { display: flex; flex-grow: 1; max-width: 600px; margin-left: 20px; }
         .search-box input {
-            flex-grow: 1; border: none; background: transparent; color: var(--text-main);
-            font-size: 15px; outline: none; width: 100%;
+            width: 100%; padding: 8px 12px; border: 1px solid #ccc;
+            border-radius: 20px 0 0 20px; font-size: 16px; outline: none;
         }
-        .search-btn {
-            background: var(--chip-bg); border: none; border-radius: 40px;
-            padding: 0 16px; height: 36px; color: var(--text-main); cursor: pointer; font-weight: 500;
-        }
-
-        .chips-container {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
-        }
-        .chips-container::-webkit-scrollbar { display: none; }
-        .chip {
-            background: var(--chip-bg); color: var(--text-main); padding: 6px 12px;
-            border-radius: 8px; font-size: 14px; white-space: nowrap; cursor: pointer; border: none;
-        }
-        .chip.active { background: var(--text-main); color: var(--bg-color); }
-
-        .main-content {
-            height: calc(100vh - 150px); overflow-y: auto; padding: 0; margin-bottom: 50px;
+        .search-box button {
+            padding: 8px 20px; background-color: #f8f8f8; border: 1px solid #ccc;
+            border-left: none; border-radius: 0 20px 20px 0; cursor: pointer;
         }
 
-        .video-card { cursor: pointer; margin-bottom: 16px; }
-        .video-card:active { opacity: 0.7; }
+        main { padding: 20px 15px; max-width: 1600px; margin: 0 auto; }
+
+        .video-grid { display: flex; flex-wrap: wrap; margin: -10px; }
+        .video-card { width: 100%; padding: 10px; cursor: pointer; }
+        .video-card:active { opacity: 0.6; }
+
+        @media (min-width: 500px) { .video-card { width: 50%; } }
+        @media (min-width: 800px) { .video-card { width: 33.333%; } }
+        @media (min-width: 1100px) { .video-card { width: 25%; } }
+
+        .thumbnail-container {
+            width: 100%; background-color: #e5e5e5; border-radius: 8px;
+            overflow: hidden; position: relative; padding-top: 56.25%; 
+        }
+        .thumbnail {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+        }
+        .video-info { padding-top: 10px; }
+        .video-title {
+            font-size: 15px; font-weight: 500; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .channel-name { font-size: 13px; color: #606060; margin-top: 4px; }
+
+        .player-container { max-width: 900px; margin: 0 auto; }
+        .back-button {
+            display: inline-block; margin-bottom: 15px; padding: 8px 16px;
+            background-color: #eee; border-radius: 20px; cursor: pointer; font-size: 14px;
+            user-select: none;
+        }
+        .back-button:active { background-color: #ddd; }
         
-        .thumb { position: relative; width: 100%; padding-top: 56.25%; background: var(--border); }
-        .thumb img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
-        
-        .meta-container { display: flex; gap: 12px; padding: 12px 16px; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--chip-bg); flex-shrink: 0; }
-        .meta { display: flex; flex-direction: column; }
-        .title { font-size: 16px; font-weight: 500; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
-        .channel { font-size: 14px; color: var(--text-sub); }
-
-        .player-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #000; z-index: 200; flex-direction: column; }
-        .player-header { padding: 12px 16px; display: flex; justify-content: space-between; background: #0f0f0f; border-bottom: 1px solid #272727; }
-        .player-header button { background: none; border: none; color: #fff; font-size: 16px; cursor: pointer; }
-        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .player-controls { padding: 16px; display: flex; justify-content: center; gap: 10px; background: #0f0f0f; flex-grow: 1;}
-        .switch-btn { background: #272727; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer; }
-
-        .tab-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: var(--header-bg);
-            border-top: 1px solid var(--border); display: flex; z-index: 100;
+        /* Контейнер под видео с фиксированным соотношением сторон */
+        .video-wrapper {
+            width: 100%; background-color: #000; border-radius: 8px; overflow: hidden;
+            position: relative; padding-top: 56.25%;
         }
-        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); font-size: 10px; cursor: pointer; opacity: 0.5; }
-        .tab-item.active { opacity: 1; font-weight: 500; }
-        .msg-box { text-align: center; color: var(--text-sub); padding: 40px 20px; font-size: 15px; }
+        .video-wrapper video, .video-wrapper iframe {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
+        }
+        
+        .player-title { margin-top: 15px; font-size: 18px; font-weight: 600; }
+        .no-results { text-align: center; width: 100%; padding: 40px; color: #666; font-size: 16px; }
     </style>
 </head>
-<body data-theme="dark">
+<body>
 
-<header>
-    <div class="header-top">
-        <div class="logo" onclick="initLoad('')">Lite<span>Tube</span></div>
-        <div class="header-actions">
-            <button class="action-btn" onclick="toggleTheme()">🌗</button>
-            <button class="action-btn" onclick="toggleProxy()" id="proxy-btn">🛡️</button>
-        </div>
-    </div>
-    <div class="search-bar-container">
+    <header>
+        <div class="logo" onclick="loadTrending()">LiteTube</div>
         <div class="search-box">
-            <input type="text" id="search-input" placeholder="Введите запрос...">
+            <input type="text" id="searchInput" placeholder="Поиск на YouTube..." onkeypress="handleKeyPress(event)">
+            <button onclick="triggerSearch()">🔍</button>
         </div>
-        <button class="search-btn" onclick="triggerSearch()">Поиск</button>
-    </div>
-    <div class="chips-container">
-        <button class="chip active" onclick="setFilter('', this)">В тренде</button>
-        <button class="chip" onclick="setFilter('shorts', this)">Shorts</button>
-        <button class="chip" onclick="setFilter('music', this)">Музыка</button>
-        <button class="chip" onclick="setFilter('gaming', this)">Игры</button>
-    </div>
-</header>
+    </header>
 
-<div id="main-view" class="main-content"></div>
+    <main id="app-content">
+        </main>
 
-<div id="player-modal" class="player-modal">
-    <div class="player-header">
-        <button onclick="closePlayer()">✕ Назад</button>
-        <span style="color:#fff; font-size:14px; opacity:0.5;">Плеер</span>
-        <div style="width: 50px;"></div>
-    </div>
-    <div class="video-wrapper" id="player-target"></div>
-    <div class="player-controls">
-        <button class="switch-btn" onclick="switchPlayerType('piped')">Прокси плеер</button>
-        <button class="switch-btn" onclick="switchPlayerType('youtube')">Оригинал (YT)</button>
-    </div>
-</div>
+    <script>
+        const appContent = document.getElementById('app-content');
+        const searchInput = document.getElementById('searchInput');
 
-<nav class="tab-bar">
-    <div class="tab-item active" onclick="initLoad('')">Главная</div>
-    <div class="tab-item" onclick="setFilter('shorts', document.querySelectorAll('.chip')[1])">Shorts</div>
-</nav>
+        // Стабильный и быстрый API-сервер, который проксирует потоки
+        const API_BASE = "https://pipedapi.privacydev.net";
+        
+        // Кэш для мгновенного возврата назад без повторной загрузки из сети
+        let lastSearchResults = [];
 
-<script>
-    let isProxy = true;
-    let currentVideoId = null;
-
-    const API_URLS = [
-        "https://pipedapi.kavin.rocks/",
-        "https://pipedapi.tokhmi.xyz/",
-        "https://pipedapi.smnz.de/"
-    ];
-
-    function toggleTheme() {
-        const root = document.body;
-        root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
-    function toggleProxy() {
-        isProxy = !isProxy;
-        document.getElementById('proxy-btn').style.opacity = isProxy ? '1' : '0.3';
-        alert(isProxy ? "Анти-блок включен. Используются резервные плееры." : "Анти-блок выключен. Используется стандартный плеер YouTube.");
-    }
-
-    function setFilter(query, element) {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        if(element) element.classList.add('active');
-        initLoad(query);
-    }
-
-    function triggerSearch() {
-        const query = document.getElementById('search-input').value.trim();
-        if (query) setFilter(query, null);
-    }
-
-    async function fetchPiped(endpoint) {
-        let lastError = "";
-        for (let url of API_URLS) {
+        // Поиск видеороликов
+        async function fetchVideos(query) {
+            appContent.innerHTML = '<div class="no-results">Поиск видео... ⚡</div>';
             try {
-                const res = await fetch(url + endpoint);
-                if (res.ok) return await res.json();
-            } catch (e) {
-                lastError = e.message;
+                const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}&filter=videos`);
+                if (!response.ok) throw new Error('Ошибка');
+                const data = await response.json();
+                
+                lastSearchResults = data.items; // Сохраняем в кэш
+                renderGrid(data.items);
+            } catch (error) {
+                appContent.innerHTML = '<div class="no-results">❌ Ошибка сети. Попробуйте ввести запрос еще раз.</div>';
+                console.error(error);
             }
         }
-        throw new Error("Не удалось подключиться ни к одному серверу.");
-    }
 
-    async function initLoad(query) {
-        const view = document.getElementById('main-view');
-        view.innerHTML = '<div class="msg-box">Загрузка...</div>';
-        
-        try {
-            let endpoint = query ? `search?q=${encodeURIComponent(query)}&filter=all` : `trending?region=RU`;
-            const data = await fetchPiped(endpoint);
-            
-            const items = data.items || data; // Зависит от эндпоинта
+        // Вывод сетки видео
+        function renderGrid(items) {
+            window.scrollTo(0, 0);
             if (!items || items.length === 0) {
-                view.innerHTML = '<div class="msg-box">Ничего не найдено.</div>';
+                appContent.innerHTML = '<div class="no-results">Ничего не найдено 😔</div>';
                 return;
             }
 
-            let html = '';
-            items.forEach(v => {
-                if (v.type !== 'stream') return;
-                let id = v.url.replace('/watch?v=', '');
+            let html = '<div class="video-grid">';
+            items.forEach(video => {
+                const videoId = video.url.split('?v=')[1];
+                if (!videoId) return;
+                
+                const safeTitle = video.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                
                 html += `
-                    <div class="video-card" onclick="openPlayer('${id}')">
-                        <div class="thumb"><img src="${v.thumbnail}"></div>
-                        <div class="meta-container">
-                            <div class="avatar"></div>
-                            <div class="meta">
-                                <div class="title">${v.title}</div>
-                                <div class="channel">${v.uploaderName} • ${v.uploadedDate || 'Недавно'}</div>
-                            </div>
+                    <div class="video-card" onclick="playVideo('${videoId}', '${safeTitle}')">
+                        <div class="thumbnail-container">
+                            <img class="thumbnail" src="${video.thumbnail}" alt="preview">
                         </div>
-                    </div>`;
+                        <div class="video-info">
+                            <div class="video-title">${video.title}</div>
+                            <div class="channel-name">${video.uploaderName}</div>
+                        </div>
+                    </div>
+                `;
             });
-            view.innerHTML = html;
-        } catch (error) {
-            view.innerHTML = `<div class="msg-box">Ошибка: ${error.message}</div>`;
+            html += '</div>';
+            appContent.innerHTML = html;
         }
-    }
 
-    function openPlayer(id) {
-        currentVideoId = id;
-        document.getElementById('player-modal').style.display = 'flex';
-        switchPlayerType(isProxy ? 'piped' : 'youtube');
-    }
+        // Включение видео через прямой обходной стрим
+        async function playVideo(videoId, title) {
+            window.scrollTo(0, 0);
+            
+            // Создаем каркас плеера со статусом загрузки
+            appContent.innerHTML = `
+                <div class="player-container">
+                    <div class="back-button" onclick="returnToSearch()">← Назад к поиску</div>
+                    <div class="video-wrapper" id="media-box">
+                        <div class="no-results" style="color:#fff; position:absolute; top:35%; width:100%;">
+                            Подключаем скоростной поток... 🚀
+                        </div>
+                    </div>
+                    <h1 class="player-title">${title}</h1>
+                </div>
+            `;
 
-    function switchPlayerType(type) {
-        const target = document.getElementById('player-target');
-        if (type === 'piped') {
-            target.innerHTML = `<iframe src="https://piped.video/embed/${currentVideoId}?autoplay=1" allowfullscreen></iframe>`;
-        } else {
-            target.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${currentVideoId}?autoplay=1" allowfullscreen></iframe>`;
+            try {
+                // Запрашиваем прямые медиа-ссылки у прокси-сервера
+                const response = await fetch(`${API_BASE}/streams/${videoId}`);
+                if (!response.ok) throw new Error('Поток не получен');
+                const data = await response.json();
+
+                let directStreamUrl = "";
+
+                // 1. Пытаемся взять HLS поток (идеально для iOS Safari и ТВ)
+                if (data.hls) {
+                    directStreamUrl = data.hls;
+                } 
+                // 2. Если HLS нет, ищем обычный готовый MP4-файл со звуком
+                else if (data.videoStreams) {
+                    for (let i = 0; i < data.videoStreams.length; i++) {
+                        const stream = data.videoStreams[i];
+                        if (!stream.videoOnly && stream.mimeType && stream.mimeType.indexOf('mp4') !== -1) {
+                            directStreamUrl = stream.url;
+                            break;
+                        }
+                    }
+                }
+
+                if (!directStreamUrl) throw new Error('Нет подходящего формата');
+
+                // Встраиваем чистый HTML5 плеер, который воспроизведет поток в обход блокировок
+                document.getElementById('media-box').innerHTML = `
+                    <video controls autoplay playsinline>
+                        <source src="${directStreamUrl}" type="application/x-mpegURL">
+                        <source src="${directStreamUrl}" type="video/mp4">
+                        Ваш девайс не поддерживает прямой плеер.
+                    </video>
+                `;
+
+            } catch (error) {
+                console.error(error);
+                // Резервный вариант, если прокси-сервер перегружен
+                document.getElementById('media-box').innerHTML = `
+                    <iframe 
+                        src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1" 
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            }
         }
-    }
 
-    function closePlayer() {
-        document.getElementById('player-modal').style.display = 'none';
-        document.getElementById('player-target').innerHTML = '';
-        currentVideoId = null;
-    }
+        // Логика управления
+        function triggerSearch() {
+            const query = searchInput.value.trim();
+            if (query) fetchVideos(query);
+        }
 
-    document.getElementById('search-input').addEventListener('keypress', e => { if (e.key === 'Enter') triggerSearch(); });
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                triggerSearch();
+                searchInput.blur();
+            }
+        }
 
-    // Старт
-    initLoad('');
-</script>
+        // Мгновенный возврат к результатам из памяти (без расхода трафика)
+        function returnToSearch() {
+            if (lastSearchResults && lastSearchResults.length > 0) {
+                renderGrid(lastSearchResults);
+            } else {
+                loadTrending();
+            }
+        }
 
+        function loadTrending() {
+            searchInput.value = '';
+            fetchVideos("Популярное");
+        }
+
+        // Старт
+        loadTrending();
+    </script>
 </body>
 </html>
