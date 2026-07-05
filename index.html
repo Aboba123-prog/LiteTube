@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>YouTube Premium Lite Absolute</title>
+    <title>LiteTube Premium Absolute + Shorts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -14,6 +14,7 @@
             --text-main: #ffffff;
             --text-sub: #aaaaaa;
             --yt-red: #ff0000;
+            --nav-height: 60px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,6 +24,7 @@
             background-color: var(--bg-main);
             color: var(--text-main);
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
 
         /* Шапка */
@@ -78,14 +80,11 @@
             cursor: pointer;
             padding: 8px 12px;
             border-radius: 50%;
-            transition: background 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
         .search-trigger-btn:hover { background-color: var(--bg-pill); }
-        .search-trigger-btn:active { opacity: 0.6; }
 
         /* Категории */
         .categories-bar {
@@ -106,17 +105,15 @@
             white-space: nowrap;
             cursor: pointer;
             user-select: none;
-            transition: background-color 0.2s;
         }
-        .chip:hover { background-color: var(--bg-pill-hover); }
         .chip.active {
             background-color: var(--text-main);
             color: var(--bg-main);
         }
 
-        /* Главный контейнер сетки */
+        /* Основной контейнер контента с отступом под нижний бар */
         main {
-            padding: 10px 30px;
+            padding: 10px 30px calc(var(--nav-height) + 20px) 30px;
             max-width: 1920px;
             margin: 0 auto;
         }
@@ -128,11 +125,7 @@
             row-gap: 45px;
         }
 
-        .video-card {
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-        }
+        .video-card { display: flex; flex-direction: column; cursor: pointer; }
 
         .thumbnail-wrapper {
             width: 100%;
@@ -149,15 +142,9 @@
             object-fit: cover;
             transition: transform 0.2s ease;
         }
-
         .video-card:hover .thumbnail { transform: scale(1.02); }
-        .video-card:active .thumbnail { transform: scale(0.98); }
 
-        .video-meta {
-            display: flex;
-            margin-top: 14px;
-            gap: 14px;
-        }
+        .video-meta { display: flex; margin-top: 14px; gap: 14px; }
 
         .channel-avatar {
             width: 38px;
@@ -171,8 +158,6 @@
             flex-shrink: 0;
             font-size: 15px;
         }
-
-        .video-details { display: flex; flex-direction: column; }
 
         .video-title {
             font-size: 16px;
@@ -188,107 +173,160 @@
 
         .video-author { font-size: 14px; color: var(--text-sub); }
 
-        /* Кинематографичный HTML5 Плеер */
-        .watch-container {
-            max-width: 1400px;
+        /* Стандартный Плеер (Обычные Видео) */
+        .watch-container { max-width: 1400px; margin: 0 auto; }
+        .player-wrapper {
+            width: 100%; background-color: #000; border-radius: 16px;
+            overflow: hidden; position: relative; padding-top: 56.25%;
+        }
+        .player-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .watch-title { font-size: 22px; font-weight: 700; margin: 20px 0 8px 0; }
+        .stream-status { font-size: 13px; color: #2bda7a; margin-bottom: 16px; }
+        .watch-author-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid #272727; }
+        .author-left { display: flex; align-items: center; gap: 14px; }
+        .subscribe-btn { background-color: #ffffff; color: #000000; padding: 10px 20px; border-radius: 24px; font-weight: 600; border: none; cursor: pointer; }
+        .actions-right { display: flex; gap: 10px; }
+        .action-pill { background-color: var(--bg-pill); padding: 10px 18px; border-radius: 24px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        /* --- НОВЫЙ РАЗДЕЛ: СТИЛИ ДЛЯ ИНФИНИТИ SHORTS --- */
+        .shorts-feed {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            max-width: 500px;
             margin: 0 auto;
-            padding: 10px 0;
         }
 
-        .player-wrapper {
+        .shorts-card {
             width: 100%;
+            max-width: 460px;
+            height: calc(82vh - var(--nav-height));
             background-color: #000;
             border-radius: 16px;
-            overflow: hidden;
             position: relative;
-            padding-top: 56.25%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
-        /* Нативный видео тег без iframe */
-        .player-wrapper video {
+        .shorts-video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Сохраняет вертикальные пропорции 9:16 */
+            z-index: 2;
+        }
+
+        /* Заглушка-обложка шортса до клика */
+        .shorts-cover {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            outline: none;
-        }
-
-        .watch-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 20px 0 8px 0;
-            line-height: 1.4;
-        }
-
-        /* Статус-бар стриминга для прозрачности работы ИИ */
-        .stream-status {
-            font-size: 13px;
-            color: #2bda7a;
-            margin-bottom: 16px;
+            background-size: cover;
+            background-position: center;
+            z-index: 3;
             display: flex;
+            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            gap: 6px;
+            cursor: pointer;
+        }
+        .shorts-cover::before {
+            content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+            z-index: 1;
         }
 
-        .watch-author-row {
+        .shorts-play-btn {
+            font-size: 50px; color: #fff; z-index: 4; opacity: 0.9;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .shorts-cover:hover .shorts-play-btn { transform: scale(1.1); }
+
+        /* Текстовые данные поверх шортса снизу */
+        .shorts-overlay-info {
+            position: absolute;
+            bottom: 20px; left: 20px; right: 80px;
+            z-index: 5;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        .shorts-overlay-author { font-weight: 600; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .shorts-overlay-title { font-size: 14px; line-height: 1.3; color: #fff; }
+
+        /* Боковая панель действий Shorts (Лайк, дизлайк, поделиться) */
+        .shorts-side-actions {
+            position: absolute;
+            right: 12px; bottom: 30px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
             gap: 20px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid #272727;
+            z-index: 5;
         }
 
-        .author-left {
+        .shorts-action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        .shorts-action-circle {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background-color: rgba(39, 39, 39, 0.8);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
-            gap: 14px;
+            justify-content: center;
+            font-size: 18px;
+            color: #fff;
+            transition: background-color 0.2s;
         }
+        .shorts-action-circle:hover { background-color: rgba(63, 63, 63, 0.9); }
+        .shorts-action-item span { font-size: 12px; font-weight: 500; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
 
-        .author-name-container { display: flex; flex-direction: column; }
-        .author-name { font-weight: 600; font-size: 16px; }
-        .subs-count { font-size: 13px; color: var(--text-sub); }
-
-        .subscribe-btn {
-            background-color: #ffffff;
-            color: #000000;
-            padding: 10px 20px;
-            border-radius: 24px;
-            font-weight: 600;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        .actions-right { display: flex; gap: 10px; }
-
-        .action-pill {
-            background-color: var(--bg-pill);
-            padding: 10px 18px;
-            border-radius: 24px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
+        /* --- НИЖНИЙ НАВИГАЦИОННЫЙ БАР (YOUTUBE STYLE) --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: var(--nav-height);
+            background-color: #0f0f0f;
+            border-top: 1px solid #272727;
             display: flex;
+            justify-content: space-around;
             align-items: center;
-            gap: 8px;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: var(--text-sub);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 400;
+            width: 25%;
+            height: 100%;
             user-select: none;
         }
-        .action-pill:hover { background-color: var(--bg-pill-hover); }
+        .nav-item i { font-size: 18px; }
+        .nav-item.active { color: var(--text-main); font-weight: 600; }
 
-        .loader {
-            text-align: center;
-            padding: 80px;
-            color: var(--text-sub);
-            font-size: 18px;
-        }
+        .loader { text-align: center; padding: 60px; color: var(--text-sub); font-size: 18px; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-container" onclick="resetToHome()">
+        <div class="logo-container" onclick="switchToTab('home')">
             <div class="logo-icon"></div>
             <div class="logo-text">LiteTube</div>
         </div>
@@ -308,11 +346,21 @@
     <main id="app-content">
         </main>
 
+    <nav class="bottom-nav">
+        <div class="nav-item active" id="nav-home" onclick="switchToTab('home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Главная</span>
+        </div>
+        <div class="nav-item" id="nav-shorts" onclick="switchToTab('shorts')">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Shorts</span>
+        </div>
+    </nav>
+
     <script>
         const appContent = document.getElementById('app-content');
         const chipsBar = document.getElementById('chipsBar');
 
-        // Глобальный отказоустойчивый пул прокси-серверов Invidious
         const INSTANCES = [
             "https://invidious.perennialte.ch",
             "https://iv.melmac.space",
@@ -323,29 +371,54 @@
         
         let currentServerIdx = 0;
         let cachedVideos = [];
-        let networkAttempts = 0;
+        let currentTab = 'home'; // 'home' или 'shorts'
+        
+        // Переменные для бесконечной ленты Shorts
+        let shortsList = [];
+        let isShortsLoading = false;
+        let shortsPage = 1;
 
-        function getActiveServer() {
-            return INSTANCES[currentServerIdx];
-        }
-
-        function switchServer() {
-            currentServerIdx = (currentServerIdx + 1) % INSTANCES.length;
-            console.log("Смена узла на: " + getActiveServer());
-        }
+        function getActiveServer() { return INSTANCES[currentServerIdx]; }
+        function switchServer() { currentServerIdx = (currentServerIdx + 1) % INSTANCES.length; }
 
         function openSearchPrompt() {
             const text = prompt("Что хотите найти на YouTube?");
             if (text && text.trim() !== "") {
+                if (currentTab === 'shorts') {
+                    switchToTab('home'); // Если ищут через лупу, перекидываем на главную
+                }
                 document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
                 loadVideos(text.trim());
             }
         }
 
-        // Отказоустойчивый поиск по пулу серверов
-        async function loadVideos(query) {
-            appContent.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Подключение к свободному узлу сети...</div>';
+        // Переключение табов нижнего бара
+        function switchToTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             
+            if (tab === 'home') {
+                document.getElementById('nav-home').classList.add('active');
+                chipsBar.style.display = "flex";
+                if (cachedVideos.length > 0) {
+                    renderFeed(cachedVideos);
+                } else {
+                    resetToHome();
+                }
+            } else if (tab === 'shorts') {
+                document.getElementById('nav-shorts').classList.add('active');
+                chipsBar.style.display = "none";
+                // Сброс и запуск бесконечной ленты Shorts
+                shortsList = [];
+                shortsPage = 1;
+                appContent.innerHTML = '<div class="shorts-feed" id="shortsFeedBox"></div>';
+                loadShortsPack();
+            }
+        }
+
+        // Загрузка обычных видео
+        async function loadVideos(query) {
+            appContent.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Подключение к свободному узлу...</div>';
             let success = false;
             let data = null;
 
@@ -357,7 +430,7 @@
                     success = true;
                     break; 
                 } catch (e) {
-                    switchServer(); // Сервер упал или перегружен — мгновенно меняем узел
+                    switchServer();
                 }
             }
 
@@ -365,40 +438,25 @@
                 cachedVideos = data;
                 renderFeed(data);
             } else {
-                appContent.innerHTML = '<div class="loader">❌ Все резервные узлы заняты. Попробуйте нажать на лупу еще раз через пару секунд.</div>';
+                appContent.innerHTML = '<div class="loader">❌ Ошибка сети. Перезапустите страницу.</div>';
             }
         }
 
         function renderFeed(items) {
             window.scrollTo(0, 0);
-            chipsBar.style.display = "flex";
-            
-            if(!items || items.length === 0) {
-                appContent.innerHTML = '<div class="loader">Ничего не найдено 😔</div>';
-                return;
-            }
-
             let html = '<div class="video-grid">';
             items.forEach(video => {
                 if (!video.videoId) return;
-
                 const firstLetter = video.author ? video.author.charAt(0).toUpperCase() : 'Y';
                 const safeTitle = video.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
                 const safeChannel = video.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-
-                // Генерация обложки, устойчивой к блокировкам
-                const thumbUrl = (video.videoThumbnails && video.videoThumbnails.length > 0) 
-                    ? video.videoThumbnails[0].url 
-                    : `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
-
+                const thumbUrl = (video.videoThumbnails && video.videoThumbnails.length > 0) ? video.videoThumbnails[0].url : `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
                 const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#009688', '#4caf50'];
                 const avatarBg = colors[Math.floor(Math.random() * colors.length)];
 
                 html += `
                     <div class="video-card" onclick="openWatchPage('${video.videoId}', '${safeTitle}', '${safeChannel}', '${firstLetter}', '${avatarBg}')">
-                        <div class="thumbnail-wrapper">
-                            <img class="thumbnail" src="${thumbUrl}" alt="preview">
-                        </div>
+                        <div class="thumbnail-wrapper"><img class="thumbnail" src="${thumbUrl}" alt="preview"></div>
                         <div class="video-meta">
                             <div class="channel-avatar" style="background-color: ${avatarBg}">${firstLetter}</div>
                             <div class="video-details">
@@ -413,11 +471,137 @@
             appContent.innerHTML = html;
         }
 
-        // Воспроизведение через ПРЯМОЙ HTML5 туннелированный видеопоток
+        // --- ЛОГИКА БЕСКОНЕЧНЫХ SHORTS ---
+        async function loadShortsPack() {
+            if (isShortsLoading) return;
+            isShortsLoading = true;
+
+            const shortsFeedBox = document.getElementById('shortsFeedBox');
+            if (shortsFeedBox && shortsList.length === 0) {
+                shortsFeedBox.innerHTML = '<div class="loader" id="shortsInitLoader"><i class="fa-solid fa-circle-notch fa-spin"></i> Сборка вертикальной ленты Shorts...</div>';
+            }
+
+            // Массив поисковых фраз для генерации случайных интересных шортсов
+            const queries = ["youtube shorts trending", "funny shorts clips", "satisfying shorts", "epic moments shorts"];
+            const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+
+            let success = false;
+            let data = null;
+
+            for (let i = 0; i < INSTANCES.length; i++) {
+                try {
+                    const response = await fetch(`${getActiveServer()}/api/v1/search?q=${encodeURIComponent(randomQuery)}&type=video`);
+                    if (!response.ok) throw new Error();
+                    data = await response.json();
+                    success = true;
+                    break;
+                } catch (e) {
+                    switchServer();
+                }
+            }
+
+            const initLoader = document.getElementById('shortsInitLoader');
+            if (initLoader) initLoader.remove();
+
+            if (success && data && data.length > 0) {
+                // Отсекаем слишком длинные ролики, симулируя только короткий контент
+                const filtered = data.filter(v => v.lengthSeconds < 120);
+                appendShortsToDOM(filtered);
+            }
+            isShortsLoading = false;
+        }
+
+        function appendShortsToDOM(items) {
+            const shortsFeedBox = document.getElementById('shortsFeedBox');
+            if (!shortsFeedBox) return;
+
+            items.forEach(item => {
+                if (!item.videoId) return;
+                
+                // Избегаем дубликатов в ленте
+                if (document.getElementById(`short-${item.videoId}`)) return;
+
+                const safeTitle = item.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                const safeAuthor = item.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                const thumbUrl = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+
+                const card = document.createElement('div');
+                card.className = 'shorts-card';
+                card.id = `short-${item.videoId}`;
+                card.innerHTML = `
+                    <div class="shorts-cover" id="cover-${item.videoId}" style="background-image: url('${thumbUrl}')" onclick="activateShortVideo('${item.videoId}')">
+                        <i class="fa-solid fa-play shorts-play-btn"></i>
+                    </div>
+                    
+                    <div style="width:100%; height:100%;" id="player-slot-${item.videoId}"></div>
+
+                    <div class="shorts-overlay-info">
+                        <div class="shorts-overlay-author"><i class="fa-solid fa-circle-user"></i> ${safeAuthor}</div>
+                        <div class="shorts-overlay-title">${safeTitle}</div>
+                    </div>
+
+                    <div class="shorts-side-actions">
+                        <div class="shorts-action-item" onclick="this.querySelector('i').style.color='#ff0000'">
+                            <div class="shorts-action-circle"><i class="fa-solid fa-thumbs-up"></i></div>
+                            <span>Like</span>
+                        </div>
+                        <div class="shorts-action-item">
+                            <div class="shorts-action-circle"><i class="fa-solid fa-comment"></i></div>
+                            <span>2.4K</span>
+                        </div>
+                        <div class="shorts-action-item" onclick="navigator.clipboard.writeText('https://youtu.be/${item.videoId}'); alert('Ссылка скопирована!');">
+                            <div class="shorts-action-circle"><i class="fa-solid fa-share"></i></div>
+                            <span>Поделиться</span>
+                        </div>
+                    </div>
+                `;
+                shortsFeedBox.appendChild(card);
+            });
+        }
+
+        // Динамическая активация плеера при клике на Шортс (с выгрузкой остальных)
+        function activateShortVideo(id) {
+            // Удаляем любые запущенные ранее видео в ленте шортсов, чтобы не забивать память устройства
+            document.querySelectorAll('.shorts-video').forEach(vid => {
+                const slotId = vid.parentNode.id;
+                const oldId = slotId.replace('player-slot-', '');
+                vid.remove();
+                // Возвращаем обложку
+                const cover = document.getElementById(`cover-${oldId}`);
+                if (cover) cover.style.display = 'flex';
+            });
+
+            const cover = document.getElementById(`cover-${id}`);
+            if (cover) cover.style.display = 'none';
+
+            const slot = document.getElementById(`player-slot-${id}`);
+            if (slot) {
+                const streamUrl = `${getActiveServer()}/latest_version?id=${id}&itag=22&local=true`;
+                slot.innerHTML = `<video class="shorts-video" id="video-control-${id}" controls autoplay loop playsinline src="${streamUrl}"></video>`;
+                
+                // Логика автоматического отката на 360р в случае сбоя сети
+                const videoEl = document.getElementById(`video-control-${id}`);
+                videoEl.onerror = function() {
+                    videoEl.src = `${getActiveServer()}/latest_version?id=${id}&itag=18&local=true`;
+                    videoEl.load();
+                };
+            }
+        }
+
+        // Слежение за прокруткой для бесконечной ленты шортсов
+        window.onscroll = function() {
+            if (currentTab === 'shorts') {
+                // Если докрутили до низа страницы (осталось меньше 700 пикселей) - подгружаем новые
+                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 700) {
+                    loadShortsPack();
+                }
+            }
+        };
+
+        // Стандартная страница просмотра обычных видео
         function openWatchPage(id, title, channel, letter, avatarColor) {
             window.scrollTo(0, 0);
             chipsBar.style.display = "none";
-            networkAttempts = 0; 
 
             appContent.innerHTML = `
                 <div class="watch-container">
@@ -425,69 +609,51 @@
                         <video id="html5Player" controls autoplay playsinline></video>
                     </div>
                     <h1 class="watch-title">${title}</h1>
-                    <div class="stream-status" id="statusLabel">
-                        <i class="fa-solid fa-server"></i> Подключение канала передачи данных...
-                    </div>
+                    <div class="stream-status" id="statusLabel"><i class="fa-solid fa-server"></i> Стабилизация канала...</div>
                     
                     <div class="watch-author-row">
                         <div class="author-left">
                             <div class="channel-avatar" style="background-color: ${avatarColor}">${letter}</div>
                             <div class="author-name-container">
                                 <span class="author-name">${channel}</span>
-                                <span class="subs-count">Режим прямого туннеля</span>
+                                <span class="subs-count">Прямой туннелированный поток</span>
                             </div>
                             <button class="subscribe-btn" onclick="this.innerText='В подписках'; this.style.background='#272727'; this.style.color='#fff';">Подписаться</button>
                         </div>
-                        
                         <div class="actions-right">
                             <div class="action-pill"><i class="fa-regular fa-thumbs-up"></i> Лайк</div>
-                            <div class="action-pill"><i class="fa-solid fa-share"></i> Ссылка</div>
-                            <div class="action-pill" onclick="goBackToFeed()" style="background-color: var(--text-main); color: var(--bg-main);">
-                                <i class="fa-solid fa-arrow-left"></i> К ленте
-                            </div>
+                            <div class="action-pill" onclick="switchToTab('home')"><i class="fa-solid fa-arrow-left"></i> На главную</div>
                         </div>
                     </div>
                 </div>
             `;
 
-            initPlayerSource(id);
-        }
-
-        // Инжекция туннельной ссылки прямо в тег <video>
-        function initPlayerSource(id) {
             const player = document.getElementById('html5Player');
             const statusLabel = document.getElementById('statusLabel');
-            
-            if (!player) return;
+            let attempts = 0;
 
-            // Задаем источник. itag=22 запрашивает 720p готовый mp4. local=true заставляет проксировать поток через сервер.
-            const streamUrl = `${getActiveServer()}/latest_version?id=${id}&itag=22&local=true`;
-            
-            statusLabel.style.color = "#dfab1c";
-            statusLabel.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Стрим: Поток [Узел ${currentServerIdx + 1}/${INSTANCES.length}]`;
+            function runStream() {
+                player.src = `${getActiveServer()}/latest_version?id=${id}&itag=22&local=true`;
+                player.load();
+            }
 
-            player.src = streamUrl;
-            player.load();
-
-            // Автоматическое исправление ошибок «на лету»
             player.onerror = function() {
-                networkAttempts++;
-                if (networkAttempts < INSTANCES.length) {
-                    switchServer(); // Переключаем сервер в пуле
-                    initPlayerSource(id); // Запускаем повторную инициализацию с новой точкой
+                attempts++;
+                if (attempts < INSTANCES.length) {
+                    switchServer();
+                    runStream();
                 } else {
-                    // Если высокое качество недоступно, переключаемся на легкий поток 360р (itag=18)
-                    statusLabel.style.color = "#ff4444";
-                    statusLabel.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Смена формата на Эко-поток...`;
+                    statusLabel.innerHTML = `⚠️ Переключение на Эко-поток...`;
                     player.src = `${getActiveServer()}/latest_version?id=${id}&itag=18&local=true`;
                     player.load();
                 }
             };
 
             player.onplaying = function() {
-                statusLabel.style.color = "#2bda7a";
-                statusLabel.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Защищенный скоростной туннель активен. Стабильное соединение.`;
+                statusLabel.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Безопасный туннель активен. Потоковое вещание запущено.`;
             };
+
+            runStream();
         }
 
         function clickChip(element, searchQuery) {
@@ -496,20 +662,12 @@
             loadVideos(searchQuery);
         }
 
-        function goBackToFeed() {
-            if(cachedVideos.length > 0) {
-                renderFeed(cachedVideos);
-            } else {
-                resetToHome();
-            }
-        }
-
         function resetToHome() {
             const firstChip = document.querySelector('.chip');
             clickChip(firstChip, 'Популярное россии');
         }
 
-        // Старт
+        // Старт приложения
         resetToHome();
     </script>
 </body>
