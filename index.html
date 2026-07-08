@@ -3,129 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LiteTube Premium Absolute + Shorts</title>
+    <title>LiteTube</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Roboto:wght@400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root {
-            --bg-main: #0f0f0f;
-            --bg-card: #0f0f0f;
-            --bg-pill: #272727;
-            --bg-pill-hover: #3f3f3f;
-            --text-main: #ffffff;
-            --text-sub: #aaaaaa;
-            --yt-red: #ff0000;
-            --nav-height: 60px;
+        * {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body {
-            font-family: "Roboto", "YouTube Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-main);
-            color: var(--text-main);
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #0f0f0f;
+            color: #f1f1f1;
             -webkit-tap-highlight-color: transparent;
             overflow-x: hidden;
         }
 
         /* Шапка */
         header {
+            display: -webkit-box;
+            display: -webkit-flex;
             display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
             align-items: center;
+            -webkit-box-pack: justify;
+            -webkit-justify-content: space-between;
             justify-content: space-between;
-            padding: 16px 30px;
-            background-color: var(--bg-main);
+            padding: 12px 24px;
+            background-color: #0f0f0f;
+            position: -webkit-sticky;
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .logo-container {
+            display: -webkit-box;
+            display: -webkit-flex;
             display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
             align-items: center;
-            gap: 10px;
+            gap: 4px;
             cursor: pointer;
             user-select: none;
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 22px;
-            background-color: var(--yt-red);
-            border-radius: 6px;
-            position: relative;
-        }
-
-        .logo-icon::after {
-            content: "";
-            position: absolute;
-            border-style: solid;
-            border-width: 5px 0 5px 8px;
-            border-color: transparent transparent transparent #ffffff;
-            top: 6px;
-            left: 13px;
+            -webkit-user-select: none;
         }
 
         .logo-text {
             font-size: 22px;
             font-weight: 700;
-            letter-spacing: -0.7px;
-            font-family: "YouTube Sans", sans-serif;
+            letter-spacing: -1px;
+            font-family: "YouTube Sans", "Roboto Condensed", "Arial Black", sans-serif;
+            color: #ffffff;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            gap: 6px;
         }
 
         .search-trigger-btn {
             background: none;
             border: none;
-            color: var(--text-main);
-            font-size: 20px;
+            color: #f1f1f1;
+            font-size: 18px;
             cursor: pointer;
-            padding: 8px 12px;
+            padding: 10px;
             border-radius: 50%;
+            display: -webkit-box;
+            display: -webkit-flex;
             display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
             align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
             justify-content: center;
         }
-        .search-trigger-btn:hover { background-color: var(--bg-pill); }
 
-        /* Категории */
+        /* Категории (Chips) */
         .categories-bar {
+            display: -webkit-box;
+            display: -webkit-flex;
             display: flex;
-            gap: 12px;
-            padding: 10px 30px 20px 30px;
+            gap: 10px;
+            padding: 6px 24px 14px 24px;
             overflow-x: auto;
-            background-color: var(--bg-main);
+            background-color: #0f0f0f;
+            scrollbar-width: none; /* Скрытие скроллбара в Firefox */
         }
-        .categories-bar::-webkit-scrollbar { display: none; }
+        .categories-bar::-webkit-scrollbar { display: none; } /* Скрытие в Chrome/Safari */
 
         .chip {
-            background-color: var(--bg-pill);
-            padding: 8px 16px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 7px 12px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
             white-space: nowrap;
             cursor: pointer;
-            user-select: none;
+            border: none;
+            color: #f1f1f1;
         }
         .chip.active {
-            background-color: var(--text-main);
-            color: var(--bg-main);
+            background-color: #ffffff;
+            color: #0f0f0f;
         }
 
-        /* Основной контейнер контента с отступом под нижний бар */
+        /* Универсальная Flex-сетка вместо Grid */
         main {
-            padding: 10px 30px calc(var(--nav-height) + 20px) 30px;
+            padding: 0 24px 80px 24px;
             max-width: 1920px;
             margin: 0 auto;
         }
 
         .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            column-gap: 20px;
-            row-gap: 45px;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+            margin-left: -8px;
+            margin-right: -8px;
         }
 
-        .video-card { display: flex; flex-direction: column; cursor: pointer; }
+        .video-card {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0 8px;
+            margin-bottom: 36px;
+            width: 100%;
+        }
 
         .thumbnail-wrapper {
             width: 100%;
@@ -140,195 +161,250 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             object-fit: cover;
-            transition: transform 0.2s ease;
         }
-        .video-card:hover .thumbnail { transform: scale(1.02); }
 
-        .video-meta { display: flex; margin-top: 14px; gap: 14px; }
+        .video-meta {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            margin-top: 12px;
+            gap: 12px;
+        }
 
         .channel-avatar {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background-color: #444;
+            display: -webkit-box;
+            display: -webkit-flex;
             display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
             align-items: center;
+            -webkit-box-pack: center;
+            -webkit-justify-content: center;
             justify-content: center;
             font-weight: bold;
+            -webkit-flex-shrink: 0;
             flex-shrink: 0;
-            font-size: 15px;
+            font-size: 14px;
+        }
+
+        .video-details {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            flex-direction: column;
         }
 
         .video-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 500;
             line-height: 1.4;
-            color: var(--text-main);
+            color: #f1f1f1;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
-        .video-author { font-size: 14px; color: var(--text-sub); }
+        .video-author { font-size: 12px; color: #aaaaaa; }
 
-        /* Стандартный Плеер (Обычные Видео) */
-        .watch-container { max-width: 1400px; margin: 0 auto; }
+        .ad-label {
+            background-color: #f1f1f1;
+            color: #0f0f0f;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* --- ПОЛКА SHORTS --- */
+        .shorts-shelf {
+            width: 100%;
+            padding: 16px 8px 24px 8px;
+            border-bottom: 4px solid #212121;
+            margin-bottom: 20px;
+        }
+
+        .shorts-shelf-header {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .shorts-shelf-grid {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+            margin-left: -6px;
+            margin-right: -6px;
+        }
+
+        .shorts-shelf-card {
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0 6px;
+            width: 50%;
+            margin-bottom: 16px;
+        }
+
+        .shorts-shelf-thumb-wrapper {
+            width: 100%;
+            position: relative;
+            padding-top: 160%;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #1c1c1c;
+        }
+
+        .shorts-shelf-title {
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        /* Базовые стили для SVG-иконки Shorts */
+        .shorts-icon {
+            width: 22px;
+            height: 22px;
+            fill: currentColor; /* Управляется через color родителя */
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* Страница просмотра видео */
+        .watch-container { width: 100%; max-width: 1280px; margin: 0 auto; }
         .player-wrapper {
-            width: 100%; background-color: #000; border-radius: 16px;
+            width: 100%; background-color: #000; border-radius: 12px;
             overflow: hidden; position: relative; padding-top: 56.25%;
         }
         .player-wrapper video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .watch-title { font-size: 22px; font-weight: 700; margin: 20px 0 8px 0; }
-        .stream-status { font-size: 13px; color: #2bda7a; margin-bottom: 16px; }
-        .watch-author-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid #272727; }
-        .author-left { display: flex; align-items: center; gap: 14px; }
-        .subscribe-btn { background-color: #ffffff; color: #000000; padding: 10px 20px; border-radius: 24px; font-weight: 600; border: none; cursor: pointer; }
-        .actions-right { display: flex; gap: 10px; }
-        .action-pill { background-color: var(--bg-pill); padding: 10px 18px; border-radius: 24px; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .watch-title { font-size: 18px; font-weight: 700; margin: 16px 0 8px 0; }
+        .stream-status { font-size: 12px; color: #2bda7a; margin-bottom: 16px; }
+        .watch-author-row {
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-pack: justify; -webkit-justify-content: space-between; justify-content: space-between;
+            -webkit-flex-wrap: wrap; flex-wrap: wrap; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid #272727;
+        }
+        .author-left { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; gap: 12px; }
+        .subscribe-btn { background-color: #ffffff; color: #000000; padding: 8px 16px; border-radius: 18px; font-weight: 600; border: none; font-size: 13px; }
+        .actions-right { display: -webkit-box; display: -webkit-flex; display: flex; gap: 8px; }
+        .action-pill { background-color: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 18px; font-size: 13px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; gap: 6px; }
 
-        /* --- НОВЫЙ РАЗДЕЛ: СТИЛИ ДЛЯ ИНФИНИТИ SHORTS --- */
+        /* --- ЛЕНТА ВЕРТИКАЛЬНЫХ SHORTS --- */
         .shorts-feed {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-            max-width: 500px;
-            margin: 0 auto;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center; gap: 20px; max-width: 480px; margin: 0 auto;
         }
 
         .shorts-card {
-            width: 100%;
-            max-width: 460px;
-            height: calc(82vh - var(--nav-height));
-            background-color: #000;
-            border-radius: 16px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            width: 100%; height: 75vh; background-color: #000; border-radius: 12px; position: relative; overflow: hidden;
         }
 
-        .shorts-video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Сохраняет вертикальные пропорции 9:16 */
-            z-index: 2;
-        }
+        .shorts-video { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; }
 
-        /* Заглушка-обложка шортса до клика */
         .shorts-cover {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover;
-            background-position: center;
-            z-index: 3;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; z-index: 3;
+            display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; -webkit-box-align: center; -webkit-align-items: center; align-items: center; cursor: pointer;
         }
         .shorts-cover::before {
             content: ""; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
-            z-index: 1;
+            background: -webkit-linear-gradient(top, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
         }
 
-        .shorts-play-btn {
-            font-size: 50px; color: #fff; z-index: 4; opacity: 0.9;
-            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            transition: transform 0.2s;
-        }
-        .shorts-cover:hover .shorts-play-btn { transform: scale(1.1); }
+        .shorts-play-btn { font-size: 44px; color: #fff; z-index: 4; opacity: 0.8; }
+        .shorts-overlay-info { position: absolute; bottom: 16px; left: 16px; right: 70px; z-index: 5; }
+        .shorts-overlay-author { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+        .shorts-overlay-title { font-size: 13px; line-height: 1.3; color: #fff; }
+        .shorts-side-actions { position: absolute; right: 12px; bottom: 24px; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column; -webkit-box-align: center; -webkit-align-items: center; align-items: center; gap: 16px; z-index: 5; }
+        .shorts-action-circle { width: 40px; height: 40px; border-radius: 50%; background-color: rgba(39, 39, 39, 0.6); display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; font-size: 16px; color: #fff; }
+        .shorts-side-actions span { font-size: 11px; margin-top: 2px; color: #fff; }
 
-        /* Текстовые данные поверх шортса снизу */
-        .shorts-overlay-info {
-            position: absolute;
-            bottom: 20px; left: 20px; right: 80px;
-            z-index: 5;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
-            pointer-events: none;
-        }
-        .shorts-overlay-author { font-weight: 600; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .shorts-overlay-title { font-size: 14px; line-height: 1.3; color: #fff; }
-
-        /* Боковая панель действий Shorts (Лайк, дизлайк, поделиться) */
-        .shorts-side-actions {
-            position: absolute;
-            right: 12px; bottom: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            z-index: 5;
-        }
-
-        .shorts-action-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
-        .shorts-action-circle {
-            width: 44px; height: 44px;
-            border-radius: 50%;
-            background-color: rgba(39, 39, 39, 0.8);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: #fff;
-            transition: background-color 0.2s;
-        }
-        .shorts-action-circle:hover { background-color: rgba(63, 63, 63, 0.9); }
-        .shorts-action-item span { font-size: 12px; font-weight: 500; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
-
-        /* --- НИЖНИЙ НАВИГАЦИОННЫЙ БАР (YOUTUBE STYLE) --- */
+        /* --- НИЖНИЙ НАВИГАЦИОННЫЙ БАР --- */
         .bottom-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            height: var(--nav-height);
-            background-color: #0f0f0f;
-            border-top: 1px solid #272727;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #0f0f0f;
+            border-top: 1px solid #212121; display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-justify-content: space-around; justify-content: space-around; -webkit-box-align: center; -webkit-align-items: center; align-items: center; z-index: 1000;
         }
 
         .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            color: var(--text-sub);
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 400;
-            width: 25%;
-            height: 100%;
-            user-select: none;
+            display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column; -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center; gap: 4px; color: #aaaaaa;
+            cursor: pointer; font-size: 10px; width: 25%; height: 100%;
+            transition: color 0.2s ease;
         }
         .nav-item i { font-size: 18px; }
-        .nav-item.active { color: var(--text-main); font-weight: 600; }
+        
+        /* Цвета активных вкладок */
+        .nav-item.active { color: #f1f1f1; }
+        #nav-shorts.active { color: #ff0000; } /* При переходе на вкладку Shorts она горит красным */
 
-        .loader { text-align: center; padding: 60px; color: var(--text-sub); font-size: 18px; }
+        .loader { text-align: center; padding: 60px; color: #aaaaaa; font-size: 16px; }
+
+        /* --- АДАПТИВНОСТЬ --- */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .video-card { width: 50%; }
+            .shorts-shelf-card { width: 25%; }
+        }
+
+        @media (min-width: 1025px) and (max-width: 1600px) {
+            .video-card { width: 25%; }
+            .shorts-shelf-card { width: 16.66%; }
+        }
+
+        @media (min-width: 1601px) {
+            .video-card { width: 20%; }
+            .shorts-shelf-card { width: 16.66%; }
+            .video-title { font-size: 16px; }
+            .logo-text { font-size: 26px; }
+        }
     </style>
 </head>
 <body>
 
     <header>
         <div class="logo-container" onclick="switchToTab('home')">
-            <div class="logo-icon"></div>
-            <div class="logo-text">LiteTube</div>
+            <div class="logo-text">
+                <svg viewBox="0 0 24 24" width="36" height="26" style="vertical-align: middle;">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93 .502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" fill="#FF0000"/>
+                    <polygon points="9.5,8.5 9.5,15.5 15.5,12" fill="#FFFFFF"/>
+                </svg>
+                LiteTube
+            </div>
         </div>
         <button class="search-trigger-btn" onclick="openSearchPrompt()">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -336,11 +412,11 @@
     </header>
 
     <div class="categories-bar" id="chipsBar">
-        <div class="chip active" onclick="clickChip(this, 'Популярное россии')">Все</div>
-        <div class="chip" onclick="clickChip(this, 'Свежие технологии 2026')">Технологии</div>
-        <div class="chip" onclick="clickChip(this, 'Лоуфай музыка для учебы')">Музыка</div>
-        <div class="chip" onclick="clickChip(this, 'Космос Наука')">Наука</div>
-        <div class="chip" onclick="clickChip(this, 'Популярные трейлеры кино')">Трейлеры</div>
+        <div class="chip active" onclick="clickChip(this, 'Популярное')">Все</div>
+        <div class="chip" onclick="clickChip(this, 'Музыка тренды')">Музыка</div>
+        <div class="chip" onclick="clickChip(this, 'Гаджеты технологии 2026')">Технологии</div>
+        <div class="chip" onclick="clickChip(this, 'Научпоп космос')">Наука</div>
+        <div class="chip" onclick="clickChip(this, 'Кино трейлеры')">Фильмы</div>
     </div>
 
     <main id="app-content">
@@ -352,16 +428,18 @@
             <span>Главная</span>
         </div>
         <div class="nav-item" id="nav-shorts" onclick="switchToTab('shorts')">
-            <i class="fa-solid fa-bolt"></i>
+            <svg class="shorts-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.748 10.488L16.033 9.47l1.836-1.077c1.977-1.157 2.628-3.69 1.454-5.64C18.257.94 15.688.298 13.71.137l-7.74 4.542c-.93.546-1.5 1.54-1.5 2.616 0 1.075.57 2.07 1.5 2.616l1.715 1.018-1.836 1.077c-1.977 1.157-2.628 3.69-1.454 5.64 1.066 1.782 3.013 2.695 4.953 2.457a4.935 4.935 0 002.39-1.117l7.74-4.542c.93-.546 1.5-1.54 1.5-2.616s-.57-2.07-1.5-2.616l-.23-.134zm-7.494 5.23V8.282l6.208 3.718-6.208 3.718z" />
+            </svg>
             <span>Shorts</span>
         </div>
     </nav>
 
     <script>
-        const appContent = document.getElementById('app-content');
-        const chipsBar = document.getElementById('chipsBar');
+        var appContent = document.getElementById('app-content');
+        var chipsBar = document.getElementById('chipsBar');
 
-        const INSTANCES = [
+        var INSTANCES = [
             "https://invidious.perennialte.ch",
             "https://iv.melmac.space",
             "https://invidious.flokinet.to",
@@ -369,34 +447,33 @@
             "https://invidious.lunar.icu"
         ];
         
-        let currentServerIdx = 0;
-        let cachedVideos = [];
-        let currentTab = 'home'; // 'home' или 'shorts'
-        
-        // Переменные для бесконечной ленты Shorts
-        let shortsList = [];
-        let isShortsLoading = false;
-        let shortsPage = 1;
+        var currentServerIdx = 0;
+        var cachedVideos = [];
+        var currentTab = 'home';
+        var isShortsLoading = false;
 
         function getActiveServer() { return INSTANCES[currentServerIdx]; }
         function switchServer() { currentServerIdx = (currentServerIdx + 1) % INSTANCES.length; }
 
         function openSearchPrompt() {
-            const text = prompt("Что хотите найти на YouTube?");
+            var text = prompt("Что хотите найти на LiteTube?");
             if (text && text.trim() !== "") {
-                if (currentTab === 'shorts') {
-                    switchToTab('home'); // Если ищут через лупу, перекидываем на главную
+                if (currentTab === 'shorts') switchToTab('home');
+                var chips = document.getElementsByClassName('chip');
+                for (var i = 0; i < chips.length; i++) {
+                    chips[i].classList.remove('active');
                 }
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
                 loadVideos(text.trim());
             }
         }
 
-        // Переключение табов нижнего бара
         function switchToTab(tab) {
             currentTab = tab;
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            
+            var navItems = document.getElementsByClassName('nav-item');
+            for (var i = 0; i < navItems.length; i++) {
+                navItems[i].classList.remove('active');
+            }
+
             if (tab === 'home') {
                 document.getElementById('nav-home').classList.add('active');
                 chipsBar.style.display = "flex";
@@ -408,266 +485,291 @@
             } else if (tab === 'shorts') {
                 document.getElementById('nav-shorts').classList.add('active');
                 chipsBar.style.display = "none";
-                // Сброс и запуск бесконечной ленты Shorts
-                shortsList = [];
-                shortsPage = 1;
                 appContent.innerHTML = '<div class="shorts-feed" id="shortsFeedBox"></div>';
                 loadShortsPack();
             }
         }
 
-        // Загрузка обычных видео
-        async function loadVideos(query) {
-            appContent.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Подключение к свободному узлу...</div>';
-            let success = false;
-            let data = null;
+        function loadVideos(query) {
+            appContent.innerHTML = '<div class="loader"><i class="fa-solid fa-spinner fa-spin"></i> Загрузка...</div>';
+            var attempt = 0;
 
-            for (let i = 0; i < INSTANCES.length; i++) {
-                try {
-                    const response = await fetch(`${getActiveServer()}/api/v1/search?q=${encodeURIComponent(query)}&type=video`);
-                    if (!response.ok) throw new Error();
-                    data = await response.json();
-                    success = true;
-                    break; 
-                } catch (e) {
+            function executeAjax() {
+                var xhr = new XMLHttpRequest();
+                var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent(query) + '&type=video';
+                xhr.open('GET', url, true);
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                var data = JSON.parse(xhr.responseText);
+                                cachedVideos = data;
+                                renderFeed(data);
+                            } catch (e) {
+                                retry();
+                            }
+                        } else {
+                            retry();
+                        }
+                    }
+                };
+                xhr.send();
+            }
+
+            function retry() {
+                attempt++;
+                if (attempt < INSTANCES.length) {
                     switchServer();
+                    executeAjax();
+                } else {
+                    appContent.innerHTML = '<div class="loader">❌ Ошибка сети. Обновите страницу.</div>';
                 }
             }
 
-            if (success && data) {
-                cachedVideos = data;
-                renderFeed(data);
-            } else {
-                appContent.innerHTML = '<div class="loader">❌ Ошибка сети. Перезапустите страницу.</div>';
-            }
+            executeAjax();
+        }
+
+        function generateRandomAdHTML() {
+            var ads = [
+                { title: "LiteTube Clips — Новый способ залипать в бесконечные Shorts без лагов!", author: "LiteTube Промо", icon: "fa-bolt" },
+                { title: "Стань звездой! Загрузи первый клип в LiteTube Креатор и собери миллион просмотров.", author: "Академия Авторов", icon: "fa-circle-play" },
+                { title: "LiteTube Premium Линейка: Смотри все Shorts без пауз и сторонней рекламы.", author: "LiteTube Global", icon: "fa-wand-magic-sparkles" }
+            ];
+            var randomAd = ads[Math.floor(Math.random() * ads.length)];
+
+            return '<div class="video-card" onclick="alert(\'LiteTube Shorts PRO: Успешно активировано!\')">' +
+                '<div class="thumbnail-wrapper">' +
+                    '<div style="position:absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #1f1111 0%, #080808 100%); display:-webkit-box; display:-webkit-flex; display:flex; -webkit-box-align:center; -webkit-align-items:center; align-items:center; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; -webkit-box-orient:vertical; -webkit-box-direction:normal; -webkit-flex-direction:column; flex-direction:column; gap:8px;">' +
+                        '<i class="fa-solid ' + randomAd.icon + '" style="font-size:32px; color:#ff0000;"></i>' +
+                        '<span style="font-weight:700; font-size:15px; color:#ffffff; letter-spacing:0.5px;">LITETUBE SHORTS</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="video-meta">' +
+                    '<div class="channel-avatar" style="background-color:#ff0000; color:#fff;"><i class="fa-solid fa-star"></i></div>' +
+                    '<div class="video-details">' +
+                        '<div class="video-title"><span class="ad-label">Реклама</span>' + randomAd.title + '</div>' +
+                        '<div class="video-author">' + randomAd.author + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
         }
 
         function renderFeed(items) {
             window.scrollTo(0, 0);
-            let html = '<div class="video-grid">';
-            items.forEach(video => {
-                if (!video.videoId) return;
-                const firstLetter = video.author ? video.author.charAt(0).toUpperCase() : 'Y';
-                const safeTitle = video.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                const safeChannel = video.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                const thumbUrl = (video.videoThumbnails && video.videoThumbnails.length > 0) ? video.videoThumbnails[0].url : `https://img.youtube.com/vi/${video.videoId}/hqdefault.jpg`;
-                const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#009688', '#4caf50'];
-                const avatarBg = colors[Math.floor(Math.random() * colors.length)];
+            chipsBar.style.display = "flex";
+            
+            if (!items || items.length === 0) {
+                appContent.innerHTML = '<div class="loader">Ничего не найдено 😔</div>';
+                return;
+            }
 
-                html += `
-                    <div class="video-card" onclick="openWatchPage('${video.videoId}', '${safeTitle}', '${safeChannel}', '${firstLetter}', '${avatarBg}')">
-                        <div class="thumbnail-wrapper"><img class="thumbnail" src="${thumbUrl}" alt="preview"></div>
-                        <div class="video-meta">
-                            <div class="channel-avatar" style="background-color: ${avatarBg}">${firstLetter}</div>
-                            <div class="video-details">
-                                <div class="video-title">${video.title}</div>
-                                <div class="video-author">${video.author}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
+            var screenWidth = window.innerWidth || document.documentElement.clientWidth;
+            var html = '<div class="video-grid">';
+
+            html += generateRandomAdHTML();
+
+            var rawShortsPool = items.slice(0, 4);
+
+            if (screenWidth <= 640) {
+                html += generateShortsShelfHTML(rawShortsPool);
+                for (var i = 0; i < items.length; i++) {
+                    html += generateVideoCardHTML(items[i]);
+                }
+            } else {
+                var splitIndex = screenWidth > 1600 ? 5 : 4; 
+                for (var i = 0; i < items.length; i++) {
+                    html += generateVideoCardHTML(items[i]);
+                    if (i === (splitIndex - 1)) {
+                        html += generateShortsShelfHTML(rawShortsPool);
+                    }
+                }
+            }
+
             html += '</div>';
             appContent.innerHTML = html;
         }
 
-        // --- ЛОГИКА БЕСКОНЕЧНЫХ SHORTS ---
-        async function loadShortsPack() {
+        function generateVideoCardHTML(video) {
+            if (!video.videoId) return '';
+            var firstLetter = video.author ? video.author.charAt(0).toUpperCase() : 'L';
+            var safeTitle = video.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+            var safeChannel = video.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+            var thumbUrl = (video.videoThumbnails && video.videoThumbnails.length > 0) ? video.videoThumbnails[0].url : 'https://img.youtube.com/vi/' + video.videoId + '/hqdefault.jpg';
+            var colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#009688', '#4caf50'];
+            var avatarBg = colors[Math.floor(Math.random() * colors.length)];
+
+            return '<div class="video-card" onclick="openWatchPage(\'' + video.videoId + '\', \'' + safeTitle + '\', \'' + safeChannel + '\', \'' + firstLetter + '\', \'' + avatarBg + '\')">' +
+                '<div class="thumbnail-wrapper"><img class="thumbnail" src="' + thumbUrl + '" alt="preview"></div>' +
+                '<div class="video-meta">' +
+                    '<div class="channel-avatar" style="background-color: ' + avatarBg + '">' + firstLetter + '</div>' +
+                    '<div class="video-details">' +
+                        '<div class="video-title">' + video.title + '</div>' +
+                        '<div class="video-author">' + video.author + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        }
+
+        function generateShortsShelfHTML(shortsItems) {
+            var shelfHtml = '<div class="shorts-shelf">' +
+                '<div class="shorts-shelf-header">' +
+                    '<svg class="shorts-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="color: #FF0000; margin-right: 4px;">' +
+                        '<path d="M17.748 10.488L16.033 9.47l1.836-1.077c1.977-1.157 2.628-3.69 1.454-5.64C18.257.94 15.688.298 13.71.137l-7.74 4.542c-.93.546-1.5 1.54-1.5 2.616 0 1.075.57 2.07 1.5 2.616l1.715 1.018-1.836 1.077c-1.977 1.157-2.628 3.69-1.454 5.64 1.066 1.782 3.013 2.695 4.953 2.457a4.935 4.935 0 002.39-1.117l7.74-4.542c.93-.546 1.5-1.54 1.5-2.616s-.57-2.07-1.5-2.616l-.23-.134zm-7.494 5.23V8.282l6.208 3.718-6.208 3.718z" />' +
+                    '</svg>' +
+                    '<span>Shorts</span>' +
+                '</div>' +
+                '<div class="shorts-shelf-grid">';
+
+            for (var i = 0; i < shortsItems.length; i++) {
+                var item = shortsItems[i];
+                var imgUrl = 'https://img.youtube.com/vi/' + item.videoId + '/hqdefault.jpg';
+                var safeTitle = item.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                shelfHtml += '<div class="shorts-shelf-card" onclick="activateShortsFromShelf(\'' + item.videoId + '\')">' +
+                    '<div class="shorts-shelf-thumb-wrapper" style="background-image: url(\'' + imgUrl + '\'); background-size: cover; background-position: center;"></div>' +
+                    '<div class="shorts-shelf-title">' + safeTitle + '</div>' +
+                '</div>';
+            }
+
+            shelfHtml += '</div></div>';
+            return shelfHtml;
+        }
+
+        function activateShortsFromShelf(id) {
+            switchToTab('shorts');
+            setTimeout(function() {
+                activateShortVideo(id);
+                var target = document.getElementById('short-' + id);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 150);
+        }
+
+        function loadShortsPack() {
             if (isShortsLoading) return;
             isShortsLoading = true;
 
-            const shortsFeedBox = document.getElementById('shortsFeedBox');
-            if (shortsFeedBox && shortsList.length === 0) {
-                shortsFeedBox.innerHTML = '<div class="loader" id="shortsInitLoader"><i class="fa-solid fa-circle-notch fa-spin"></i> Сборка вертикальной ленты Shorts...</div>';
+            var shortsFeedBox = document.getElementById('shortsFeedBox');
+            if (shortsFeedBox && shortsFeedBox.children.length === 0) {
+                shortsFeedBox.innerHTML = '<div class="loader" id="shortsInitLoader"><i class="fa-solid fa-circle-notch fa-spin"></i> Загрузка Shorts...</div>';
             }
 
-            // Массив поисковых фраз для генерации случайных интересных шортсов
-            const queries = ["youtube shorts trending", "funny shorts clips", "satisfying shorts", "epic moments shorts"];
-            const randomQuery = queries[Math.floor(Math.random() * queries.length)];
-
-            let success = false;
-            let data = null;
-
-            for (let i = 0; i < INSTANCES.length; i++) {
-                try {
-                    const response = await fetch(`${getActiveServer()}/api/v1/search?q=${encodeURIComponent(randomQuery)}&type=video`);
-                    if (!response.ok) throw new Error();
-                    data = await response.json();
-                    success = true;
-                    break;
-                } catch (e) {
-                    switchServer();
+            var xhr = new XMLHttpRequest();
+            var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent('shorts тренды кубы') + '&type=video';
+            xhr.open('GET', url, true);
+            
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var initLoader = document.getElementById('shortsInitLoader');
+                    if (initLoader) initLoader.remove();
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        appendShortsToDOM(data);
+                    } catch (e) {}
                 }
-            }
-
-            const initLoader = document.getElementById('shortsInitLoader');
-            if (initLoader) initLoader.remove();
-
-            if (success && data && data.length > 0) {
-                // Отсекаем слишком длинные ролики, симулируя только короткий контент
-                const filtered = data.filter(v => v.lengthSeconds < 120);
-                appendShortsToDOM(filtered);
-            }
-            isShortsLoading = false;
+                isShortsLoading = false;
+            };
+            xhr.send();
         }
 
         function appendShortsToDOM(items) {
-            const shortsFeedBox = document.getElementById('shortsFeedBox');
+            var shortsFeedBox = document.getElementById('shortsFeedBox');
             if (!shortsFeedBox) return;
 
-            items.forEach(item => {
-                if (!item.videoId) return;
-                
-                // Избегаем дубликатов в ленте
-                if (document.getElementById(`short-${item.videoId}`)) return;
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                if (!item.videoId || document.getElementById('short-' + item.videoId)) continue;
 
-                const safeTitle = item.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                const safeAuthor = item.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
-                const thumbUrl = `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`;
+                var safeTitle = item.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                var safeAuthor = item.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+                var thumbUrl = 'https://img.youtube.com/vi/' + item.videoId + '/hqdefault.jpg';
 
-                const card = document.createElement('div');
+                var card = document.createElement('div');
                 card.className = 'shorts-card';
-                card.id = `short-${item.videoId}`;
-                card.innerHTML = `
-                    <div class="shorts-cover" id="cover-${item.videoId}" style="background-image: url('${thumbUrl}')" onclick="activateShortVideo('${item.videoId}')">
-                        <i class="fa-solid fa-play shorts-play-btn"></i>
-                    </div>
-                    
-                    <div style="width:100%; height:100%;" id="player-slot-${item.videoId}"></div>
-
-                    <div class="shorts-overlay-info">
-                        <div class="shorts-overlay-author"><i class="fa-solid fa-circle-user"></i> ${safeAuthor}</div>
-                        <div class="shorts-overlay-title">${safeTitle}</div>
-                    </div>
-
-                    <div class="shorts-side-actions">
-                        <div class="shorts-action-item" onclick="this.querySelector('i').style.color='#ff0000'">
-                            <div class="shorts-action-circle"><i class="fa-solid fa-thumbs-up"></i></div>
-                            <span>Like</span>
-                        </div>
-                        <div class="shorts-action-item">
-                            <div class="shorts-action-circle"><i class="fa-solid fa-comment"></i></div>
-                            <span>2.4K</span>
-                        </div>
-                        <div class="shorts-action-item" onclick="navigator.clipboard.writeText('https://youtu.be/${item.videoId}'); alert('Ссылка скопирована!');">
-                            <div class="shorts-action-circle"><i class="fa-solid fa-share"></i></div>
-                            <span>Поделиться</span>
-                        </div>
-                    </div>
-                `;
+                card.id = 'short-' + item.videoId;
+                card.innerHTML = '<div class="shorts-cover" id="cover-' + item.videoId + '" style="background-image: url(\'' + thumbUrl + '\')" onclick="activateShortVideo(\'' + item.videoId + '\')">' +
+                        '<i class="fa-solid fa-play shorts-play-btn"></i>' +
+                    '</div>' +
+                    '<div style="width:100%; height:100%;" id="player-slot-' + item.videoId + '"></div>' +
+                    '<div class="shorts-overlay-info">' +
+                        '<div class="shorts-overlay-author"><i class="fa-solid fa-circle-user"></i> ' + safeAuthor + '</div>' +
+                        '<div class="shorts-overlay-title">' + safeTitle + '</div>' +
+                    '</div>' +
+                    '<div class="shorts-side-actions">' +
+                        '<div class="shorts-action-circle"><i class="fa-solid fa-thumbs-up"></i></div><span>Like</span>' +
+                        '<div class="shorts-action-circle"><i class="fa-solid fa-comment"></i></div><span>Reply</span>' +
+                        '<div class="shorts-action-circle" onclick="alert(\'Ссылка скопирована!\');"><i class="fa-solid fa-share"></i></div><span>Share</span>' +
+                    '</div>';
                 shortsFeedBox.appendChild(card);
-            });
-        }
-
-        // Динамическая активация плеера при клике на Шортс (с выгрузкой остальных)
-        function activateShortVideo(id) {
-            // Удаляем любые запущенные ранее видео в ленте шортсов, чтобы не забивать память устройства
-            document.querySelectorAll('.shorts-video').forEach(vid => {
-                const slotId = vid.parentNode.id;
-                const oldId = slotId.replace('player-slot-', '');
-                vid.remove();
-                // Возвращаем обложку
-                const cover = document.getElementById(`cover-${oldId}`);
-                if (cover) cover.style.display = 'flex';
-            });
-
-            const cover = document.getElementById(`cover-${id}`);
-            if (cover) cover.style.display = 'none';
-
-            const slot = document.getElementById(`player-slot-${id}`);
-            if (slot) {
-                const streamUrl = `${getActiveServer()}/latest_version?id=${id}&itag=22&local=true`;
-                slot.innerHTML = `<video class="shorts-video" id="video-control-${id}" controls autoplay loop playsinline src="${streamUrl}"></video>`;
-                
-                // Логика автоматического отката на 360р в случае сбоя сети
-                const videoEl = document.getElementById(`video-control-${id}`);
-                videoEl.onerror = function() {
-                    videoEl.src = `${getActiveServer()}/latest_version?id=${id}&itag=18&local=true`;
-                    videoEl.load();
-                };
             }
         }
 
-        // Слежение за прокруткой для бесконечной ленты шортсов
+        function activateShortVideo(id) {
+            var videos = document.getElementsByClassName('shorts-video');
+            for (var i = 0; i < videos.length; i++) {
+                var oldId = videos[i].parentNode.id.replace('player-slot-', '');
+                videos[i].remove();
+                var cover = document.getElementById('cover-' + oldId);
+                if (cover) cover.style.display = 'flex';
+            }
+
+            var targetCover = document.getElementById('cover-' + id);
+            if (targetCover) targetCover.style.display = 'none';
+
+            var slot = document.getElementById('player-slot-' + id);
+            if (slot) {
+                var streamUrl = getActiveServer() + '/latest_version?id=' + id + '&itag=22&local=true';
+                slot.innerHTML = '<video class="shorts-video" id="video-control-' + id + '" controls autoplay loop playsinline src="' + streamUrl + '"></video>';
+            }
+        }
+
         window.onscroll = function() {
             if (currentTab === 'shorts') {
-                // Если докрутили до низа страницы (осталось меньше 700 пикселей) - подгружаем новые
-                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 700) {
+                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 900) {
                     loadShortsPack();
                 }
             }
         };
 
-        // Стандартная страница просмотра обычных видео
         function openWatchPage(id, title, channel, letter, avatarColor) {
             window.scrollTo(0, 0);
             chipsBar.style.display = "none";
 
-            appContent.innerHTML = `
-                <div class="watch-container">
-                    <div class="player-wrapper">
-                        <video id="html5Player" controls autoplay playsinline></video>
-                    </div>
-                    <h1 class="watch-title">${title}</h1>
-                    <div class="stream-status" id="statusLabel"><i class="fa-solid fa-server"></i> Стабилизация канала...</div>
-                    
-                    <div class="watch-author-row">
-                        <div class="author-left">
-                            <div class="channel-avatar" style="background-color: ${avatarColor}">${letter}</div>
-                            <div class="author-name-container">
-                                <span class="author-name">${channel}</span>
-                                <span class="subs-count">Прямой туннелированный поток</span>
-                            </div>
-                            <button class="subscribe-btn" onclick="this.innerText='В подписках'; this.style.background='#272727'; this.style.color='#fff';">Подписаться</button>
-                        </div>
-                        <div class="actions-right">
-                            <div class="action-pill"><i class="fa-regular fa-thumbs-up"></i> Лайк</div>
-                            <div class="action-pill" onclick="switchToTab('home')"><i class="fa-solid fa-arrow-left"></i> На главную</div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            appContent.innerHTML = '<div class="watch-container">' +
+                    '<div class="player-wrapper"><video id="html5Player" controls autoplay playsinline></video></div>' +
+                    '<h1 class="watch-title">' + title + '</h1>' +
+                    '<div class="stream-status" id="statusLabel"><i class="fa-solid fa-server"></i> Стабилизация...</div>' +
+                    '<div class="watch-author-row">' +
+                        '<div class="author-left">' +
+                            '<div class="channel-avatar" style="background-color: ' + avatarColor + '">' + letter + '</div>' +
+                            '<div><span style="font-weight:600; font-size:15px;">' + channel + '</span></div>' +
+                            '<button class="subscribe-btn" onclick="this.innerText=\'Вы подписаны\';">Подписаться</button>' +
+                        '</div>' +
+                        '<div class="actions-right">' +
+                            '<div class="action-pill"><i class="fa-regular fa-thumbs-up"></i> Лайк</div>' +
+                            '<div class="action-pill" onclick="switchToTab(\'home\')"><i class="fa-solid fa-arrow-left"></i> Выход</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
 
-            const player = document.getElementById('html5Player');
-            const statusLabel = document.getElementById('statusLabel');
-            let attempts = 0;
-
-            function runStream() {
-                player.src = `${getActiveServer()}/latest_version?id=${id}&itag=22&local=true`;
-                player.load();
-            }
-
-            player.onerror = function() {
-                attempts++;
-                if (attempts < INSTANCES.length) {
-                    switchServer();
-                    runStream();
-                } else {
-                    statusLabel.innerHTML = `⚠️ Переключение на Эко-поток...`;
-                    player.src = `${getActiveServer()}/latest_version?id=${id}&itag=18&local=true`;
-                    player.load();
-                }
-            };
-
-            player.onplaying = function() {
-                statusLabel.innerHTML = `<i class="fa-solid fa-shield-halved"></i> Безопасный туннель активен. Потоковое вещание запущено.`;
-            };
-
-            runStream();
+            var player = document.getElementById('html5Player');
+            player.src = getActiveServer() + '/latest_version?id=' + id + '&itag=22&local=true';
+            player.load();
         }
 
         function clickChip(element, searchQuery) {
-            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            var chips = document.getElementsByClassName('chip');
+            for (var i = 0; i < chips.length; i++) {
+                chips[i].classList.remove('active');
+            }
             element.classList.add('active');
             loadVideos(searchQuery);
         }
 
         function resetToHome() {
-            const firstChip = document.querySelector('.chip');
-            clickChip(firstChip, 'Популярное россии');
+            var firstChip = document.querySelector('.chip');
+            if (firstChip) clickChip(firstChip, 'Популярное россии');
         }
 
-        // Старт приложения
         resetToHome();
     </script>
 </body>
