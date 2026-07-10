@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LiteTube</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Roboto:wght@400;500;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght=700&family=Roboto:wght=400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <style>
+        /* БАЗОВЫЕ СБРОСЫ И СТИЛИ ОСНОВЫ */
         * {
             -webkit-box-sizing: border-box;
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        
         body {
             font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #0f0f0f;
@@ -22,7 +23,7 @@
             overflow-x: hidden;
         }
 
-        /* Полоса загрузки */
+        /* ИНДИКАТОР ЗАГРУЗКИ (ЛОАДЕР) */
         #loading-bar {
             position: fixed;
             top: 0;
@@ -35,269 +36,200 @@
             transform: translateX(-100%);
             display: none;
         }
-
         .loading-active #loading-bar {
             display: block;
+            -webkit-animation: yt-loader 1.2s infinite linear;
             animation: yt-loader 1.2s infinite linear;
         }
-
+        @-webkit-keyframes yt-loader {
+            0% { -webkit-transform: translateX(-100%); }
+            50% { -webkit-transform: translateX(-20%); }
+            100% { -webkit-transform: translateX(100%); }
+        }
         @keyframes yt-loader {
             0% { transform: translateX(-100%); }
             50% { transform: translateX(-20%); }
             100% { transform: translateX(100%); }
         }
 
-        /* Шапка */
+        /* ХЕДЕР (ШАПКА САЙТА) */
         header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: space-between; -webkit-justify-content: space-between; justify-content: space-between;
             padding: 12px 24px;
             background-color: #0f0f0f;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: -webkit-sticky; position: sticky;
+            top: 0; z-index: 100;
         }
-
         .logo-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            cursor: pointer; user-select: none; -webkit-user-select: none;
         }
-
         .logo-text {
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
+            font-size: 22px; font-weight: 700; letter-spacing: -1px; color: #ffffff;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
         }
         .logo-text svg { margin-right: 6px; }
-
         .search-trigger-btn {
-            background: none;
-            border: none;
-            color: #f1f1f1;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 50%;
+            background: none; border: none; color: #f1f1f1; font-size: 18px;
+            cursor: pointer; padding: 10px; border-radius: 50%;
         }
 
-        /* Категории */
+        /* ГОРИЗОНТАЛЬНАЯ ЛЕНТА КАТЕГОРИЙ */
         .categories-bar {
-            display: flex;
-            padding: 6px 24px 14px 24px;
-            overflow-x: auto;
-            background-color: #0f0f0f;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            padding: 6px 24px 14px 24px; overflow-x: auto; background-color: #0f0f0f;
+            scrollbar-width: none; -webkit-overflow-scrolling: touch;
         }
         .categories-bar::-webkit-scrollbar { display: none; }
-
         .chip {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-            cursor: pointer;
-            border: none;
-            color: #f1f1f1;
-            flex-shrink: 0;
-            -webkit-flex-shrink: 0;
-            margin-right: 10px;
+            background-color: rgba(255, 255, 255, 0.1); padding: 7px 14px; border-radius: 8px;
+            font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; border: none;
+            color: #f1f1f1; -webkit-flex-shrink: 0; flex-shrink: 0; margin-right: 10px;
         }
-        .chip.active {
-            background-color: #ffffff;
-            color: #0f0f0f;
-        }
+        .chip.active { background-color: #ffffff; color: #0f0f0f; }
 
-        /* Сетка контента */
-        main {
-            padding: 0 24px 80px 24px;
-            max-width: 1920px;
-            margin: 0 auto;
-        }
-
+        /* ОСНОВНАЯ СЕТКА И КАРТОЧКИ ВИДЕО */
+        main { padding: 0 24px 80px 24px; max-width: 1920px; margin: 0 auto; }
         .video-grid {
-            display: flex;
-            flex-wrap: wrap;
-            margin-left: -8px;
-            margin-right: -8px;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-flex-wrap: wrap; flex-wrap: wrap; margin-left: -8px; margin-right: -8px;
         }
-
         .video-card {
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            padding: 0 8px;
-            margin-bottom: 36px;
-            width: 100%;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            cursor: pointer; padding: 0 8px; margin-bottom: 36px; width: 100%;
         }
-
-        .thumbnail-wrapper {
-            width: 100%;
-            position: relative;
-            padding-top: 56.25%;
-            border-radius: 12px;
-            overflow: hidden;
-            background-color: #222;
-        }
-
-        .thumbnail {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover;
-        }
-
-        .video-meta { display: flex; margin-top: 12px; }
-
+        .thumbnail-wrapper { width: 100%; position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; background-color: #222; }
+        .thumbnail { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .video-meta { display: -webkit-box; display: -webkit-flex; display: flex; margin-top: 12px; }
         .channel-avatar {
             width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; flex-shrink: 0; font-size: 14px; margin-right: 12px;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center;
+            font-weight: bold; -webkit-flex-shrink: 0; flex-shrink: 0; font-size: 14px; margin-right: 12px;
         }
-
-        .video-details { display: flex; flex-direction: column; }
-        .video-title {
-            font-size: 14px; font-weight: 500; line-height: 1.4; color: #f1f1f1;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-            overflow: hidden; margin-bottom: 4px;
-        }
+        .video-details { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column; }
+        .video-title { font-size: 14px; font-weight: 500; line-height: 1.4; color: #f1f1f1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
         .video-author { font-size: 12px; color: #aaaaaa; }
 
-        /* Полка Shorts (Ровно 2 штуки) */
-        .shorts-shelf {
-            width: 100%; padding: 16px 8px 24px 8px;
-            border-bottom: 4px solid #212121; margin-bottom: 20px;
-        }
+        /* ВЫДЕЛЕННАЯ ПОЛКА SHORTS (ГЛАВНАЯ СТРАНИЦА) */
+        .shorts-shelf { width: 100%; padding: 16px 8px 24px 8px; border-bottom: 4px solid #212121; margin-bottom: 20px; }
         .shorts-shelf-header {
-            display: flex; align-items: center; font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 16px;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            font-size: 18px; font-weight: 700; color: #ffffff; margin-bottom: 16px;
         }
-        .shorts-shelf-grid { display: flex; flex-wrap: wrap; margin-left: -6px; margin-right: -6px; }
-        .shorts-shelf-card { display: flex; flex-direction: column; cursor: pointer; padding: 0 6px; width: 50%; max-width: 280px; margin-bottom: 16px; }
+        .shorts-shelf-grid { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-flex-wrap: wrap; flex-wrap: wrap; margin-left: -6px; margin-right: -6px; }
+        .shorts-shelf-card {
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            cursor: pointer; padding: 0 6px; width: 50%; max-width: 280px; margin-bottom: 16px;
+        }
         .shorts-shelf-thumb-wrapper { width: 100%; position: relative; padding-top: 160%; border-radius: 12px; overflow: hidden; background-color: #1c1c1c; }
         .shorts-shelf-title { font-size: 13px; font-weight: 500; margin-top: 8px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #ffffff; }
         .shorts-icon { width: 22px; height: 22px; display: inline-block; vertical-align: middle; }
 
-        /* Плеер и Меню действий под ним */
+        /* ИНТЕРФЕЙС СТРАНИЦЫ ПРОСМОТРА (ПЛЕЕР) */
         .watch-container { width: 100%; max-width: 1280px; margin: 0 auto; }
         .player-wrapper { width: 100%; background-color: #000; border-radius: 12px; overflow: hidden; position: relative; padding-top: 56.25%; }
-        .player-wrapper video, .player-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background:#000; border: none; }
+        .player-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background:#000; border: none; }
         .watch-title { font-size: 18px; font-weight: 700; margin: 16px 0 8px 0; line-height: 1.4; }
-        .stream-status { font-size: 12px; color: #2bda7a; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
         
-        .watch-author-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            flex-wrap: wrap; 
-            padding-bottom: 16px; 
-            border-bottom: 1px solid #272727;
-            gap: 16px;
+        .stream-status-row {
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: space-between; -webkit-justify-content: space-between; justify-content: space-between;
+            margin-bottom: 16px; -webkit-flex-wrap: wrap; flex-wrap: wrap;
         }
-        .author-left { display: flex; align-items: center; }
-        .subscribe-btn { background-color: #ffffff; color: #000000; padding: 8px 16px; border-radius: 18px; font-weight: 600; border: none; font-size: 13px; margin-left: 12px; cursor: pointer; transition: background 0.2s; }
+        .stream-status { font-size: 12px; color: #2bda7a; display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; }
+        .stream-status i { margin-right: 6px; }
+        .server-switch-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #aaa; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; }
+
+        .watch-author-row {
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-pack: space-between; -webkit-justify-content: space-between; justify-content: space-between;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-flex-wrap: wrap; flex-wrap: wrap; padding-bottom: 16px; border-bottom: 1px solid #272727;
+        }
+        .author-left { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; }
+        .subscribe-btn { background-color: #ffffff; color: #000000; padding: 8px 16px; border-radius: 18px; font-weight: 600; border: none; font-size: 13px; margin-left: 12px; cursor: pointer; }
         
-        /* Исправленный контейнер кнопок меню */
-        .actions-right { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px;
-            flex-wrap: nowrap;
-        }
-        .action-pill { 
-            background-color: rgba(255, 255, 255, 0.1); 
-            padding: 8px 16px; 
-            border-radius: 18px; 
-            font-size: 13px; 
-            font-weight: 500;
-            display: flex; 
-            align-items: center; 
-            color: #f1f1f1;
-            cursor: pointer; 
-            user-select: none;
-            -webkit-user-select: none;
-            transition: background-color 0.2s, color 0.2s;
-            white-space: nowrap;
+        .actions-right { display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center; margin-top: 10px; }
+        .action-pill {
+            background-color: rgba(255, 255, 255, 0.1); padding: 8px 14px; border-radius: 18px; font-size: 13px; font-weight: 500;
+            display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            color: #f1f1f1; cursor: pointer; user-select: none; -webkit-user-select: none; white-space: nowrap; margin-right: 8px;
         }
         .action-pill i { margin-right: 6px; font-size: 14px; }
-        .action-pill:hover { background-color: rgba(255, 255, 255, 0.2); }
 
-        /* Лента Shorts */
-        .shorts-feed { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 480px; margin: 0 auto; }
-        .shorts-card { width: 100%; height: 75vh; background-color: #000; border-radius: 12px; position: relative; overflow: hidden; }
-        .shorts-video, .shorts-card iframe { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; background:#000; border: none; }
-        .shorts-cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 3; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        /* ВЕРТИКАЛЬНАЯ ЛЕНТА SHORTS (ПОЛНОЭКРАННАЯ) */
+        .shorts-feed {
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            max-width: 480px; margin: 0 auto;
+        }
+        .shorts-card { width: 100%; height: 70vh; background-color: #000; border-radius: 12px; position: relative; overflow: hidden; margin-bottom: 24px; }
+        .shorts-video, .shorts-card iframe { width: 100%; height: 100%; position: relative; z-index: 2; background:#000; border: none; }
+        .shorts-cover {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 3;
+            display: -webkit-box; display: -webkit-flex; display: flex; -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center; cursor: pointer;
+        }
         .shorts-cover::before { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6)); }
         .shorts-play-btn { font-size: 44px; color: #fff; z-index: 4; opacity: 0.8; }
-        .shorts-overlay-info { position: absolute; bottom: 16px; left: 16px; right: 70px; z-index: 5; pointer-events: none; }
+        .shorts-overlay-info { position: absolute; bottom: 16px; left: 16px; right: 80px; z-index: 5; pointer-events: none; }
         .shorts-overlay-author { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
         .shorts-overlay-title { font-size: 13px; line-height: 1.3; color: #fff; }
-        .shorts-side-actions { position: absolute; right: 12px; bottom: 24px; display: flex; flex-direction: column; align-items: center; z-index: 5; }
-        .shorts-action-circle { width: 40px; height: 40px; border-radius: 50%; background-color: rgba(39, 39, 39, 0.6); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; margin-top: 16px; }
+        .shorts-side-actions {
+            position: absolute; right: 12px; bottom: 24px;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center; z-index: 5;
+        }
+        .shorts-action-circle {
+            width: 40px; height: 40px; border-radius: 50%; background-color: rgba(39, 39, 39, 0.8);
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center;
+            font-size: 16px; color: #fff; margin-top: 14px;
+        }
         .shorts-side-actions span { font-size: 11px; margin-top: 4px; color: #fff; }
 
-        /* Навигация */
+        /* НИЖНИЙ НАВИГАЦИОННЫЙ БАР */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #0f0f0f;
-            border-top: 1px solid #212121; display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background-color: #0f0f0f; border-top: 1px solid #212121;
+            display: -webkit-box; display: -webkit-flex; display: flex; -webkit-justify-content: space-around; justify-content: space-around;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center; z-index: 1000;
         }
         .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            color: #aaaaaa; cursor: pointer; font-size: 10px; width: 25%; height: 100%;
-            user-select: none; -webkit-user-select: none; transition: color 0.1s ease-in-out;
+            display: -webkit-box; display: -webkit-flex; display: flex;
+            -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column;
+            -webkit-box-align: center; -webkit-align-items: center; align-items: center;
+            -webkit-box-pack: center; -webkit-justify-content: center; justify-content: center;
+            color: #aaaaaa; cursor: pointer; font-size: 10px; width: 50%; height: 100%; user-select: none; -webkit-user-select: none;
         }
         .nav-item i, .nav-item svg { margin-bottom: 4px; }
         .nav-item.active { color: #ffffff; }
 
-        /* Ошибки */
-        .error-container { text-align: center; padding: 100px 24px; color: #aaaaaa; max-width: 400px; margin: 0 auto; }
+        /* ИНТЕРФЕЙС ОШИБОК И СЕТЕВЫХ СБОЕВ */
+        .error-container { text-align: center; padding: 80px 24px; color: #aaaaaa; max-width: 400px; margin: 0 auto; }
         .error-container i { font-size: 48px; color: #ff4444; margin-bottom: 16px; }
-        .error-btn {
-            background-color: #ffffff; color: #0f0f0f; border: none; padding: 12px 28px;
-            border-radius: 22px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 24px;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
+        .error-btn { background-color: #ffffff; color: #0f0f0f; border: none; padding: 12px 28px; border-radius: 22px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 24px; }
 
-        /* Адаптивные медиа-запросы */
+        /* АДАПТИВНЫЙ МЕДИА-СЛОЙ ДЛЯ СТАРЫХ ДВИЖКОВ (БЕЗ СВОЙСТВА GAP) */
         @media (max-width: 640px) {
-            .watch-author-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 14px;
-            }
-            .author-left { width: 100%; justify-content: space-between; }
-            /* Горизонтальный скролл меню на смартфонах */
-            .actions-right {
-                width: 100%;
-                overflow-x: auto;
-                padding-bottom: 6px;
-                scrollbar-width: none;
-                -webkit-overflow-scrolling: touch;
-            }
-            .actions-right::-webkit-scrollbar { display: none; }
+            .watch-author-row { -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column; -webkit-box-align: start; -webkit-align-items: flex-start; align-items: flex-start; }
+            .author-left { width: 100%; -webkit-box-pack: space-between; -webkit-justify-content: space-between; justify-content: space-between; }
+            .actions-right { width: 100%; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; }
         }
-
-        @media (min-width: 641px) and (max-width: 1024px) { 
-            .video-card { width: 50%; } 
-        }
-        @media (min-width: 1025px) and (max-width: 1600px) { 
-            .video-card { width: 25%; } 
-            .shorts-feed { max-width: 650px; gap: 24px; }
-            .shorts-card { height: calc(100vh - 120px); border-radius: 16px; }
-        }
-        @media (min-width: 1601px) { 
-            .video-card { width: 20%; } 
-            .video-title { font-size: 16px; }
-            .shorts-feed { max-width: 700px; gap: 30px; }
-            .shorts-card { height: calc(100vh - 140px); border-radius: 20px; }
-        }
+        @media (min-width: 641px) and (max-width: 1024px) { .video-card { width: 50%; } }
+        @media (min-width: 1025px) { .video-card { width: 25%; } }
     </style>
 </head>
 <body>
@@ -338,9 +270,11 @@
     </nav>
 
     <script>
+        // ГЛОБАЛЬНЫЕ ЭЛЕМЕНТЫ DOM
         var appContent = document.getElementById('app-content');
         var chipsBar = document.getElementById('chipsBar');
 
+        // 1. КОНФИГУРАЦИИ И СЕРВЕРНЫЕ ИНСТАНСЫ (INVIDIOUS)
         var INSTANCES = [
             "https://yewtu.be",
             "https://invidious.nerdvpn.de",
@@ -352,89 +286,64 @@
         var PREFERENCES = [
             { name: "Все", query: "Популярное" }, { name: "Музыка", query: "Музыка тренды" },
             { name: "Гаджеты", query: "Гаджеты технологии обзор" }, { name: "Наука", query: "Научпоп космос" },
-            { name: "Фильмы", query: "Кино трейлеры" }, { name: "Игры", query: "Игровые новинки стрим" },
-            { name: "Спорт", query: "Спорт футбольные обзоры" }, { name: "Авто", query: "Авто обзоры тест драйв" },
-            { name: "Юмор", query: "Стендап приколы шоу" }, { name: "Подкасты", query: "Интервью подкасты" }
+            { name: "Фильмы", query: "Кино трейлеры" }, { name: "Игры", query: "Игровые новинки стрим" }
         ];
 
+        // 2. СОСТОЯНИЕ ПРИЛОЖЕНИЯ (STATE МЕНЕДЖЕР)
         var AppState = {
             currentServerIdx: 0,
             cachedVideos: [],
             currentTab: 'home',
             isShortsLoading: false,
+            isHomeLoading: false, 
+            homePage: 1,          
             lastQuery: 'Популярное',
             activeVideoId: null,
-            activeShortId: null,
-            videoErrorCount: 0,
-            shortErrorCount: 0
+            playerEngineMode: 1 // 1 = Базовый Invidious, 2 = YouTube Legacy WebKit Эмбед
         };
 
+        // 3. СИСТЕМНЫЕ УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         function getActiveServer() { return INSTANCES[AppState.currentServerIdx]; }
         function switchServer() { AppState.currentServerIdx = (AppState.currentServerIdx + 1) % INSTANCES.length; }
 
         function toggleLoader(show) {
-            if (show) document.body.classList.add('loading-active');
-            else document.body.classList.remove('loading-active');
+            if (show) document.body.className = 'loading-active';
+            else document.body.className = '';
         }
 
         function triggerRetry() {
-            if (AppState.currentTab === 'home') loadVideos(AppState.lastQuery);
+            if (AppState.currentTab === 'home') loadVideos(AppState.lastQuery, false);
             else if (AppState.currentTab === 'shorts') loadShortsPack();
         }
 
-        function renderChips() {
-            var html = "";
-            for (var i = 0; i < PREFERENCES.length; i++) {
-                var cls = (PREFERENCES[i].query === AppState.lastQuery) ? "chip active" : "chip";
-                html += '<div class="' + cls + '" onclick="clickChip(this, \'' + PREFERENCES[i].query + '\')">' + PREFERENCES[i].name + '</div>';
-            }
-            chipsBar.innerHTML = html;
-        }
-
-        function openSearchPrompt() {
-            var text = prompt("Что хотите найти на LiteTube?");
-            if (text && text.trim() !== "") {
-                if (AppState.currentTab === 'shorts') switchToTab('home');
-                loadVideos(text.trim());
-            }
-        }
-
-        function switchToTab(tab) {
-            AppState.currentTab = tab;
-            var navItems = document.getElementsByClassName('nav-item');
-            for (var i = 0; i < navItems.length; i++) navItems[i].classList.remove('active');
-
-            if (tab === 'home') {
-                document.getElementById('nav-home').classList.add('active');
-                chipsBar.style.display = "flex";
-                if (AppState.cachedVideos.length > 0) renderFeed(AppState.cachedVideos);
-                else resetToHome();
-            } else if (tab === 'shorts') {
-                document.getElementById('nav-shorts').classList.add('active');
-                chipsBar.style.display = "none";
-                appContent.innerHTML = '<div class="shorts-feed" id="shortsFeedBox"></div>';
-                loadShortsPack();
-            }
-        }
-
-        function loadVideos(query) {
+        // 4. ЗАПРОСЫ К API И ЗАГРУЗКА ДАННЫХ (AJAX)
+        function loadVideos(query, append) {
+            if (AppState.isHomeLoading) return;
+            AppState.isHomeLoading = true;
             AppState.lastQuery = query;
             toggleLoader(true);
-            var attempt = 0;
 
+            if (!append) {
+                AppState.homePage = 1;
+                appContent.innerHTML = '<div class="video-grid" id="homeVideoGrid"></div>';
+                window.scrollTo(0, 0);
+            } else {
+                AppState.homePage++;
+            }
+
+            var attempt = 0;
             function executeAjax() {
                 var xhr = new XMLHttpRequest();
-                var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent(query) + '&type=video';
+                var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent(query) + '&type=video&page=' + AppState.homePage;
                 xhr.open('GET', url, true);
-                
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
                         if (xhr.status >= 200 && xhr.status < 300) {
                             try {
                                 var data = JSON.parse(xhr.responseText);
-                                AppState.cachedVideos = data;
-                                renderFeed(data);
+                                AppState.isHomeLoading = false;
                                 toggleLoader(false);
+                                renderFeedData(data, append);
                             } catch (e) { retry(); }
                         } else { retry(); }
                     }
@@ -448,48 +357,96 @@
                     switchServer();
                     executeAjax();
                 } else {
+                    AppState.isHomeLoading = false;
                     toggleLoader(false);
-                    showErrorOverlay();
+                    if (!append) showErrorOverlay();
                 }
             }
             executeAjax();
         }
 
-        function showErrorOverlay() {
-            appContent.innerHTML = '<div class="error-container">' +
-                '<i class="fa-solid fa-circle-exclamation"></i>' +
-                '<h3>Ошибка подключения</h3>' +
-                '<p style="font-size:13px; margin-top:6px; color:#888;">Зеркала перегружены. Попробуйте снова.</p>' +
-                '<button class="error-btn" onclick="triggerRetry()"><i class="fa-solid fa-arrow-rotate-right"></i> Повторить</button>' +
-            '</div>';
+        function loadRealShortsForShelf() {
+            var xhr = new XMLHttpRequest();
+            var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent('shorts тренды') + '&type=video';
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        var targetZone = document.getElementById('realShortsShelfZone');
+                        if (targetZone && data) {
+                            var trueShorts = [];
+                            for(var i=0; i<data.length; i++) {
+                                if (data[i].lengthSeconds && data[i].lengthSeconds > 65) continue; // Жесткий отсев длинных видео
+                                trueShorts.push(data[i]);
+                                if(trueShorts.length >= 2) break;
+                            }
+                            if(trueShorts.length > 0) {
+                                targetZone.innerHTML = generateShortsShelfHTML(trueShorts);
+                            }
+                        }
+                    } catch (e) {}
+                }
+            };
+            xhr.send();
         }
 
-        function renderFeed(items) {
-            window.scrollTo(0, 0);
-            chipsBar.style.display = "flex";
-            renderChips();
+        function loadShortsPack() {
+            if (AppState.isShortsLoading) return;
+            AppState.isShortsLoading = true;
+            toggleLoader(true);
+
+            var xhr = new XMLHttpRequest();
+            var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent('shorts рунет') + '&type=video';
+            xhr.open('GET', url, true);
             
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    toggleLoader(false);
+                    if (xhr.status === 200) {
+                        try {
+                            appendShortsToDOM(JSON.parse(xhr.responseText));
+                        } catch (e) {}
+                    }
+                    AppState.isShortsLoading = false;
+                }
+            };
+            xhr.send();
+        }
+
+        // 5. ШАБЛОНИЗАЦИЯ И РЕНДЕРИНГ ИНТЕРФЕЙСА (DOM КОНСТРУКТОРЫ)
+        function renderChips() {
+            var html = "";
+            for (var i = 0; i < PREFERENCES.length; i++) {
+                var cls = (PREFERENCES[i].query === AppState.lastQuery) ? "chip active" : "chip";
+                html += '<div class="' + cls + '" onclick="clickChip(this, \'' + PREFERENCES[i].query + '\')">' + PREFERENCES[i].name + '</div>';
+            }
+            chipsBar.innerHTML = html;
+        }
+
+        function renderFeedData(items, append) {
+            var grid = document.getElementById('homeVideoGrid');
+            if (!grid) return;
+
             if (!items || items.length === 0) {
-                appContent.innerHTML = '<div style="text-align:center; padding:60px; color:#aaa;">Ничего не найдено 😔</div>';
+                if (!append) grid.innerHTML = '<div style="text-align:center; padding:60px; color:#aaa; width:100%;">Ничего не найдено</div>';
                 return;
             }
 
-            var screenWidth = window.innerWidth || document.documentElement.clientWidth;
-            var html = '<div class="video-grid">';
-            
-            var rawShortsPool = items.slice(0, 2);
-
-            if (screenWidth <= 640) {
-                html += generateShortsShelfHTML(rawShortsPool);
-                for (var i = 0; i < items.length; i++) html += generateVideoCardHTML(items[i]);
+            if (!append) {
+                AppState.cachedVideos = items;
+                renderChips();
+                grid.innerHTML = '<div id="realShortsShelfZone" style="width:100%;"></div>';
+                loadRealShortsForShelf();
             } else {
-                for (var i = 0; i < items.length; i++) {
-                    html += generateVideoCardHTML(items[i]);
-                    if (i === 3) html += generateShortsShelfHTML(rawShortsPool);
-                }
+                AppState.cachedVideos = AppState.cachedVideos.concat(items);
             }
-            html += '</div>';
-            appContent.innerHTML = html;
+
+            var html = '';
+            for (var i = 0; i < items.length; i++) {
+                html += generateVideoCardHTML(items[i]);
+            }
+            grid.innerHTML += html;
         }
 
         function generateVideoCardHTML(video) {
@@ -498,13 +455,11 @@
             var safeTitle = video.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
             var safeChannel = video.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
             var thumbUrl = 'https://img.youtube.com/vi/' + video.videoId + '/hqdefault.jpg';
-            var colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#009688', '#4caf50'];
-            var avatarBg = colors[Math.floor(Math.random() * colors.length)];
 
-            return '<div class="video-card" onclick="openWatchPage(\'' + video.videoId + '\', \'' + safeTitle + '\', \'' + safeChannel + '\', \'' + firstLetter + '\', \'' + avatarBg + '\')">' +
+            return '<div class="video-card" onclick="openWatchPage(\'' + video.videoId + '\', \'' + safeTitle + '\', \'' + safeChannel + '\', \'' + firstLetter + '\')">' +
                 '<div class="thumbnail-wrapper"><img class="thumbnail" src="' + thumbUrl + '" alt="preview"></div>' +
                 '<div class="video-meta">' +
-                    '<div class="channel-avatar" style="background-color: ' + avatarBg + '">' + firstLetter + '</div>' +
+                    '<div class="channel-avatar" style="background-color: #333">' + firstLetter + '</div>' +
                     '<div class="video-details">' +
                         '<div class="video-title">' + video.title + '</div>' +
                         '<div class="video-author">' + video.author + '</div>' +
@@ -513,13 +468,15 @@
             '</div>';
         }
 
+        // КЛАССИЧЕСКАЯ ПОЛКА С СТАРЫМ ЛОГОТИПОМ И НАДПИСЬЮ SHORTS
         function generateShortsShelfHTML(shortsItems) {
             var shelfHtml = '<div class="shorts-shelf">' +
                 '<div class="shorts-shelf-header">' +
-                    '<svg class="shorts-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="color: #FF0000; margin-right: 8px;">' +
-                        '<path d="M17.74 10.49l-1.72-1.02 1.84-1.08c2.03-1.19 2.7-3.79 1.51-5.82-1.19-2.03-3.79-2.7-5.82-1.51L5.82 5.6C4.85 6.17 4.23 7.2 4.23 8.33c0 1.13.62 2.16 1.59 2.73l1.72 1.02-1.84 1.08c-2.03 1.19-2.7 3.79-1.51 5.82.8 1.36 2.22 2.13 3.66 2.13.73 0 1.48-.19 2.16-.59l7.73-4.54c.97-.57 1.59-1.6 1.59-2.73 0-1.13-.62-2.16-1.59-2.73z" fill="currentColor"/>' +
+                    '<svg viewBox="0 0 24 24" width="24" height="24" style="vertical-align: middle; margin-right: 8px;">' +
+                        '<path d="M17.74 10.49l-1.72-1.02 1.84-1.08c2.03-1.19 2.7-3.79 1.51-5.82-1.19-2.03-3.79-2.7-5.82-1.51L5.82 5.6C4.85 6.17 4.23 7.2 4.23 8.33c0 1.13.62 2.16 1.59 2.73l1.72 1.02-1.84 1.08c-2.03 1.19-2.7 3.79-1.51 5.82.8 1.36 2.22 2.13 3.66 2.13.73 0 1.48-.19 2.16-.59l7.73-4.54c.97-.57 1.59-1.6 1.59-2.73 0-1.13-.62-2.16-1.59-2.73z" fill="#FF0000"/>' +
                         '<polygon points="10,9.5 10,14.5 14.5,12" fill="#ffffff"/>' +
-                    '</svg><span>Shorts</span>' +
+                    '</svg>' +
+                    '<span>Shorts</span>' +
                 '</div><div class="shorts-shelf-grid">';
 
             for (var i = 0; i < shortsItems.length; i++) {
@@ -534,38 +491,6 @@
             return shelfHtml;
         }
 
-        function activateShortsFromShelf(id) {
-            switchToTab('shorts');
-            setTimeout(function() {
-                activateShortVideo(id);
-                var target = document.getElementById('short-' + id);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 150);
-        }
-
-        function loadShortsPack() {
-            if (AppState.isShortsLoading) return;
-            AppState.isShortsLoading = true;
-            toggleLoader(true);
-
-            var xhr = new XMLHttpRequest();
-            var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent('shorts тренды') + '&type=video';
-            xhr.open('GET', url, true);
-            
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    toggleLoader(false);
-                    if (xhr.status === 200) {
-                        try {
-                            appendShortsToDOM(JSON.parse(xhr.responseText));
-                        } catch (e) {}
-                    } else { showErrorOverlay(); }
-                    AppState.isShortsLoading = false;
-                }
-            };
-            xhr.send();
-        }
-
         function appendShortsToDOM(items) {
             var shortsFeedBox = document.getElementById('shortsFeedBox');
             if (!shortsFeedBox) return;
@@ -573,6 +498,7 @@
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 if (!item.videoId || document.getElementById('short-' + item.videoId)) continue;
+                if (item.lengthSeconds && item.lengthSeconds > 65) continue;
 
                 var safeTitle = item.title.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
                 var safeAuthor = item.author.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
@@ -582,92 +508,122 @@
                 card.className = 'shorts-card';
                 card.id = 'short-' + item.videoId;
                 card.innerHTML = '<div class="shorts-cover" id="cover-' + item.videoId + '" style="background-image: url(\'' + thumbUrl + '\')" onclick="activateShortVideo(\'' + item.videoId + '\')">' +
-                        '<i class="fa-solid fa-play shorts-play-btn"></i>' +
+                        '<div class="shorts-play-btn">▶</div>' +
                     '</div>' +
                     '<div style="width:100%; height:100%;" id="player-slot-' + item.videoId + '"></div>' +
                     '<div class="shorts-overlay-info">' +
-                        '<div class="shorts-overlay-author"><i class="fa-solid fa-circle-user"></i> ' + safeAuthor + '</div>' +
+                        '<div class="shorts-overlay-author">' + safeAuthor + '</div>' +
                         '<div class="shorts-overlay-title">' + safeTitle + '</div>' +
                     '</div>' +
                     '<div class="shorts-side-actions">' +
-                        '<div class="shorts-action-circle"><i class="fa-solid fa-thumbs-up"></i></div><span>Like</span>' +
-                        '<div class="shorts-action-circle"><i class="fa-solid fa-comment"></i></div><span>Reply</span>' +
-                        '<div class="shorts-action-circle" onclick="alert(\'Ссылка скопирована!\');"><i class="fa-solid fa-share"></i></div><span>Share</span>' +
+                        '<div class="shorts-action-circle">👍</div><span>Like</span>' +
+                        '<div class="shorts-action-circle" onclick="handleShare(\'' + item.videoId + '\')">🔗</div><span>Link</span>' +
                     '</div>';
                 shortsFeedBox.appendChild(card);
             }
         }
 
-        function activateShortVideo(id) {
-            AppState.activeShortId = id;
-            AppState.shortErrorCount = 0;
-
-            var covers = document.getElementsByClassName('shorts-cover');
-            for (var i = 0; i < covers.length; i++) covers[i].style.display = 'flex';
-
-            var videos = document.getElementsByClassName('shorts-video');
-            while(videos.length > 0) videos[0].remove();
-
-            playShortVideoLogic(id);
+        function showErrorOverlay() {
+            appContent.innerHTML = '<div class="error-container">' +
+                '<i class="fa-solid fa-circle-exclamation"></i>' +
+                '<h3>Ошибка сети</h3>' +
+                '<p style="font-size:13px; margin-top:6px; color:#888;">Все зеркала перегружены.</p>' +
+                '<button class="error-btn" onclick="triggerRetry()">Повторить</button>' +
+            '</div>';
         }
 
-        function playShortVideoLogic(id) {
-            var slot = document.getElementById('player-slot-' + id);
+        // 6. УПРАВЛЕНИЕ ПЛЕЕРАМИ И ДВИЖКАМИ ВЫВОДА ПОТОКА
+        function playMainVideoLogic(id) {
+            var slot = document.getElementById('mainPlayerSlot');
+            var label = document.getElementById('statusLabel');
             if (!slot) return;
 
-            var targetCover = document.getElementById('cover-' + id);
-            if (targetCover) targetCover.style.display = 'none';
-
-            if (AppState.shortErrorCount >= 3) {
-                slot.innerHTML = '<iframe src="' + getActiveServer() + '/embed/' + id + '?listen=0&autoplay=1" style="width:100%; height:100%;" allow="autoplay"></iframe>';
-                return;
-            }
-
-            var streamUrl = getActiveServer() + '/latest_version?id=' + id + '&itag=18';
-            slot.innerHTML = '<video class="shorts-video" controls autoplay loop playsinline src="' + streamUrl + '"></video>';
-            
-            var videoEl = slot.querySelector('video');
-            if (videoEl) {
-                videoEl.onerror = function() {
-                    if (AppState.activeShortId === id) {
-                        AppState.shortErrorCount++;
-                        switchServer();
-                        playShortVideoLogic(id);
-                    }
-                };
+            if (AppState.playerEngineMode === 1) {
+                if(label) label.innerHTML = "📡 Поток: Зеркало Invidious";
+                slot.innerHTML = '<iframe src="' + getActiveServer() + '/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
+            } else {
+                if(label) label.innerHTML = "🔒 Поток: YouTube Legacy (Макс. совместимость)";
+                slot.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             }
         }
 
-        // Открытие основного плеера с исправленным МЕНЮ ДЕЙСТВИЙ
-        function openWatchPage(id, title, channel, letter, avatarColor) {
+        function activateShortVideo(id) {
+            var covers = document.getElementsByClassName('shorts-cover');
+            for (var i = 0; i < covers.length; i++) covers[i].style.display = 'block';
+
+            var slots = document.getElementsByClassName('shorts-video');
+            while(slots.length > 0) slots[0].remove();
+
+            var slot = document.getElementById('player-slot-' + id);
+            var cover = document.getElementById('cover-' + id);
+            if (slot) {
+                if(cover) cover.style.display = 'none';
+                slot.innerHTML = '<iframe class="shorts-video" src="https://www.youtube-nocookie.com/embed/' + id + '?autoplay=1&rel=0" allow="autoplay; encrypted-media" style="width:100%; height:100%; border:none;"></iframe>';
+            }
+        }
+
+        function emergencyEngineSwitch(id) {
+            if (AppState.playerEngineMode === 1) {
+                AppState.playerEngineMode = 2;
+            } else {
+                AppState.playerEngineMode = 1;
+                switchServer();
+            }
+            playMainVideoLogic(id);
+        }
+
+        // 7. НАВИГАЦИОННЫЕ КОНТРОЛЛЕРЫ И ОБРАБОТЧИКИ СОБЫТИЙ
+        function switchToTab(tab) {
+            AppState.currentTab = tab;
+            var navItems = document.getElementsByClassName('nav-item');
+            for (var i = 0; i < navItems.length; i++) navItems[i].className = 'nav-item';
+
+            if (tab === 'home') {
+                document.getElementById('nav-home').className = 'nav-item active';
+                chipsBar.style.display = "flex";
+                if (AppState.cachedVideos.length > 0) {
+                    appContent.innerHTML = '<div class="video-grid" id="homeVideoGrid"></div>';
+                    var tempCache = AppState.cachedVideos;
+                    AppState.cachedVideos = []; 
+                    renderFeedData(tempCache, false);
+                } else {
+                    resetToHome();
+                }
+            } else if (tab === 'shorts') {
+                document.getElementById('nav-shorts').className = 'nav-item active';
+                chipsBar.style.display = "none";
+                appContent.innerHTML = '<div class="shorts-feed" id="shortsFeedBox"></div>';
+                loadShortsPack();
+            }
+        }
+
+        function openWatchPage(id, title, channel, letter) {
             AppState.activeVideoId = id;
-            AppState.videoErrorCount = 0; 
+            AppState.playerEngineMode = 1;
             window.scrollTo(0, 0);
             chipsBar.style.display = "none";
 
             appContent.innerHTML = '<div class="watch-container">' +
                     '<div class="player-wrapper" id="mainPlayerSlot"></div>' +
                     '<h1 class="watch-title">' + title + '</h1>' +
-                    '<div class="stream-status" id="statusLabel"><i class="fa-solid fa-circle-check"></i> Поток стабилизирован (720p)</div>' +
+                    
+                    '<div class="stream-status-row">' +
+                        '<div class="stream-status" id="statusLabel">⚙️ Стандартный HTML5-поток</div>' +
+                        '<button class="server-switch-btn" onclick="emergencyEngineSwitch(\''+id+'\')">🔄 Сменить плеер/сервер</button>' +
+                    '</div>' +
+                    
                     '<div class="watch-author-row">' +
                         '<div class="author-left">' +
-                            '<div class="channel-avatar" style="background-color: ' + avatarColor + '">' + letter + '</div>' +
+                            '<div class="channel-avatar" style="background-color: #444">' + letter + '</div>' +
                             '<div><span style="font-weight:600; font-size:15px;">' + channel + '</span></div>' +
                             '<button class="subscribe-btn" onclick="handleSubscribe(this)">Подписаться</button>' +
                         '</div>' +
-                        '' +
                         '<div class="actions-right">' +
-                            '<div class="action-pill" onclick="handleLikeToggle(this)">' +
-                                '<i class="fa-regular fa-thumbs-up"></i><span>Лайк</span>' +
-                            '</div>' +
                             '<div class="action-pill" onclick="handleShare(\'' + id + '\')">' +
-                                '<i class="fa-solid fa-share"></i><span>Поделиться</span>' +
-                            '</div>' +
-                            '<div class="action-pill" onclick="handleDownload(\'' + id + '\')">' +
-                                '<i class="fa-solid fa-download"></i><span>Скачать</span>' +
+                                '<span>Поделиться</span>' +
                             '</div>' +
                             '<div class="action-pill" onclick="switchToTab(\'home\')">' +
-                                '<i class="fa-solid fa-arrow-left"></i><span>Назад</span>' +
+                                '<span>Назад</span>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
@@ -676,57 +632,34 @@
             playMainVideoLogic(id);
         }
 
-        function playMainVideoLogic(id) {
-            var slot = document.getElementById('mainPlayerSlot');
-            if (!slot) return;
-
-            if (AppState.videoErrorCount === 0) {
-                var streamUrl = getActiveServer() + '/latest_version?id=' + id + '&itag=22';
-                slot.innerHTML = '<video id="html5Player" controls autoplay playsinline src="' + streamUrl + '"></video>';
-            } else if (AppState.videoErrorCount < 3) {
-                document.getElementById('statusLabel').innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Снижение качества до 360p...';
-                var streamUrl = getActiveServer() + '/latest_version?id=' + id + '&itag=18';
-                slot.innerHTML = '<video id="html5Player" controls autoplay playsinline src="' + streamUrl + '"></video>';
-            } else {
-                document.getElementById('statusLabel').innerHTML = '<i class="fa-solid fa-shield-halved"></i> Активирован резервный iframe-плеер';
-                slot.innerHTML = '<iframe src="' + getActiveServer() + '/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
-                return;
-            }
-
-            var player = document.getElementById('html5Player');
-            if (player) {
-                player.onerror = function() {
-                    if (AppState.activeVideoId === id) {
-                        AppState.videoErrorCount++;
-                        switchServer();
-                        playMainVideoLogic(id);
-                    }
-                };
-            }
+        function activateShortsFromShelf(id) {
+            switchToTab('shorts');
+            setTimeout(function() {
+                activateShortVideo(id);
+                var target = document.getElementById('short-' + id);
+                if (target) { window.scrollTo(0, target.offsetTop - 20); }
+            }, 200);
         }
 
-        /* Функции логики интерактивного меню плеера */
-        function handleLikeToggle(element) {
-            var icon = element.querySelector('i');
-            var text = element.querySelector('span');
-            
-            if (icon.classList.contains('fa-regular')) {
-                icon.className = 'fa-solid fa-thumbs-up';
-                element.style.backgroundColor = '#272727';
-                element.style.color = '#3ea6ff';
-                text.innerText = 'Понравилось';
-            } else {
-                icon.className = 'fa-regular fa-thumbs-up';
-                element.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                element.style.color = '#f1f1f1';
-                text.innerText = 'Лайк';
+        function clickChip(element, searchQuery) {
+            var chips = document.getElementsByClassName('chip');
+            for (var i = 0; i < chips.length; i++) chips[i].className = 'chip';
+            element.className = 'chip active';
+            loadVideos(searchQuery, false);
+        }
+
+        function openSearchPrompt() {
+            var text = prompt("Что хотите найти на LiteTube?");
+            if (text && text.trim() !== "") {
+                if (AppState.currentTab === 'shorts') switchToTab('home');
+                loadVideos(text.trim(), false);
             }
         }
 
         function handleSubscribe(btn) {
             if (btn.innerText === 'Подписаться') {
                 btn.innerText = 'Вы подписаны';
-                btn.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                btn.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                 btn.style.color = '#ffffff';
             } else {
                 btn.innerText = 'Подписаться';
@@ -737,45 +670,42 @@
 
         function handleShare(id) {
             var videoLink = "https://www.youtube.com/watch?v=" + id;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(videoLink).then(function() {
-                    alert("Ссылка скопирована в буфер обмена!");
-                }).catch(function() {
-                    alert("Не удалось скопировать. Ссылка: " + videoLink);
-                });
-            } else {
-                alert("Ссылка на видео: " + videoLink);
+            var dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = videoLink;
+            dummy.select();
+            try {
+                document.execCommand("copy");
+                alert("Ссылка скопирована!");
+            } catch(err) {
+                alert("Скопируйте вручную: " + videoLink);
             }
+            document.body.removeChild(dummy);
         }
 
-        function handleDownload(id) {
-            // Генерирует прямую рабочую ссылку через текущий активный сервер
-            var directDownloadUrl = getActiveServer() + '/latest_version?id=' + id + '&itag=22';
-            window.open(directDownloadUrl, '_blank');
-        }
-
-        var scrollThrottleTimeout;
+        // КРОССБРАУЗЕРНЫЙ ТРОТТЛИНГ ПОДГРУЗКИ ПРИ СКРОЛЛЕ
+        var scrollTimeout;
         window.onscroll = function() {
-            if (AppState.currentTab !== 'shorts' || AppState.isShortsLoading) return;
-            if (!scrollThrottleTimeout) {
-                scrollThrottleTimeout = setTimeout(function() {
-                    scrollThrottleTimeout = null;
-                    if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 1100) {
-                        loadShortsPack();
+            if (!scrollTimeout) {
+                scrollTimeout = setTimeout(function() {
+                    scrollTimeout = null;
+                    if (AppState.currentTab === 'shorts' && !AppState.isShortsLoading) {
+                        if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 1400) {
+                            loadShortsPack();
+                        }
                     }
-                }, 150);
+                    if (AppState.currentTab === 'home' && !AppState.isHomeLoading) {
+                        if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 1500) {
+                            loadVideos(AppState.lastQuery, true);
+                        }
+                    }
+                }, 250);
             }
         };
 
-        function clickChip(element, searchQuery) {
-            var chips = document.getElementsByClassName('chip');
-            for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
-            element.classList.add('active');
-            loadVideos(searchQuery);
-        }
+        function resetToHome() { loadVideos('Популярное', false); }
 
-        function resetToHome() { loadVideos('Популярное'); }
-
+        // ТОЧКА ВХОДА ИНИЦИАЛИЗАЦИИ
         resetToHome();
     </script>
 </body>
