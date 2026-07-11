@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LiteTube</title>
+    <title>LiteTube Premium</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght=700&family=Roboto:wght=400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
@@ -222,7 +222,7 @@
         .error-container i { font-size: 48px; color: #ff4444; margin-bottom: 16px; }
         .error-btn { background-color: #ffffff; color: #0f0f0f; border: none; padding: 12px 28px; border-radius: 22px; font-weight: 600; font-size: 14px; cursor: pointer; margin-top: 24px; }
 
-        /* АДАПТИВНЫЙ МЕДИА-СЛОЙ ДЛЯ СТАРЫХ ДВИЖКОВ (БЕЗ СВОЙСТВА GAP) */
+        /* АДАПТИВНЫЙ МЕДИА-СЛОЙ ДЛЯ СТАРЫХ ДВИЖКОВ */
         @media (max-width: 640px) {
             .watch-author-row { -webkit-box-orient: vertical; -webkit-box-direction: normal; -webkit-flex-direction: column; flex-direction: column; -webkit-box-align: start; -webkit-align-items: flex-start; align-items: flex-start; }
             .author-left { width: 100%; -webkit-box-pack: space-between; -webkit-justify-content: space-between; justify-content: space-between; }
@@ -270,11 +270,10 @@
     </nav>
 
     <script>
-        // ГЛОБАЛЬНЫЕ ЭЛЕМЕНТЫ DOM
         var appContent = document.getElementById('app-content');
         var chipsBar = document.getElementById('chipsBar');
 
-        // 1. КОНФИГУРАЦИИ И СЕРВЕРНЫЕ ИНСТАНСЫ (INVIDIOUS)
+        // 1. КОНФИГУРАЦИИ И СЕРВЕРНЫЕ ИНСТАНСЫ
         var INSTANCES = [
             "https://yewtu.be",
             "https://invidious.nerdvpn.de",
@@ -289,7 +288,7 @@
             { name: "Фильмы", query: "Кино трейлеры" }, { name: "Игры", query: "Игровые новинки стрим" }
         ];
 
-        // 2. СОСТОЯНИЕ ПРИЛОЖЕНИЯ (STATE МЕНЕДЖЕР)
+        // 2. СОСТОЯНИЕ ПРИЛОЖЕНИЯ
         var AppState = {
             currentServerIdx: 0,
             cachedVideos: [],
@@ -299,12 +298,15 @@
             homePage: 1,          
             lastQuery: 'Популярное',
             activeVideoId: null,
-            playerEngineMode: 1 // 1 = Базовый Invidious, 2 = YouTube Legacy WebKit Эмбед
+            playerEngineMode: 1
         };
 
-        // 3. СИСТЕМНЫЕ УТИЛИТЫ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // 3. СИСТЕМНЫЕ УТИЛИТЫ И РОТАЦИЯ СЕРВЕРОВ
         function getActiveServer() { return INSTANCES[AppState.currentServerIdx]; }
-        function switchServer() { AppState.currentServerIdx = (AppState.currentServerIdx + 1) % INSTANCES.length; }
+        
+        function switchServer() {
+            AppState.currentServerIdx = (AppState.currentServerIdx + 1) % INSTANCES.length;
+        }
 
         function toggleLoader(show) {
             if (show) document.body.className = 'loading-active';
@@ -316,7 +318,7 @@
             else if (AppState.currentTab === 'shorts') loadShortsPack();
         }
 
-        // 4. ЗАПРОСЫ К API И ЗАГРУЗКА ДАННЫХ (AJAX)
+        // 4. ЗАПРОСЫ К API (ДИНАМИЧЕСКИЙ AJAX)
         function loadVideos(query, append) {
             if (AppState.isHomeLoading) return;
             AppState.isHomeLoading = true;
@@ -335,6 +337,7 @@
             function executeAjax() {
                 var xhr = new XMLHttpRequest();
                 var url = getActiveServer() + '/api/v1/search?q=' + encodeURIComponent(query) + '&type=video&page=' + AppState.homePage;
+
                 xhr.open('GET', url, true);
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4) {
@@ -377,7 +380,7 @@
                         if (targetZone && data) {
                             var trueShorts = [];
                             for(var i=0; i<data.length; i++) {
-                                if (data[i].lengthSeconds && data[i].lengthSeconds > 65) continue; // Жесткий отсев длинных видео
+                                if (data[i].lengthSeconds && data[i].lengthSeconds > 65) continue;
                                 trueShorts.push(data[i]);
                                 if(trueShorts.length >= 2) break;
                             }
@@ -414,7 +417,7 @@
             xhr.send();
         }
 
-        // 5. ШАБЛОНИЗАЦИЯ И РЕНДЕРИНГ ИНТЕРФЕЙСА (DOM КОНСТРУКТОРЫ)
+        // 5. ШАБЛОНИЗАЦИЯ И РЕНДЕРИНГ ИНТЕРФЕЙСА
         function renderChips() {
             var html = "";
             for (var i = 0; i < PREFERENCES.length; i++) {
@@ -468,7 +471,6 @@
             '</div>';
         }
 
-        // КЛАССИЧЕСКАЯ ПОЛКА С СТАРЫМ ЛОГОТИПОМ И НАДПИСЬЮ SHORTS
         function generateShortsShelfHTML(shortsItems) {
             var shelfHtml = '<div class="shorts-shelf">' +
                 '<div class="shorts-shelf-header">' +
@@ -526,20 +528,20 @@
         function showErrorOverlay() {
             appContent.innerHTML = '<div class="error-container">' +
                 '<i class="fa-solid fa-circle-exclamation"></i>' +
-                '<h3>Ошибка сети</h3>' +
-                '<p style="font-size:13px; margin-top:6px; color:#888;">Все зеркала перегружены.</p>' +
+                '<h3>Ошибка соединения</h3>' +
+                '<p style="font-size:13px; margin-top:6px; color:#888;">Все доступные медиа-ноды временно не отвечают.</p>' +
                 '<button class="error-btn" onclick="triggerRetry()">Повторить</button>' +
             '</div>';
         }
 
-        // 6. УПРАВЛЕНИЕ ПЛЕЕРАМИ И ДВИЖКАМИ ВЫВОДА ПОТОКА
+        // 6. УПРАВЛЕНИЕ ПОТОКОВЫМИ ПЛЕЕРАМИ
         function playMainVideoLogic(id) {
             var slot = document.getElementById('mainPlayerSlot');
             var label = document.getElementById('statusLabel');
             if (!slot) return;
 
             if (AppState.playerEngineMode === 1) {
-                if(label) label.innerHTML = "📡 Поток: Зеркало Invidious";
+                if(label) label.innerHTML = "📡 Поток: Стабильное HTML5-зеркало";
                 slot.innerHTML = '<iframe src="' + getActiveServer() + '/embed/' + id + '?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
             } else {
                 if(label) label.innerHTML = "🔒 Поток: YouTube Legacy (Макс. совместимость)";
@@ -572,7 +574,7 @@
             playMainVideoLogic(id);
         }
 
-        // 7. НАВИГАЦИОННЫЕ КОНТРОЛЛЕРЫ И ОБРАБОТЧИКИ СОБЫТИЙ
+        // 7. НАВИГАЦИОННЫЕ КОНТРОЛЛЕРЫ И СОБЫТИЯ
         function switchToTab(tab) {
             AppState.currentTab = tab;
             var navItems = document.getElementsByClassName('nav-item');
@@ -608,8 +610,8 @@
                     '<h1 class="watch-title">' + title + '</h1>' +
                     
                     '<div class="stream-status-row">' +
-                        '<div class="stream-status" id="statusLabel">⚙️ Стандартный HTML5-поток</div>' +
-                        '<button class="server-switch-btn" onclick="emergencyEngineSwitch(\''+id+'\')">🔄 Сменить плеер/сервер</button>' +
+                        '<div class="stream-status" id="statusLabel">⚙️ Запуск потока...</div>' +
+                        '<button class="server-switch-btn" onclick="emergencyEngineSwitch(\''+id+'\')">🔄 Альтернативный плеер / Смена ноды</button>' +
                     '</div>' +
                     
                     '<div class="watch-author-row">' +
@@ -683,7 +685,6 @@
             document.body.removeChild(dummy);
         }
 
-        // КРОССБРАУЗЕРНЫЙ ТРОТТЛИНГ ПОДГРУЗКИ ПРИ СКРОЛЛЕ
         var scrollTimeout;
         window.onscroll = function() {
             if (!scrollTimeout) {
@@ -705,7 +706,7 @@
 
         function resetToHome() { loadVideos('Популярное', false); }
 
-        // ТОЧКА ВХОДА ИНИЦИАЛИЗАЦИИ
+        // ЗАПУСК СИСТЕМЫ
         resetToHome();
     </script>
 </body>
