@@ -155,31 +155,44 @@ body {
     overflow: hidden;
 }
 
-.shorts-grid {
+.shorts-feed-container {
     display: flex;
-    flex-wrap: wrap;
-    margin: -8px;
+    flex-direction: column;
+    height: calc(100vh - 65px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: y mandatory;
+    background: #000;
+    max-width: 450px;
+    margin: 0 auto;
 }
 
-.short-card {
-    width: 50%;
-    padding: 8px;
-    cursor: pointer;
-}
-
-@media (min-width: 600px) {
-    .short-card { width: 25%; }
-}
-
-@media (min-width: 900px) {
-    .short-card { width: 20%; }
-}
-
-.short-thumb {
+.short-video-wrapper {
+    flex: 0 0 100%;
+    height: 100%;
     width: 100%;
-    padding-bottom: 177.77%;
-    background-size: cover;
-    background-position: center;
-    background-color: #212121;
-    border-radius: 8px;
+    scroll-snap-align: start;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #121212;
+}
+
+.short-video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.short-overlay-title {
+    position: absolute;
+    bottom: 25px;
+    left: 15px;
+    right: 15px;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+    font-size: 14px;
+    z-index: 10;
+    line-height: 1.4;
 }
