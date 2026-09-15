@@ -8,6 +8,10 @@ var SERVERS = [
     { type: "piped", url: "https://pipedapi.drgns.space" },
     { type: "piped", url: "https://pipedapi.mha.fi" },
     { type: "piped", url: "https://api.piped.privacydev.net" },
+    { type: "piped", url: "https://pipedapi.kavin.rocks" },
+    { type: "invidious", url: "https://yewtu.be" },
+    { type: "invidious", url: "https://inv.riverside.rocks" },
+    { type: "piped", url: "https://pipedapi.drgns.space" },
     { type: "piped", url: "https://pipedapi.kavin.rocks" }
 ];
 
