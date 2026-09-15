@@ -1,11 +1,17 @@
-var API_NODES = [
-    "https://pipedapi.kavin.rocks",
-    "https://api.piped.privacydev.net",
-    "https://pipedapi.drgns.space",
-    "https://pipedapi.adminforge.de"
+var SERVERS = [
+    { type: "invidious", url: "https://invidious.nerdvpn.de" },
+    { type: "invidious", url: "https://inv.tux.pizza" },
+    { type: "invidious", url: "https://invidious.drgns.space" },
+    { type: "invidious", url: "https://invidious.no-name-given.de" },
+    { type: "piped", url: "https://pipedapi.adminforge.de" },
+    { type: "piped", url: "https://pipedapi.yt" },
+    { type: "piped", url: "https://pipedapi.drgns.space" },
+    { type: "piped", url: "https://pipedapi.mha.fi" },
+    { type: "piped", url: "https://api.piped.privacydev.net" },
+    { type: "piped", url: "https://pipedapi.kavin.rocks" }
 ];
 
-var currentApiIndex = 0;
+var activeServerIndex = 0;
 var currentStreams = [];
 var searchInput = document.getElementById("searchInput");
 var searchBtn = document.getElementById("searchBtn");
@@ -18,6 +24,7 @@ var mainVideo = document.getElementById("mainVideo");
 var videoTitle = document.getElementById("videoTitle");
 var qualitySelect = document.getElementById("qualitySelect");
 var captionTrack = document.getElementById("captionTrack");
+
 var hasObserver = ('IntersectionObserver' in window);
 var shortsObserver;
 
@@ -30,16 +37,9 @@ if (hasObserver) {
 
             if (entry.isIntersecting) {
                 if (!videoElement.src) {
-                    fetchJSON("/streams/" + videoId, function(err, data) {
-                        if (!err && data && data.videoStreams) {
-                            var bestUrl = data.videoStreams[0].url;
-                            for (var k = 0; k < data.videoStreams.length; k++) {
-                                if (data.videoStreams[k].videoOnly === false) {
-                                    bestUrl = data.videoStreams[k].url;
-                                    break;
-                                }
-                            }
-                            videoElement.src = bestUrl;
+                    loadStreamsForVideo(videoId, function(err, streams) {
+                        if (!err && streams && streams.length > 0) {
+                            videoElement.src = streams[0].url;
                             var playPromise = videoElement.play();
                             if (playPromise !== undefined && playPromise.catch) {
                                 playPromise.catch(function(e) {});
@@ -61,48 +61,146 @@ if (hasObserver) {
     }, { threshold: 0.5 });
 }
 
-function getApiUrl(path) {
-    return API_NODES[currentApiIndex] + path;
-}
-
-function fetchJSON(path, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", getApiUrl(path), true);
-    
-    function tryNextFallback() {
-        if (currentApiIndex < API_NODES.length - 1) {
-            currentApiIndex++;
-            fetchJSON(path, callback);
-        } else {
-            currentApiIndex = 0;
-            callback("Error", null);
-        }
+function requestCascade(actionType, params, attemptIndex, callback) {
+    if (attemptIndex >= SERVERS.length) {
+        callback("Все серверы недоступны. Попробуйте еще раз позже.", null);
+        return;
     }
 
+    var server = SERVERS[attemptIndex];
+    var endpoint = "";
+
+    if (server.type === "invidious") {
+        if (actionType === "trending") endpoint = "/api/v1/trending?region=RU";
+        else if (actionType === "search") endpoint = "/api/v1/search?q=" + encodeURIComponent(params.q);
+        else if (actionType === "streams") endpoint = "/api/v1/videos/" + params.id;
+    } else if (server.type === "piped") {
+        if (actionType === "trending") endpoint = "/trending?region=RU";
+        else if (actionType === "search") endpoint = "/search?q=" + encodeURIComponent(params.q) + "&filter=all";
+        else if (actionType === "streams") endpoint = "/streams/" + params.id;
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", server.url + endpoint, true);
+    
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
                 try {
-                    var data = JSON.parse(xhr.responseText);
-                    callback(null, data);
+                    var json = JSON.parse(xhr.responseText);
+                    var normalizedData = normalizeResponse(actionType, server.type, json);
+                    if (normalizedData) {
+                        activeServerIndex = attemptIndex;
+                        callback(null, normalizedData);
+                    } else {
+                        requestCascade(actionType, params, attemptIndex + 1, callback);
+                    }
                 } catch (e) {
-                    tryNextFallback();
+                    requestCascade(actionType, params, attemptIndex + 1, callback);
                 }
-            } else if (xhr.status !== 0) {
-                tryNextFallback();
+            } else {
+                requestCascade(actionType, params, attemptIndex + 1, callback);
             }
         }
     };
-    
-    xhr.onerror = function() {
-        tryNextFallback();
+
+    xhr.onerror = function () {
+        requestCascade(actionType, params, attemptIndex + 1, callback);
     };
-    
+
     xhr.send();
 }
 
+function executeApiRequest(actionType, params, callback) {
+    requestCascade(actionType, params, activeServerIndex, function(err, result) {
+        if (err) {
+            requestCascade(actionType, params, 0, callback);
+        } else {
+            callback(null, result);
+        }
+    });
+}
+
+function normalizeResponse(actionType, serverType, data) {
+    if (!data) return null;
+
+    if (actionType === "trending" || actionType === "search") {
+        var rawList = Array.isArray(data) ? data : (data.items || []);
+        var items = [];
+
+        for (var i = 0; i < rawList.length; i++) {
+            var item = rawList[i];
+            var id = item.videoId || (item.url ? item.url.replace("/watch?v=", "").replace("/shorts/", "") : item.id);
+            if (!id) continue;
+
+            var title = item.title || "Без названия";
+            var thumb = "";
+
+            if (item.videoThumbnails && item.videoThumbnails.length > 0) {
+                thumb = item.videoThumbnails[0].url;
+            } else if (item.thumbnail) {
+                thumb = item.thumbnail;
+            } else if (item.thumbnails && item.thumbnails.length > 0) {
+                thumb = item.thumbnails[0].url;
+            } else {
+                thumb = "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg";
+            }
+
+            items.push({ id: id, title: title, thumbnail: thumb });
+        }
+        return items;
+    }
+
+    if (actionType === "streams") {
+        var title = data.title || "Видео";
+        var streams = [];
+        var subtitles = [];
+
+        if (serverType === "invidious") {
+            var formatStreams = data.formatStreams || [];
+            for (var j = 0; j < formatStreams.length; j++) {
+                var fs = formatStreams[j];
+                if (fs.url) {
+                    streams.push({
+                        url: fs.url,
+                        quality: fs.qualityLabel || fs.resolution || "SD",
+                        format: fs.container || "MP4"
+                    });
+                }
+            }
+            var captions = data.captions || [];
+            for (var c = 0; c < captions.length; c++) {
+                subtitles.push({ url: captions[c].url, code: captions[c].languageCode });
+            }
+        } else if (serverType === "piped") {
+            var vStreams = data.videoStreams || [];
+            for (var k = 0; k < vStreams.length; k++) {
+                var vs = vStreams[k];
+                if (vs.url && vs.videoOnly === false) {
+                    streams.push({
+                        url: vs.url,
+                        quality: vs.quality || "SD",
+                        format: vs.format || "MP4"
+                    });
+                }
+            }
+            var subs = data.subtitles || [];
+            for (var s = 0; s < subs.length; s++) {
+                subtitles.push({ url: subs[s].url, code: subs[s].code });
+            }
+        }
+
+        if (streams.length === 0) return null;
+        return { title: title, streams: streams, subtitles: subtitles };
+    }
+
+    return null;
+}
+
 function renderGrid(items, container) {
+    if (!container) return;
     container.innerHTML = "";
+    
     if (!items || items.length === 0) {
         container.innerHTML = "<div style='padding:20px;'>Ничего не найдено.</div>";
         return;
@@ -110,24 +208,18 @@ function renderGrid(items, container) {
 
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
-        var rawUrl = item.url || item.id;
-        if (!rawUrl) continue;
 
-        var videoId = rawUrl.replace("/watch?v=", "").replace("/shorts/", "");
         var card = document.createElement("div");
         card.className = "card";
-        card.setAttribute("data-id", videoId);
+        card.setAttribute("data-id", item.id);
 
-        var thumbUrl = item.thumbnail || (item.thumbnails && item.thumbnails.length ? item.thumbnails[0].url : "");
         var thumb = document.createElement("div");
         thumb.className = "card-thumb";
-        if (thumbUrl) {
-            thumb.style.backgroundImage = "url('" + thumbUrl + "')";
-        }
+        thumb.style.backgroundImage = "url('" + item.thumbnail + "')";
 
         var title = document.createElement("div");
         title.className = "card-title";
-        title.textContent = item.title || "Без названия";
+        title.textContent = item.title;
 
         card.appendChild(thumb);
         card.appendChild(title);
@@ -146,11 +238,11 @@ function loadTrending() {
     playerContainer.classList.add("hidden");
     shortsContainer.className = "hidden";
     mainVideo.pause();
-    gridContainer.innerHTML = "<div style='padding:20px; color:#aaa;'>Загрузка...</div>";
+    gridContainer.innerHTML = "<div style='padding:20px; color:#aaa;'>Поиск рабочего сервера и загрузка...</div>";
 
-    fetchJSON("/trending?region=RU", function (err, data) {
+    executeApiRequest("trending", {}, function (err, data) {
         if (err || !data) {
-            gridContainer.innerHTML = "<div style='padding:20px; color:#ff5555;'>Ошибка загрузки.</div>";
+            gridContainer.innerHTML = "<div style='padding:20px; color:#ff5555;'>" + (err || "Ошибка загрузки.") + "</div>";
             return;
         }
         renderGrid(data, gridContainer);
@@ -166,37 +258,31 @@ function loadShorts() {
     shortsContainer.innerHTML = "<div style='padding:20px; color:#aaa; text-align:center;'>Загрузка Shorts...</div>";
     shortsContainer.className = "shorts-feed-container"; 
 
-    fetchJSON("/search?q=shorts&filter=videos", function (err, data) {
-        if (err || !data) {
+    executeApiRequest("search", { q: "shorts" }, function (err, items) {
+        if (err || !items) {
             shortsContainer.innerHTML = "<div style='padding:20px; color:#ff5555;'>Ошибка загрузки Shorts.</div>";
             return;
         }
         
-        var items = data.items || data;
         shortsContainer.innerHTML = ""; 
 
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            var rawUrl = item.url || item.id;
-            if (!rawUrl) continue;
-            var videoId = rawUrl.replace("/watch?v=", "").replace("/shorts/", "");
 
             var wrapper = document.createElement("div");
             wrapper.className = "short-video-wrapper";
-            wrapper.setAttribute("data-id", videoId);
+            wrapper.setAttribute("data-id", item.id);
 
             var videoEl = document.createElement("video");
             videoEl.loop = true;
             videoEl.controls = true;
             videoEl.setAttribute("playsinline", "");
             videoEl.setAttribute("webkit-playsinline", "");
-
-            var thumbUrl = item.thumbnail || (item.thumbnails && item.thumbnails.length ? item.thumbnails[0].url : "");
-            videoEl.poster = thumbUrl;
+            videoEl.poster = item.thumbnail;
 
             var titleEl = document.createElement("div");
             titleEl.className = "short-overlay-title";
-            titleEl.textContent = item.title || "Без названия";
+            titleEl.textContent = item.title;
 
             wrapper.appendChild(videoEl);
             wrapper.appendChild(titleEl);
@@ -209,16 +295,9 @@ function loadShorts() {
                     var v = this.querySelector("video");
                     var id = this.getAttribute("data-id");
                     if (!v.src) {
-                        fetchJSON("/streams/" + id, function(e, d) {
-                            if(!e && d && d.videoStreams) {
-                                var bUrl = d.videoStreams[0].url;
-                                for (var w = 0; w < d.videoStreams.length; w++) {
-                                    if (d.videoStreams[w].videoOnly === false) {
-                                        bUrl = d.videoStreams[w].url;
-                                        break;
-                                    }
-                                }
-                                v.src = bUrl;
+                        loadStreamsForVideo(id, function(e, str) {
+                            if (!e && str && str.length > 0) {
+                                v.src = str[0].url;
                                 v.play();
                             }
                         });
@@ -229,53 +308,55 @@ function loadShorts() {
     });
 }
 
+function loadStreamsForVideo(videoId, callback) {
+    executeApiRequest("streams", { id: videoId }, function (err, data) {
+        if (err || !data) {
+            callback(err, null);
+        } else {
+            callback(null, data.streams, data);
+        }
+    });
+}
+
 function playVideo(videoId) {
     playerContainer.classList.remove("hidden");
     window.scrollTo(0, 0);
     mainVideo.pause();
     mainVideo.removeAttribute('src');
-    videoTitle.textContent = "Загрузка потока...";
-    qualitySelect.innerHTML = "<option>Поиск качества...</option>";
+    videoTitle.textContent = "Подключение к серверу...";
+    qualitySelect.innerHTML = "<option>Загрузка...</option>";
 
-    fetchJSON("/streams/" + videoId, function (err, data) {
+    executeApiRequest("streams", { id: videoId }, function (err, data) {
         if (err || !data) {
-            videoTitle.textContent = "Не удалось загрузить видео.";
+            videoTitle.textContent = "Не удалось воспроизвести видео.";
             qualitySelect.innerHTML = "";
             return;
         }
 
-        videoTitle.textContent = data.title || "Видео";
-        var allStreams = data.videoStreams || [];
-        var validStreams = [];
-        
-        for (var i = 0; i < allStreams.length; i++) {
-            if (allStreams[i].videoOnly === false) {
-                validStreams.push(allStreams[i]);
-            }
-        }
-
-        currentStreams = validStreams.length > 0 ? validStreams : allStreams;
+        videoTitle.textContent = data.title;
+        currentStreams = data.streams;
         qualitySelect.innerHTML = "";
 
         for (var j = 0; j < currentStreams.length; j++) {
             var stream = currentStreams[j];
-            if (stream.quality) {
-                var opt = document.createElement("option");
-                opt.value = j;
-                opt.textContent = stream.quality + " (" + (stream.format || "MP4") + ")";
-                qualitySelect.appendChild(opt);
-            }
+            var opt = document.createElement("option");
+            opt.value = j;
+            opt.textContent = stream.quality + " (" + stream.format + ")";
+            qualitySelect.appendChild(opt);
         }
 
         if (currentStreams.length > 0) {
             mainVideo.src = currentStreams[0].url;
-            mainVideo.play();
+            var playPromise = mainVideo.play();
+            if (playPromise !== undefined && playPromise.catch) {
+                playPromise.catch(function(e) {});
+            }
         }
 
         if (data.subtitles && data.subtitles.length > 0) {
             var subUrl = data.subtitles[0].url; 
-            for(var k = 0; k < data.subtitles.length; k++) {
-                if(data.subtitles[k].code === "ru") {
+            for (var k = 0; k < data.subtitles.length; k++) {
+                if (data.subtitles[k].code === "ru") {
                     subUrl = data.subtitles[k].url;
                     break;
                 }
@@ -299,7 +380,10 @@ qualitySelect.onchange = function () {
         mainVideo.currentTime = currentTime;
         
         if (!isPaused) {
-            mainVideo.play();
+            var playPromise = mainVideo.play();
+            if (playPromise !== undefined && playPromise.catch) {
+                playPromise.catch(function(e) {});
+            }
         }
     }
 };
@@ -315,12 +399,11 @@ searchBtn.onclick = function () {
     mainVideo.pause();
     gridContainer.innerHTML = "<div style='padding:20px; color:#aaa;'>Поиск...</div>";
 
-    fetchJSON("/search?q=" + encodeURIComponent(query) + "&filter=all", function (err, data) {
-        if (err || !data) {
-            gridContainer.innerHTML = "<div style='padding:20px; color:#ff5555;'>Ошибка при поиске.</div>";
+    executeApiRequest("search", { q: query }, function (err, items) {
+        if (err || !items) {
+            gridContainer.innerHTML = "<div style='padding:20px; color:#ff5555;'>Ошибка поиска.</div>";
             return;
         }
-        var items = data.items || data;
         renderGrid(items, gridContainer);
     });
 };
