@@ -1,0 +1,185 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #0f0f0f;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.navbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background-color: #212121;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.search-box {
+    display: flex;
+    flex: 1;
+    max-width: 500px;
+    margin: 8px 16px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 12px;
+    background-color: #121212;
+    border: 1px solid #303030;
+    color: #fff;
+    border-radius: 2px 0 0 2px;
+    outline: none;
+}
+
+.search-box button {
+    padding: 8px 16px;
+    background-color: #383838;
+    border: 1px solid #303030;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 0 2px 2px 0;
+}
+
+.nav-links button {
+    background: none;
+    border: none;
+    color: #aaa;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.nav-links button.active {
+    color: #fff;
+    border-bottom: 2px solid #ff0000;
+}
+
+#appContent {
+    padding: 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    background-color: #000;
+}
+
+.video-wrapper video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-details {
+    padding: 12px 0;
+    border-bottom: 1px solid #303030;
+    margin-bottom: 20px;
+}
+
+.controls-bar {
+    margin-top: 10px;
+}
+
+.controls-bar select {
+    background-color: #212121;
+    color: #fff;
+    border: 1px solid #303030;
+    padding: 4px 8px;
+}
+
+.video-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -8px;
+}
+
+.card {
+    width: 100%;
+    padding: 8px;
+    cursor: pointer;
+}
+
+@media (min-width: 600px) {
+    .card { width: 50%; }
+}
+
+@media (min-width: 900px) {
+    .card { width: 33.333%; }
+}
+
+@media (min-width: 1200px) {
+    .card { width: 25%; }
+}
+
+.card-thumb {
+    width: 100%;
+    padding-bottom: 56.25%;
+    background-size: cover;
+    background-position: center;
+    background-color: #212121;
+    border-radius: 8px;
+}
+
+.card-title {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.3;
+    max-height: 2.6em;
+    overflow: hidden;
+}
+
+.shorts-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -8px;
+}
+
+.short-card {
+    width: 50%;
+    padding: 8px;
+    cursor: pointer;
+}
+
+@media (min-width: 600px) {
+    .short-card { width: 25%; }
+}
+
+@media (min-width: 900px) {
+    .short-card { width: 20%; }
+}
+
+.short-thumb {
+    width: 100%;
+    padding-bottom: 177.77%;
+    background-size: cover;
+    background-position: center;
+    background-color: #212121;
+    border-radius: 8px;
+}
