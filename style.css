@@ -1,198 +1,959 @@
-* {
-    box-sizing: border-box;
+html,
+body {
     margin: 0;
     padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #eeeeee;
+    color: #222;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px
 }
 
 body {
-    background-color: #0f0f0f;
-    color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+    min-width: 280px
 }
 
-.navbar {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 16px;
-    background-color: #212121;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+* {
+    box-sizing: border-box
+}
+
+a {
+    text-decoration: none;
+    color: inherit
+}
+
+button,
+input,
+select,
+video {
+    font-family: Arial, Helvetica, sans-serif
+}
+
+button {
+    cursor: pointer
+}
+
+.topbar {
+    height: 58px;
+    background: #fff;
+    border-bottom: 1px solid #ccc
+}
+
+.topinner {
+    height: 58px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 9px 12px;
+    overflow: hidden
 }
 
 .logo {
-    font-size: 20px;
+    display: block;
+    float: left;
+    width: 160px;
+    height: 40px;
+    line-height: 40px;
+    font-size: 22px;
     font-weight: bold;
-    color: #ff0000;
+    color: #e21b17;
+    white-space: nowrap
 }
 
-.search-box {
-    display: flex;
-    flex: 1;
-    max-width: 500px;
-    margin: 8px 16px;
+.searchForm {
+    height: 40px;
+    margin-left: 160px;
+    overflow: hidden
 }
 
-.search-box input {
-    width: 100%;
-    padding: 8px 12px;
-    background-color: #121212;
-    border: 1px solid #303030;
-    color: #fff;
-    border-radius: 2px 0 0 2px;
-    outline: none;
+.searchInput {
+    float: left;
+    width: 82%;
+    height: 40px;
+    border: 1px solid #aaa;
+    border-right: 0;
+    border-radius: 3px 0 0 3px;
+    padding: 0 10px;
+    outline: 0;
+    background: #fff;
+    color: #222;
+    font-size: 14px
 }
 
-.search-box button {
-    padding: 8px 16px;
-    background-color: #383838;
-    border: 1px solid #303030;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 0 2px 2px 0;
+.searchButton {
+    float: left;
+    width: 18%;
+    height: 40px;
+    border: 1px solid #aaa;
+    border-radius: 0 3px 3px 0;
+    background: #e5e5e5;
+    color: #222;
+    font-size: 13px
 }
 
-.nav-links button {
-    background: none;
-    border: none;
-    color: #aaa;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
+.searchButton:hover,
+.navItem:hover,
+.plainButton:hover,
+.controlButton:hover,
+.settingButton:hover,
+.directForm button:hover,
+.sideButton:hover {
+    background: #d8d8d8
 }
 
-.nav-links button.active {
-    color: #fff;
-    border-bottom: 2px solid #ff0000;
+.navBar {
+    height: 42px;
+    background: #fff;
+    border-bottom: 1px solid #ccc
 }
 
-#appContent {
-    padding: 16px;
-    max-width: 1280px;
+.navInner {
+    max-width: 1180px;
+    height: 42px;
     margin: 0 auto;
-    width: 100%;
+    padding: 0 12px;
+    overflow: hidden
 }
 
-.hidden {
-    display: none !important;
+.navItem {
+    display: inline-block;
+    height: 42px;
+    line-height: 42px;
+    padding: 0 14px;
+    color: #555;
+    font-size: 14px
 }
 
-.video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    background-color: #000;
+.navItem.active {
+    color: #e21b17;
+    font-weight: bold;
+    border-bottom: 2px solid #e21b17
 }
 
-.video-wrapper video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+.main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 14px
 }
 
-.video-details {
-    padding: 12px 0;
-    border-bottom: 1px solid #303030;
-    margin-bottom: 20px;
+.page {
+    display: none
 }
 
-.controls-bar {
-    margin-top: 10px;
+.page.active {
+    display: block
 }
 
-.controls-bar select {
-    background-color: #212121;
-    color: #fff;
-    border: 1px solid #303030;
-    padding: 4px 8px;
+.heading {
+    min-height: 39px;
+    margin-bottom: 10px;
+    overflow: hidden
 }
 
-.video-grid {
-    display: flex;
-    flex-wrap: wrap;
-    margin: -8px;
+.heading h1 {
+    float: left;
+    margin: 3px 0;
+    font-size: 22px;
+    font-weight: normal
+}
+
+.heading h2 {
+    margin: 3px 0;
+    font-size: 19px;
+    font-weight: normal
+}
+
+.subHeading {
+    margin-top: 17px
+}
+
+.plainButton {
+    float: right;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #eee;
+    padding: 7px 11px
+}
+
+.openBox {
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    padding: 13px
+}
+
+.openTitle {
+    margin-bottom: 9px;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.directForm {
+    overflow: hidden
+}
+
+.directForm input {
+    float: left;
+    width: 82%;
+    height: 38px;
+    border: 1px solid #aaa;
+    border-right: 0;
+    border-radius: 3px 0 0 3px;
+    padding: 0 9px;
+    background: #fff;
+    color: #222;
+    outline: 0;
+    font-size: 13px
+}
+
+.directForm button {
+    float: left;
+    width: 18%;
+    height: 38px;
+    border: 1px solid #aaa;
+    border-radius: 0 3px 3px 0;
+    background: #eee
+}
+
+.status {
+    min-height: 17px;
+    margin-top: 7px;
+    color: #777;
+    font-size: 12px;
+    line-height: 17px
+}
+
+.shortsNote {
+    padding: 9px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    color: #777;
+    font-size: 12px;
+    line-height: 17px;
+    margin-bottom: 8px
+}
+
+.videoGrid {
+    margin: 0 -6px;
+    overflow: hidden
 }
 
 .card {
-    width: 100%;
-    padding: 8px;
-    cursor: pointer;
-}
-
-@media (min-width: 600px) {
-    .card { width: 50%; }
-}
-
-@media (min-width: 900px) {
-    .card { width: 33.333%; }
-}
-
-@media (min-width: 1200px) {
-    .card { width: 25%; }
-}
-
-.card-thumb {
-    width: 100%;
-    padding-bottom: 56.25%;
-    background-size: cover;
-    background-position: center;
-    background-color: #212121;
-    border-radius: 8px;
-}
-
-.card-title {
-    margin-top: 8px;
-    font-size: 14px;
-    line-height: 1.3;
-    max-height: 2.6em;
-    overflow: hidden;
-}
-
-.shorts-feed-container {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 65px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: y mandatory;
-    background: #000;
-    max-width: 450px;
-    margin: 0 auto;
-}
-
-.short-video-wrapper {
-    flex: 0 0 100%;
-    height: 100%;
-    width: 100%;
-    scroll-snap-align: start;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #121212;
+    float: left;
+    width: 25%;
+    padding: 6px
 }
 
-.short-video-wrapper video {
+.cardInner {
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    cursor: pointer
+}
+
+.cardInner:hover .cardTitle,
+.card:focus .cardTitle {
+    color: #e21b17
+}
+
+.thumbWrap {
+    position: relative;
+    width: 100%;
+    background: #ddd;
+    overflow: hidden
+}
+
+.thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 0
+}
+
+.cardTitle {
+    min-height: 36px;
+    max-height: 54px;
+    overflow: hidden;
+    padding: 8px 9px 3px;
+    font-size: 14px;
+    line-height: 18px
+}
+
+.cardMeta {
+    padding: 0 9px 9px;
+    color: #888;
+    font-size: 11px;
+    line-height: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+.duration {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    padding: 2px 4px;
+    background: #000;
+    color: #fff;
+    font-size: 11px
+}
+
+.shortBadge {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    padding: 2px 5px;
+    background: #e21b17;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold
+}
+
+.removeCard {
+    position: absolute;
+    z-index: 4;
+    right: 10px;
+    top: 10px;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: 1px solid #777;
+    background: #fff;
+    color: #444;
+    font-size: 18px;
+    line-height: 21px
+}
+
+.removeCard:hover {
+    background: #ddd
+}
+
+.playerLayout {
+    overflow: hidden
+}
+
+.playerColumn {
+    float: left;
+    width: 76%;
+    padding-right: 12px
+}
+
+.sideColumn {
+    float: right;
+    width: 24%;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    min-height: 220px
+}
+
+.playerBox {
+    position: relative;
+    width: 100%;
+    background: #000;
+    overflow: hidden
+}
+
+.playerBox:before {
+    content: "";
+    display: block;
+    padding-top: 56.25%
+}
+
+.playerBox video {
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    background: #000
 }
 
-.short-overlay-title {
+.playerMessage {
     position: absolute;
-    bottom: 25px;
-    left: 15px;
-    right: 15px;
-    color: #fff;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+    left: 0;
+    top: 50%;
+    width: 100%;
+    margin-top: -8px;
+    color: #bbb;
+    font-size: 13px;
+    text-align: center;
+    pointer-events: none
+}
+
+.videoTitle {
+    margin-top: 10px;
+    padding: 11px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-bottom: 0;
+    font-size: 19px;
+    line-height: 25px
+}
+
+.videoMeta {
+    min-height: 20px;
+    padding: 0 11px 9px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-top: 0;
+    color: #777;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.playerControls {
+    padding: 9px 11px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-top: 0
+}
+
+.qualitySelect {
+    height: 34px;
+    margin-right: 5px;
+    border: 1px solid #aaa;
+    background: #eee;
+    color: #222
+}
+
+.controlButton {
+    height: 34px;
+    margin-right: 5px;
+    padding: 0 10px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #eee;
+    font-size: 12px
+}
+
+.sideTitle {
+    margin-bottom: 9px;
+    font-size: 16px;
+    font-weight: bold
+}
+
+.sideText {
+    color: #777;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.sideForm {
+    margin-top: 12px
+}
+
+.sideInput {
+    display: block;
+    width: 100%;
+    height: 36px;
+    border: 1px solid #aaa;
+    padding: 0 8px;
+    outline: 0;
+    background: #fff;
+    font-size: 12px
+}
+
+.sideButton {
+    display: block;
+    width: 100%;
+    height: 36px;
+    margin-top: 7px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #eee
+}
+
+.sideHelp {
+    margin-top: 10px;
+    color: #777;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.related {
+    clear: both;
+    margin-top: 16px
+}
+
+.relatedTitle {
+    margin-bottom: 6px;
+    font-size: 18px
+}
+
+.empty {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    color: #777;
+    text-align: center
+}
+
+.settingsBox {
+    background: #fff;
+    border: 1px solid #d0d0d0
+}
+
+.settingRow {
+    padding: 13px;
+    border-bottom: 1px solid #e3e3e3;
+    overflow: hidden
+}
+
+.settingRow:last-child {
+    border-bottom: 0
+}
+
+.settingName {
+    float: left;
+    width: 35%;
+    padding-top: 7px;
     font-size: 14px;
-    z-index: 10;
-    line-height: 1.4;
+    font-weight: bold
+}
+
+.settingValue {
+    float: left;
+    width: 65%
+}
+
+.settingButton {
+    min-height: 34px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #eee;
+    padding: 7px 10px;
+    font-size: 12px
+}
+
+.settingSelect {
+    width: 100%;
+    height: 34px;
+    border: 1px solid #aaa;
+    background: #eee;
+    color: #222;
+    font-size: 12px
+}
+
+.serverLabel {
+    display: inline-block;
+    margin: 0 7px 5px 0;
+    color: #666;
+    font-size: 12px
+}
+
+.serverStats {
+    padding: 12px;
+    color: #777;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.settingsNote {
+    margin-top: 10px;
+    padding: 10px;
+    background: #fff;
+    border-left: 3px solid #aaa;
+    color: #777;
+    font-size: 12px;
+    line-height: 18px
+}
+
+.footer {
+    clear: both;
+    margin-top: 25px;
+    padding: 16px;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    color: #888;
+    font-size: 11px;
+    text-align: center
+}
+
+body.dark {
+    background: #181818;
+    color: #e6e6e6
+}
+
+body.dark .topbar,
+body.dark .navBar,
+body.dark .openBox,
+body.dark .cardInner,
+body.dark .videoTitle,
+body.dark .videoMeta,
+body.dark .playerControls,
+body.dark .sideColumn,
+body.dark .empty,
+body.dark .settingsBox,
+body.dark .settingsNote,
+body.dark .shortsNote,
+body.dark .footer {
+    background: #242424;
+    color: #e6e6e6
+}
+
+body.dark .logo {
+    color: #ff6b66
+}
+
+body.dark .searchInput,
+body.dark .sideInput,
+body.dark .directForm input {
+    background: #202020;
+    color: #eee;
+    border-color: #555
+}
+
+body.dark .searchButton,
+body.dark .plainButton,
+body.dark .controlButton,
+body.dark .qualitySelect,
+body.dark .settingButton,
+body.dark .settingSelect,
+body.dark .directForm button,
+body.dark .sideButton {
+    background: #333;
+    color: #eee;
+    border-color: #666
+}
+
+body.dark .navItem {
+    color: #aaa
+}
+
+body.dark .navItem.active {
+    color: #ff6b66;
+    border-color: #ff6b66
+}
+
+body.dark .cardMeta,
+body.dark .status,
+body.dark .sideText,
+body.dark .sideHelp,
+body.dark .serverLabel,
+body.dark .serverStats,
+body.dark .settingsNote {
+    color: #aaa
+}
+
+body.dark .settingRow {
+    border-color: #3a3a3a
+}
+
+body.tvMode {
+    font-size: 20px
+}
+
+body.tvMode .topbar {
+    height: 76px
+}
+
+body.tvMode .topinner {
+    height: 76px;
+    padding: 14px 20px
+}
+
+body.tvMode .logo {
+    width: 220px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 28px
+}
+
+body.tvMode .searchForm {
+    height: 48px;
+    margin-left: 220px
+}
+
+body.tvMode .searchInput {
+    height: 48px;
+    font-size: 18px
+}
+
+body.tvMode .searchButton {
+    height: 48px;
+    font-size: 17px
+}
+
+body.tvMode .navBar {
+    height: 58px
+}
+
+body.tvMode .navInner {
+    height: 58px;
+    padding: 0 20px
+}
+
+body.tvMode .navItem {
+    height: 58px;
+    line-height: 58px;
+    padding: 0 22px;
+    font-size: 18px
+}
+
+body.tvMode .main {
+    max-width: 1440px;
+    padding: 20px
+}
+
+body.tvMode .heading h1 {
+    font-size: 30px
+}
+
+body.tvMode .heading h2 {
+    font-size: 25px
+}
+
+body.tvMode .plainButton,
+body.tvMode .controlButton,
+body.tvMode .settingButton {
+    font-size: 17px;
+    padding: 10px 14px
+}
+
+body.tvMode .card {
+    width: 20%;
+    padding: 8px
+}
+
+body.tvMode .card:focus .cardInner {
+    outline: 4px solid #e21b17
+}
+
+body.tvMode .cardTitle {
+    font-size: 17px;
+    line-height: 22px
+}
+
+body.tvMode .cardMeta {
+    font-size: 13px
+}
+
+body.tvMode .playerColumn {
+    width: 78%
+}
+
+body.tvMode .sideColumn {
+    width: 22%
+}
+
+body.tvMode .sideTitle {
+    font-size: 21px
+}
+
+body.tvMode .sideText,
+body.tvMode .sideHelp {
+    font-size: 15px;
+    line-height: 22px
+}
+
+body.tvMode .settingName {
+    font-size: 18px
+}
+
+body.tvMode .settingSelect {
+    height: 42px;
+    font-size: 15px
+}
+
+body.liteMode .related {
+    display: none
+}
+
+body.liteMode .cardMeta {
+    display: none
+}
+
+body.liteMode .shortsNote {
+    font-size: 11px
+}
+
+@media screen and (max-width:1000px) {
+
+    .card {
+        width: 33.3333%
+    }
+
+    .playerColumn {
+        width: 70%
+    }
+
+    .sideColumn {
+        width: 30%
+    }
+
+}
+
+@media screen and (max-width:700px) {
+
+    .logo {
+        width: 75px;
+        font-size: 18px
+    }
+
+    .searchForm {
+        margin-left: 75px
+    }
+
+    .card {
+        width: 50%
+    }
+
+    .playerColumn,
+    .sideColumn {
+        float: none;
+        width: 100%
+    }
+
+    .playerColumn {
+        padding-right: 0
+    }
+
+    .sideColumn {
+        margin-top: 10px
+    }
+
+    .settingName,
+    .settingValue {
+        float: none;
+        width: 100%
+    }
+
+    .settingValue {
+        margin-top: 7px
+    }
+
+    body.tvMode .card {
+        width: 33.3333%
+    }
+
+}
+
+@media screen and (max-width:440px) {
+
+    .topbar {
+        height: 51px
+    }
+
+    .topinner {
+        height: 51px;
+        padding: 7px
+    }
+
+    .logo {
+        width: 55px;
+        height: 36px;
+        line-height: 36px;
+        font-size: 16px
+    }
+
+    .searchForm {
+        height: 36px;
+        margin-left: 55px
+    }
+
+    .searchInput {
+        width: 78%;
+        height: 36px;
+        font-size: 12px
+    }
+
+    .searchButton {
+        width: 22%;
+        height: 36px;
+        font-size: 12px
+    }
+
+    .navBar {
+        height: 39px
+    }
+
+    .navInner {
+        height: 39px;
+        padding: 0 3px
+    }
+
+    .navItem {
+        height: 39px;
+        line-height: 39px;
+        padding: 0 7px;
+        font-size: 11px
+    }
+
+    .main {
+        padding: 8px
+    }
+
+    .card {
+        width: 100%
+    }
+
+    .heading h1 {
+        font-size: 20px
+    }
+
+    .directForm input {
+        width: 68%;
+        font-size: 12px
+    }
+
+    .directForm button {
+        width: 32%;
+        font-size: 12px
+    }
+
+    .videoTitle {
+        font-size: 17px
+    }
+
+    .controlButton,
+    .qualitySelect {
+        margin-bottom: 5px
+    }
+
+    body.tvMode .topbar {
+        height: 64px
+    }
+
+    body.tvMode .topinner {
+        height: 64px;
+        padding: 10px
+    }
+
+    body.tvMode .logo {
+        width: 75px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 19px
+    }
+
+    body.tvMode .searchForm {
+        height: 40px;
+        margin-left: 75px
+    }
+
+    body.tvMode .searchInput {
+        height: 40px;
+        font-size: 14px
+    }
+
+    body.tvMode .searchButton {
+        height: 40px;
+        font-size: 13px
+    }
+
+    body.tvMode .navBar,
+    body.tvMode .navInner {
+        height: 48px
+    }
+
+    body.tvMode .navItem {
+        height: 48px;
+        line-height: 48px;
+        padding: 0 9px;
+        font-size: 13px
+    }
+
+    body.tvMode .card {
+        width: 100%
+    }
+
 }
