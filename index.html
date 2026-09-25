@@ -1,45 +1,334 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="HandheldFriendly" content="true">
     <title>LiteTube</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
-    <header class="navbar">
-        <div class="logo">LiteTube</div>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Поиск видео...">
-            <button id="searchBtn">Найти</button>
-        </div>
-        <nav class="nav-links">
-            <button id="homeTab" class="active">Главная</button>
-            <button id="shortsTab">Shorts</button>
+    <div id="app">
+        <header class="topbar">
+            <div class="topinner">
+                <a id="logo" href="#home" class="logo">LiteTube</a>
+                <form id="searchForm" class="searchForm" action="#">
+                    <input id="searchInput" class="searchInput" type="text" maxlength="120" autocomplete="off"
+                        spellcheck="false" placeholder="Поиск видео">
+                    <button class="searchButton" type="submit">Найти</button>
+                </form>
+            </div>
+        </header>
+
+        <nav class="navBar">
+            <div class="navInner">
+                <a href="#home" class="navItem active" data-page="home">Главная</a>
+                <a href="#shorts" class="navItem" data-page="shorts">Shorts</a>
+                <a href="#history" class="navItem" data-page="history">История</a>
+                <a href="#favorites" class="navItem" data-page="favorites">Избранное</a>
+                <a href="#settings" class="navItem" data-page="settings">Настройки</a>
+            </div>
         </nav>
-    </header>
 
-    <main id="appContent">
-        <section id="playerContainer" class="hidden">
-            <div class="video-wrapper">
-                <video id="mainVideo" controls playsinline webkit-playsinline>
-                    <track id="captionTrack" kind="captions" srclang="ru" label="Русский">
-                </video>
-            </div>
-            <div class="video-details">
-                <h2 id="videoTitle"></h2>
-                <div class="controls-bar">
-                    <label for="qualitySelect">Качество: </label>
-                    <select id="qualitySelect"></select>
+        <main class="main">
+
+            <section id="homePage" class="page active">
+                <div class="heading">
+                    <h1>LiteTube</h1>
+                    <button id="refreshHome" class="plainButton" type="button">Обновить</button>
                 </div>
-            </div>
-        </section>
 
-        <section id="gridContainer" class="video-grid"></section>
+                <div class="openBox">
+                    <div class="openTitle">Открыть YouTube-видео</div>
 
-        <section id="shortsContainer" class="hidden"></section>
-    </main>
+                    <form id="directHomeForm" action="#" class="directForm">
+                        <input id="directHomeInput" type="text" maxlength="300" autocomplete="off" spellcheck="false"
+                            placeholder="Ссылка YouTube или ID видео">
+                        <button type="submit">Смотреть</button>
+                    </form>
 
-    <script src="script.js"></script>
+                    <div id="homeStatus" class="status"></div>
+                </div>
+
+                <div class="heading subHeading">
+                    <h2>Популярное</h2>
+                </div>
+
+                <div id="homeGrid" class="videoGrid"></div>
+            </section>
+
+            <section id="shortsPage" class="page">
+                <div class="heading">
+                    <h1>Shorts</h1>
+                    <button id="refreshShorts" class="plainButton" type="button">Обновить</button>
+                </div>
+
+                <div class="shortsNote">
+                    Короткие видео определяются по данным API.
+                </div>
+
+                <div id="shortsStatus" class="status"></div>
+
+                <div id="shortsGrid" class="videoGrid shortsGrid"></div>
+            </section>
+
+            <section id="searchPage" class="page">
+                <div class="heading">
+                    <h1>Результаты поиска</h1>
+                </div>
+
+                <div id="searchStatus" class="status"></div>
+                <div id="searchGrid" class="videoGrid"></div>
+            </section>
+
+            <section id="playerPage" class="page">
+                <div class="playerLayout">
+
+                    <div class="playerColumn">
+
+                        <div class="playerBox">
+                            <video id="videoPlayer" controls preload="metadata" playsinline poster="">
+                            </video>
+
+                            <div id="playerMessage" class="playerMessage">
+                                Подключение...
+                            </div>
+                        </div>
+
+                        <div id="playerTitle" class="videoTitle">
+                            LiteTube
+                        </div>
+
+                        <div id="playerMeta" class="videoMeta"></div>
+
+                        <div class="playerControls">
+
+                            <select id="qualitySelect" class="qualitySelect">
+                                <option value="">Качество</option>
+                            </select>
+
+                            <button id="favoriteButton" class="controlButton" type="button">
+                                В избранное
+                            </button>
+
+                            <button id="youtubeButton" class="controlButton" type="button">
+                                YouTube
+                            </button>
+
+                            <button id="backButton" class="controlButton" type="button">
+                                Назад
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <aside class="sideColumn">
+
+                        <div class="sideTitle">
+                            LiteTube Player
+                        </div>
+
+                        <div id="playerInfo" class="sideText">
+                            Выберите видео.
+                        </div>
+
+                        <form id="directForm" action="#" class="sideForm">
+
+                            <input id="directInput" class="sideInput" type="text" maxlength="300" autocomplete="off"
+                                spellcheck="false" placeholder="YouTube URL или ID">
+
+                            <button type="submit" class="sideButton">
+                                Открыть
+                            </button>
+
+                        </form>
+
+                        <div id="directStatus" class="status"></div>
+
+                        <div class="sideHelp">
+                            Для слабых устройств используются лёгкие MP4-потоки.
+                        </div>
+
+                    </aside>
+                </div>
+
+                <div class="related">
+                    <div class="relatedTitle">
+                        Похожие видео
+                    </div>
+
+                    <div id="relatedGrid" class="videoGrid"></div>
+                </div>
+            </section>
+
+            <section id="historyPage" class="page">
+
+                <div class="heading">
+                    <h1>История</h1>
+
+                    <button id="clearHistory" class="plainButton" type="button">
+                        Очистить
+                    </button>
+                </div>
+
+                <div id="historyGrid" class="videoGrid"></div>
+
+                <div id="historyEmpty" class="empty">
+                    История пока пуста.
+                </div>
+
+            </section>
+
+            <section id="favoritesPage" class="page">
+
+                <div class="heading">
+                    <h1>Избранное</h1>
+
+                    <button id="clearFavorites" class="plainButton" type="button">
+                        Очистить
+                    </button>
+                </div>
+
+                <div id="favoritesGrid" class="videoGrid"></div>
+
+                <div id="favoritesEmpty" class="empty">
+                    Избранное пока пусто.
+                </div>
+
+            </section>
+
+            <section id="settingsPage" class="page">
+
+                <div class="heading">
+                    <h1>Настройки</h1>
+                </div>
+
+                <div class="settingsBox">
+
+                    <div class="settingRow">
+                        <div class="settingName">Тема</div>
+
+                        <div class="settingValue">
+                            <button id="themeButton" class="settingButton" type="button">
+                                Тёмная тема
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settingRow">
+                        <div class="settingName">Оптимизация</div>
+
+                        <div class="settingValue">
+
+                            <select id="liteMode" class="settingSelect">
+
+                                <option value="auto">
+                                    Авто
+                                </option>
+
+                                <option value="on">
+                                    Экономия включена
+                                </option>
+
+                                <option value="off">
+                                    Полный режим
+                                </option>
+
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div class="settingRow">
+                        <div class="settingName">Режим ТВ</div>
+
+                        <div class="settingValue">
+
+                            <button id="tvButton" class="settingButton" type="button">
+                                Включить ТВ-режим
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <div class="settingRow">
+
+                        <div class="settingName">
+                            Серверы
+                        </div>
+
+                        <div class="settingValue">
+
+                            <select id="serverMode" class="settingSelect">
+
+                                <option value="auto">
+                                    Авто: рабочий → проверенные → дополнительные
+                                </option>
+
+                                <option value="random">
+                                    Все серверы случайно
+                                </option>
+
+                                <option value="verified">
+                                    Только официальный список
+                                </option>
+
+                                <option value="extra">
+                                    Только дополнительные
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="settingRow">
+
+                        <div class="settingName">
+                            Текущий сервер
+                        </div>
+
+                        <div class="settingValue">
+
+                            <div id="serverLabel" class="serverLabel">
+                                Не выбран
+                            </div>
+
+                            <button id="changeServer" class="settingButton" type="button">
+                                Сменить сервер
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div id="serverStats" class="serverStats">
+                    </div>
+
+                </div>
+
+                <div class="settingsNote">
+                    Официальный пул содержит текущие публичные серверы Piped.
+                    Дополнительный пул предназначен для резервного перебора.
+                </div>
+
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            LiteTube
+        </footer>
+
+    </div>
+
+    <script type="text/javascript" src="app.js"></script>
+
 </body>
+
 </html>
