@@ -1,46 +1,70 @@
 <!DOCTYPE html>
-<html lang="ru">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiteTube</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LiteTube</title>
+<link rel="stylesheet" href="style.css">
+<!--[if lt IE 9]>
+<script>
+document.createElement('header');document.createElement('nav');
+document.createElement('main');document.createElement('section');
+</script>
+<![endif]-->
 </head>
-
 <body>
 
-    <div class="wrap">
-        <div class="header">
-            <div class="logo" onclick="resetApp()" title="Сбросить и обновить">Lite<span>Tube</span></div>
-            <div class="search-form">
-                <input type="text" id="q" placeholder="Поиск по словам или ссылка/ID..."
-                    onkeydown="if(event.keyCode===13) startSearch()">
-                <button id="btnSearch" onclick="startSearch()">Найти</button>
-            </div>
-            <div class="quick-tags">
-                <span onclick="quickSearch('музыка 80х')">Музыка</span>
-                <span onclick="quickSearch('новости технологий')">Технологии</span>
-                <span onclick="quickSearch('игровые обзоры')">Игры</span>
-                <span onclick="quickSearch('космос hd')">Космос</span>
-            </div>
-        </div>
+<header class="topbar">
+  <a href="#/home" class="logo">Lite<span>Tube</span></a>
 
-        <div class="player-box" id="playerBox">
-            <div class="player-bar">
-                <span id="nowPlaying">Воспроизведение</span>
-                <button class="close-btn" onclick="closePlayer()">Закрыть</button>
-            </div>
-            <div class="iframe-wrap">
-                <iframe id="player" src="" allowfullscreen></iframe>
-            </div>
-        </div>
+  <form id="searchForm" class="search" action="#" onsubmit="return false;">
+    <input id="searchInput" type="text" placeholder="Search videos" autocomplete="off">
+    <button id="searchBtn" type="submit">Search</button>
+  </form>
 
-        <div class="status" id="status">Введите поисковый запрос или ссылку на видео</div>
-        <div id="results"></div>
+  <nav class="tabs">
+    <a href="#/home" id="tab-home">Home</a>
+    <a href="#/shorts" id="tab-shorts">Shorts</a>
+  </nav>
+</header>
+
+<main id="app">
+
+  <section id="view-home" class="view">
+    <h2 class="heading">Recommended</h2>
+    <div id="homeFeed" class="feed"></div>
+  </section>
+
+  <section id="view-search" class="view">
+    <h2 class="heading" id="searchHeading">Search results</h2>
+    <div id="searchFeed" class="feed"></div>
+    <p id="searchEmpty" class="empty">No videos found. Try another search.</p>
+  </section>
+
+  <section id="view-shorts" class="view">
+    <div class="shorts-wrap">
+      <div id="shortFrame" class="short-frame"></div>
+      <div class="short-controls">
+        <button id="shortPrev" type="button">&#9650; Prev</button>
+        <span id="shortCount">1 / 1</span>
+        <button id="shortNext" type="button">Next &#9660;</button>
+      </div>
+      <p class="hint">Tap the video to play or pause. Swipe up or down, or use the arrow keys.</p>
     </div>
+  </section>
 
-    <script src="app.js"></script>
+</main>
+
+<div id="player" class="player">
+  <div class="player-box">
+    <button id="playerClose" type="button" class="player-close">Close &times;</button>
+    <div id="playerHolder" class="player-holder"></div>
+    <h3 id="playerTitle" class="player-title"></h3>
+    <p id="playerMeta" class="meta"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 </body>
-
 </html>
