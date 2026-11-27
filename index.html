@@ -29,26 +29,33 @@ document.createElement('main');document.createElement('section');
   </nav>
 </header>
 
+<div id="status" class="status">Times are shown in GMT+4.</div>
+
 <main id="app">
 
   <section id="view-home" class="view">
-    <h2 class="heading">Recommended</h2>
+    <h2 class="heading">Trending</h2>
+    <div id="homeMsg" class="msg"></div>
     <div id="homeFeed" class="feed"></div>
+    <div class="more-wrap"><button id="homeMore" type="button" class="more">Show more</button></div>
   </section>
 
   <section id="view-search" class="view">
-    <h2 class="heading" id="searchHeading">Search results</h2>
+    <h2 class="heading" id="searchHeading">Search</h2>
+    <div id="searchMsg" class="msg"></div>
     <div id="searchFeed" class="feed"></div>
-    <p id="searchEmpty" class="empty">No videos found. Try another search.</p>
+    <div class="more-wrap"><button id="searchMore" type="button" class="more">Show more</button></div>
   </section>
 
   <section id="view-shorts" class="view">
     <div class="shorts-wrap">
+      <div id="shortMsg" class="msg"></div>
       <div id="shortFrame" class="short-frame"></div>
       <div class="short-controls">
         <button id="shortPrev" type="button">&#9650; Prev</button>
-        <span id="shortCount">1 / 1</span>
+        <span id="shortCount">0 / 0</span>
         <button id="shortNext" type="button">Next &#9660;</button>
+        <button id="shortSound" type="button">Sound: off</button>
       </div>
       <p class="hint">Tap the video to play or pause. Swipe up or down, or use the arrow keys.</p>
     </div>
@@ -60,6 +67,7 @@ document.createElement('main');document.createElement('section');
   <div class="player-box">
     <button id="playerClose" type="button" class="player-close">Close &times;</button>
     <div id="playerHolder" class="player-holder"></div>
+    <div id="playerMsg" class="msg dark"></div>
     <h3 id="playerTitle" class="player-title"></h3>
     <p id="playerMeta" class="meta"></p>
   </div>
