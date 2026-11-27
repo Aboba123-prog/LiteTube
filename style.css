@@ -60,11 +60,35 @@ a { color: inherit; text-decoration: none; }
 }
 .tabs a.active { color: #d62828; border-bottom: 3px solid #d62828; line-height: 33px; }
 
+/* ---------- Status / messages ---------- */
+.status {
+  padding: 4px 12px;
+  font-size: 11px;
+  color: #666;
+  background: #eaeaea;
+  border-bottom: 1px solid #ddd;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.msg { display: none; margin: 8px 6px 14px; padding: 10px; background: #fff; border: 1px solid #ddd; color: #444; }
+.msg.dark { background: #222; border-color: #444; color: #ddd; }
+.msg a { color: #d62828; text-decoration: underline; }
+.retry, .more {
+  margin-top: 8px;
+  padding: 8px 16px;
+  border: 1px solid #bbb;
+  background: #eee;
+  font-size: 14px;
+  cursor: pointer;
+}
+.more-wrap { text-align: center; }
+.more { display: none; margin-bottom: 20px; }
+
 /* ---------- Views ---------- */
 .view { display: none; padding: 10px; }
 .view.active { display: block; }
 .heading { font-size: 18px; margin: 4px 6px 10px; }
-.empty { display: none; margin: 20px 6px; color: #666; }
 
 /* ---------- Feed / cards (inline-block grid) ---------- */
 .feed { font-size: 0; margin: 0 -5px; }
@@ -83,18 +107,10 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: 0;
   padding-bottom: 56.25%;
-  background: #888;
+  background: #777;
   overflow: hidden;
 }
-.play-icon {
-  position: absolute;
-  left: 50%; top: 50%;
-  width: 0; height: 0;
-  margin: -14px 0 0 -9px;
-  border-left: 24px solid rgba(255,255,255,0.9);
-  border-top: 14px solid transparent;
-  border-bottom: 14px solid transparent;
-}
+.thumb img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; }
 .badge {
   position: absolute;
   right: 4px; bottom: 4px;
@@ -104,6 +120,8 @@ a { color: inherit; text-decoration: none; }
   font-size: 11px;
   padding: 1px 4px;
 }
+.badge.live { background: #d62828; }
+.badge.sched { background: #1d5fa8; }
 .card-title {
   display: block;
   font-weight: bold;
@@ -125,46 +143,46 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   cursor: pointer;
 }
+.short-bg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .short-frame video {
   position: absolute;
   left: 0; top: 0;
   width: 100%; height: 100%;
   background: #000;
 }
-.short-bg { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .short-info {
   position: absolute;
   left: 0; right: 0; bottom: 0;
   padding: 30px 10px 10px;
   text-align: left;
   color: #fff;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0,0,0,0.5);
   pointer-events: none;
 }
 .short-info strong { display: block; font-size: 15px; }
-.short-info span { font-size: 12px; }
+.short-info span { font-size: 12px; display: block; }
 .short-pause {
   position: absolute;
   left: 50%; top: 45%;
-  margin-left: -28px;
-  width: 56px; height: 56px;
-  line-height: 56px;
-  border-radius: 28px;
-  background: rgba(0,0,0,0.55);
+  margin-left: -40px;
+  width: 80px; height: 40px;
+  line-height: 40px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.6);
   color: #fff;
-  font-size: 24px;
+  font-size: 14px;
   text-align: center;
   pointer-events: none;
 }
 .short-controls { margin-top: 10px; }
 .short-controls button {
-  padding: 8px 14px;
+  padding: 8px 12px;
   border: 1px solid #bbb;
   background: #fff;
   font-size: 14px;
   cursor: pointer;
 }
-.short-controls span { display: inline-block; min-width: 70px; color: #555; }
+.short-controls span { display: inline-block; min-width: 60px; color: #555; }
 .hint { color: #777; font-size: 12px; margin: 8px 0 0; }
 
 /* ---------- Player overlay ---------- */
@@ -174,7 +192,7 @@ a { color: inherit; text-decoration: none; }
   left: 0; top: 0; right: 0; bottom: 0;
   z-index: 50;
   background: #000;
-  background: rgba(0,0,0,0.88);
+  background: rgba(0,0,0,0.9);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
